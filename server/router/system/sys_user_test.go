@@ -1,11 +1,13 @@
 package system
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/fbsobreira/gotron-sdk/pkg/abi"
+	"os"
 
 	//"github.com/fbsobreira/gotron-sdk/pkg/abi"
 	"github.com/fbsobreira/gotron-sdk/pkg/address"
@@ -23,6 +25,9 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+
+	"github.com/mymmrac/telego"
+	tu "github.com/mymmrac/telego/telegoutil"
 )
 
 func TestTRC20_Balance(t *testing.T) {
@@ -267,7 +272,7 @@ func TestGetTransactionById(t *testing.T) {
 		log.Println(tx, _balance)
 
 	}
-	exportExcel(sumbitMap, "预感今日被冻结地址.xlsx")
+	exportExcel(sumbitMap, "今日预冻结.xlsx")
 	log.Println("==========================接下来是确认的===============================")
 	for _committx, _commitbalance := range commitMap {
 		log.Println(_committx, _commitbalance)
@@ -275,7 +280,61 @@ func TestGetTransactionById(t *testing.T) {
 	}
 
 	time.Sleep(3 * time.Second)
-	exportExcel(sumbitMap, "已确认今日被冻结地址.xlsx")
+	filePath1 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\router\\system\\今日预冻结.xlsx"
+	sendTelegram(filePath1)
+
+	exportExcel(sumbitMap, "今日已冻结.xlsx")
+	time.Sleep(3 * time.Second)
+	filePath2 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\router\\system\\今日已冻结.xlsx"
+	sendTelegram(filePath2)
+}
+
+func sendTelegram(_filePath string) {
+	ctx := context.Background()
+	//botToken := os.Getenv("TOKEN")
+	botToken := "7668068911:AAFOXuA7KpWOfur0rcoVbZTwGOgsBCjkI3s"
+	//botToken := "7668068911:AAFOXuA7KpWOfur0rcoVbZTwGOgsBCjkI3s"
+	//chatID := -4657809905
+	filePath := _filePath
+	// Note: Please keep in mind that default logger may expose sensitive information, use in development only
+	bot, err := telego.NewBot(botToken, telego.WithDefaultDebugLogger())
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	// Document parameters
+	document := tu.Document(
+		// Chat ID as Integer
+		tu.ID(int64(-4657809905)),
+
+		// Send using file from disk
+		tu.File(mustOpen(filePath)),
+
+		// Send using external URL
+		// tu.FileFromURL("https://example.com/my_file.txt"),
+
+		// Send using file ID
+		// tu.FileFromID("<file ID of your file>"),
+	).WithCaption("來自於U盾情報部")
+
+	// Sending document
+	msg, err := bot.SendDocument(ctx, document)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(msg.Document)
+
+}
+
+// Helper function to open file or panic
+func mustOpen(filename string) *os.File {
+	file, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+	return file
 }
 
 func getTransactionData(_txid string) TransactionInfo {
