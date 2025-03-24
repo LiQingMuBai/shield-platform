@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div>   <!--
     <div class="gva-search-box">
       <el-form :inline="true" :model="searchInfo">
         <el-form-item label="请求方法">
@@ -19,7 +19,9 @@
         </el-form-item>
       </el-form>
     </div>
+    -->
     <div class="gva-table-box">
+   <!--
       <div class="gva-btn-list">
         <el-button
           icon="delete"
@@ -28,6 +30,7 @@
           >删除</el-button
         >
       </div>
+      -->
       <el-table
         ref="multipleTable"
         :data="tableData"
@@ -36,6 +39,8 @@
         row-key="ID"
         @selection-change="handleSelectionChange"
       >
+
+     <!--
         <el-table-column align="left" type="selection" width="55" />
         <el-table-column align="left" label="操作人" width="140">
           <template #default="scope">
@@ -57,11 +62,12 @@
           </template>
         </el-table-column>
         <el-table-column align="left" label="请求IP" prop="ip" width="120" />
+        -->
         <el-table-column
           align="left"
           label="请求方法"
           prop="method"
-          width="120"
+          width="320"
         />
         <el-table-column
           align="left"
@@ -89,7 +95,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column align="left" label="响应" prop="path" width="80">
+        <el-table-column align="left" label="响应" prop="path" width="180">
           <template #default="scope">
             <div>
               <el-popover
@@ -115,7 +121,7 @@
               type="primary"
               link
               @click="deleteSysOperationRecordFunc(scope.row)"
-              >删除</el-button
+              >触发发送</el-button
             >
           </template>
         </el-table-column>
@@ -199,7 +205,7 @@
     multipleSelection.value = val
   }
   const onDelete = async () => {
-    ElMessageBox.confirm('确定要删除吗?', '提示', {
+    ElMessageBox.confirm('确定要发送报表到群里面吗?', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
@@ -223,7 +229,7 @@
     })
   }
   const deleteSysOperationRecordFunc = async (row) => {
-    ElMessageBox.confirm('确定要删除吗?', '提示', {
+    ElMessageBox.confirm('确定要发送报表到群里面吗?', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
@@ -232,7 +238,7 @@
       if (res.code === 0) {
         ElMessage({
           type: 'success',
-          message: '删除成功'
+          message: '发送成功'
         })
         if (tableData.value.length === 1 && page.value > 1) {
           page.value--
