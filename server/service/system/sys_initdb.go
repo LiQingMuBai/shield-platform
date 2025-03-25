@@ -117,10 +117,10 @@ func (initDBService *InitDBService) InitDB(conf request.InitDB) (err error) {
 		ctx = context.WithValue(ctx, "dbtype", "mysql")
 	}
 
-	conf.Password = "123456"
-	log.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-	log.Println(conf.UserName + ":" + conf.Password + "@tcp(" + conf.Host + ":" + conf.Port + ")/" + conf.DBName)
-	log.Println("==================================================================")
+	//conf.Password = "123456"
+	//log.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+	//log.Println(conf.UserName + ":" + conf.Password + "@tcp(" + conf.Host + ":" + conf.Port + ")/" + conf.DBName)
+	//log.Println("==================================================================")
 	ctx, err = initHandler.EnsureDB(ctx, &conf)
 	if err != nil {
 		return err
