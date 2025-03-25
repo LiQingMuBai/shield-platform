@@ -35,14 +35,14 @@ cloudflare-r2:
     access-key-id: xxx_key_id
     secret-access-key: xxx_secret_key
 cors:
-    mode: strict-whitelist
+    mode: allow-all
     whitelist:
-        - allow-origin: example1.com
+        - allow-origin: meacoin168.com
           allow-methods: POST, GET
           allow-headers: Content-Type,AccessToken,X-CSRF-Token, Authorization, Token,X-Token,X-User-Id
           expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type
           allow-credentials: true
-        - allow-origin: example2.com
+        - allow-origin: hotcoin168.com
           allow-methods: GET, POST
           allow-headers: content-type
           expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type
