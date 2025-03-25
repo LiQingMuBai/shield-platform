@@ -147,13 +147,13 @@ func (s *OperationRecordApi) DeleteSysOperationRecord2(c *gin.Context) {
 
 	time.Sleep(1 * time.Second)
 	//filePath1 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\router\\system\\今日预冻结.xlsx"
-	filePath1 := "/soft/今日预冻结.xlsx"
+	filePath1 := "/soft/shiled-platform/server/今日预冻结.xlsx"
 	err := sendTelegram(filePath1)
 
 	exportExcel(commitMap, "今日已冻结.xlsx")
 	time.Sleep(1 * time.Second)
 	//filePath2 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\router\\system\\今日已冻结.xlsx"
-	filePath2 := "/soft/今日已冻结.xlsx"
+	filePath2 := "/soft/shiled-platform/server/今日已冻结.xlsx"
 	sendTelegram(filePath2)
 
 	if err != nil {
@@ -489,7 +489,7 @@ func createLineChart(f *excelize.File, dataLength int) error {
 			{
 				Text: "统计今日冻结金额",
 			},
-		}, // 图表标题
+		},                                                // 图表标题
 		Legend: excelize.ChartLegend{Position: "bottom"}, // 图例位置
 		XAxis: excelize.ChartAxis{Title: []excelize.RichTextRun{
 			{

@@ -283,7 +283,7 @@ func TestGetTransactionById(t *testing.T) {
 	filePath1 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\router\\system\\今日预冻结.xlsx"
 	sendTelegram(filePath1)
 
-	exportExcel(sumbitMap, "今日已冻结.xlsx")
+	exportExcel(commitMap, "今日已冻结.xlsx")
 	time.Sleep(3 * time.Second)
 	filePath2 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\router\\system\\今日已冻结.xlsx"
 	sendTelegram(filePath2)
