@@ -8,8 +8,8 @@ import (
 type SysRouter struct{}
 
 func (s *SysRouter) InitSystemRouter(Router *gin.RouterGroup) {
-	sysRouter := Router.Group("system").Use(middleware.OperationRecord())
-	sysRouterWithoutRecord := Router.Group("system")
+	sysRouter := Router.Group("api/system").Use(middleware.OperationRecord())
+	sysRouterWithoutRecord := Router.Group("api/system")
 
 	{
 		sysRouter.POST("setSystemConfig", systemApi.SetSystemConfig) // 设置配置文件内容

@@ -8,8 +8,8 @@ import (
 type UserRouter struct{}
 
 func (s *UserRouter) InitUserRouter(Router *gin.RouterGroup) {
-	userRouter := Router.Group("user").Use(middleware.OperationRecord())
-	userRouterWithoutRecord := Router.Group("user")
+	userRouter := Router.Group("api/user").Use(middleware.OperationRecord())
+	userRouterWithoutRecord := Router.Group("api/user")
 	{
 		userRouter.POST("admin_register", baseApi.Register)               // 管理员注册账号
 		userRouter.POST("changePassword", baseApi.ChangePassword)         // 用户修改密码

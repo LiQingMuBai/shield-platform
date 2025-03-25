@@ -8,8 +8,8 @@ import (
 type MenuRouter struct{}
 
 func (s *MenuRouter) InitMenuRouter(Router *gin.RouterGroup) (R gin.IRoutes) {
-	menuRouter := Router.Group("menu").Use(middleware.OperationRecord())
-	menuRouterWithoutRecord := Router.Group("menu")
+	menuRouter := Router.Group("api/menu").Use(middleware.OperationRecord())
+	menuRouterWithoutRecord := Router.Group("api/menu")
 	{
 		menuRouter.POST("addBaseMenu", authorityMenuApi.AddBaseMenu)           // 新增菜单
 		menuRouter.POST("addMenuAuthority", authorityMenuApi.AddMenuAuthority) //	增加menu和角色关联关系
