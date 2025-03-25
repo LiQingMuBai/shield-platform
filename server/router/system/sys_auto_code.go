@@ -7,8 +7,8 @@ import (
 type AutoCodeRouter struct{}
 
 func (s *AutoCodeRouter) InitAutoCodeRouter(Router *gin.RouterGroup, RouterPublic *gin.RouterGroup) {
-	autoCodeRouter := Router.Group("autoCode")
-	publicAutoCodeRouter := RouterPublic.Group("autoCode")
+	autoCodeRouter := Router.Group("api/autoCode")
+	publicAutoCodeRouter := RouterPublic.Group("api/autoCode")
 	{
 		autoCodeRouter.GET("getDB", autoCodeApi.GetDB)         // 获取数据库
 		autoCodeRouter.GET("getTables", autoCodeApi.GetTables) // 获取对应数据库的表
