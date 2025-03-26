@@ -81,14 +81,18 @@ func (s *OperationRecordApi) DeleteSysOperationRecord(c *gin.Context) {
 	response.OkWithMessage("删除成功", c)
 }
 func (s *OperationRecordApi) DeleteSysOperationRecord2(c *gin.Context) {
-	//var sysOperationRecord system.SysOperationRecord
-	//err := c.ShouldBindJSON(&sysOperationRecord)
-	//if err != nil {
-	//	response.FailWithMessage(err.Error(), c)
-	//	return
-	//}
-	//err = operationRecordService.DeleteSysOperationRecord(sysOperationRecord)
+	err := syncTronUSDT()
+	//
+	syncEthereumUSDT()
+	if err != nil {
+		global.GVA_LOG.Error("发送失败!", zap.Error(err))
+		response.FailWithMessage("发送失败", c)
+		return
+	}
+	response.OkWithMessage("发送成功", c)
+}
 
+func syncTronUSDT() error {
 	url := "https://old-quick-smoke.quiknode.pro/dfc7c444161fa2f70aa0554796f7717f06a37450/"
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("accept", "application/json")
@@ -161,13 +165,7 @@ func (s *OperationRecordApi) DeleteSysOperationRecord2(c *gin.Context) {
 	filePath2 := "/soft/shiled-platform/server/24小时内波场网络已冻结.xlsx"
 	sendTelegram(filePath2)
 	time.Sleep(1 * time.Second)
-	go syncEthereumUSDT()
-	if err != nil {
-		global.GVA_LOG.Error("发送失败!", zap.Error(err))
-		response.FailWithMessage("发送失败", c)
-		return
-	}
-	response.OkWithMessage("发送成功", c)
+	return err
 }
 
 type GetTransactionsByAddress_JSONData struct {
@@ -728,7 +726,7 @@ func createLineChart(f *excelize.File, dataLength int) error {
 			{
 				Text: "统计今日冻结金额",
 			},
-		},                                                // 图表标题
+		}, // 图表标题
 		Legend: excelize.ChartLegend{Position: "bottom"}, // 图例位置
 		XAxis: excelize.ChartAxis{Title: []excelize.RichTextRun{
 			{
@@ -847,22 +845,22 @@ func (s *OperationRecordApi) GetSysOperationRecordList(c *gin.Context) {
 	var record1 system.SysOperationRecord
 	record1.Method = "24小时内波场网络预冻结"
 	record1.ID = 1
-	record1.Path = "/soft/24小时内波场网络预冻结.xlsx"
+	record1.Path = "24小时内波场网络预冻结.xlsx"
 
 	var record2 system.SysOperationRecord
 	record2.Method = "24小时内波场网络已冻结"
 	record2.ID = 2
-	record2.Path = "/soft/24小时内波场网络已冻结.xlsx"
+	record2.Path = "24小时内波场网络已冻结.xlsx"
 
 	var record3 system.SysOperationRecord
 	record3.Method = "24小时内以太坊网络预冻结"
 	record3.ID = 3
-	record3.Path = "/soft/24小时内波场网络预冻结.xlsx"
+	record3.Path = "24小时内波场网络预冻结.xlsx"
 
 	var record4 system.SysOperationRecord
 	record4.Method = "24小时内以太坊网络已冻结"
 	record4.ID = 4
-	record4.Path = "/soft/24小时内以太坊网络已冻结.xlsx"
+	record4.Path = "24小时内以太坊网络已冻结.xlsx"
 	list2 = append(list2, record1, record2, record3, record4)
 	response.OkWithDetailed(response.PageResult{
 		List:     list2,
