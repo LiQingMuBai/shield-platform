@@ -228,8 +228,10 @@ func syncEthereumUSDT() {
 			balance, err := getUSDTBalance(_address)
 			if err != nil {
 			}
-			sumbitMap[_address] = balance
-			log.Println(balance)
+			if len(_address) > 0 {
+				sumbitMap[_address] = balance
+				log.Println(balance)
+			}
 		}
 		if len(_address) == 0 {
 			//说明是已经拉入黑名单
@@ -241,8 +243,10 @@ func syncEthereumUSDT() {
 				balance, err := getUSDTBalance(_address)
 				if err != nil {
 				}
-				commitMap[_address] = balance
-				log.Println(balance)
+				if len(_address) > 0 {
+					commitMap[_address] = balance
+					log.Println(balance)
+				}
 			}
 		}
 	}
