@@ -129,13 +129,17 @@ func (s *OperationRecordApi) DeleteSysOperationRecord2(c *gin.Context) {
 			_, _amount := getBalance(tAddress)
 			//log.Println("balance", tAddress, _amount)
 
-			sumbitMap[tAddress] = _amount
+			if _amount > 0 {
+				sumbitMap[tAddress] = _amount
+			}
 		} else {
 			//已經拉入黑名單
 			//log.Println("commit")
 			_address, _amount := getCommitAddressBalance(txID)
 			//log.Println("balance", _address, _amount)
-			commitMap[_address] = _amount
+			if _amount > 0 {
+				commitMap[_address] = _amount
+			}
 		}
 		//commit
 	}
