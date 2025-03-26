@@ -258,7 +258,7 @@ func syncEthereumUSDT() {
 
 	time.Sleep(1 * time.Second)
 	//filePath1 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\api\\v1\\system\\24小时内以太坊预冻结.xlsx"
-	filePath1 := "/soft/shiled-platform/server/24小时内以太坊网络预冻结.xlsx"
+	filePath1 := "/soft/shiled-platform/server/24小时内以太坊预冻结.xlsx"
 	sendTelegram(filePath1)
 	log.Println("==========================已确认的====================================")
 	for tx, _balance := range commitMap {
@@ -268,7 +268,7 @@ func syncEthereumUSDT() {
 	exportExcel(commitMap, "24小时内以太坊已冻结.xlsx")
 	time.Sleep(1 * time.Second)
 	//filePath2 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\api\\v1\\system\\24小时内以太坊已冻结.xlsx"
-	filePath2 := "/soft/shiled-platform/server/24小时内以太坊网络已冻结.xlsx"
+	filePath2 := "/soft/shiled-platform/server/24小时内以太坊已冻结.xlsx"
 	sendTelegram(filePath2)
 
 }
