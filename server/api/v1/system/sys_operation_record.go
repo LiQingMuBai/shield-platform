@@ -24,6 +24,7 @@ import (
 	"math/big"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -88,7 +89,7 @@ func (s *OperationRecordApi) DeleteSysOperationRecord2(c *gin.Context) {
 	//}
 	//err = operationRecordService.DeleteSysOperationRecord(sysOperationRecord)
 
-	url := "https://api.trongrid.io/v1/contracts/TBPxhVAsuzoFnKyXtc1o2UySEydPHgATto/events"
+	url := "https://old-quick-smoke.quiknode.pro/dfc7c444161fa2f70aa0554796f7717f06a37450/"
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("accept", "application/json")
 	res, _ := http.DefaultClient.Do(req)
@@ -143,25 +144,236 @@ func (s *OperationRecordApi) DeleteSysOperationRecord2(c *gin.Context) {
 		log.Println(tx, _balance)
 
 	}
-	exportExcel(sumbitMap, "今日预冻结.xlsx")
+	exportExcel(sumbitMap, "24小时内波场网络预冻结.xlsx")
 
 	time.Sleep(1 * time.Second)
 	//filePath1 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\router\\system\\今日预冻结.xlsx"
-	filePath1 := "/soft/shiled-platform/server/今日预冻结.xlsx"
+	filePath1 := "/soft/shiled-platform/server/24小时内波场网络预冻结.xlsx"
 	err := sendTelegram(filePath1)
 
-	exportExcel(commitMap, "今日已冻结.xlsx")
+	exportExcel(commitMap, "24小时内波场网络已冻结.xlsx")
 	time.Sleep(1 * time.Second)
 	//filePath2 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\router\\system\\今日已冻结.xlsx"
-	filePath2 := "/soft/shiled-platform/server/今日已冻结.xlsx"
+	filePath2 := "/soft/shiled-platform/server/24小时内波场网络已冻结.xlsx"
 	sendTelegram(filePath2)
-
+	time.Sleep(1 * time.Second)
+	go syncEthereumUSDT()
 	if err != nil {
 		global.GVA_LOG.Error("发送失败!", zap.Error(err))
 		response.FailWithMessage("发送失败", c)
 		return
 	}
 	response.OkWithMessage("发送成功", c)
+}
+
+type GetTransactionsByAddress_JSONData struct {
+	ID      int      `json:"id"`
+	Jsonrpc string   `json:"jsonrpc"`
+	Method  string   `json:"method"`
+	Params  []Params `json:"params"`
+}
+type Params struct {
+	Address string `json:"address"`
+	Page    int    `json:"page"`
+	PerPage int    `json:"perPage"`
+}
+
+func syncEthereumUSDT() {
+	parameter := GetTransactionsByAddress_JSONData{
+		ID:      67,
+		Jsonrpc: "2.0",
+		Method:  "qn_getTransactionsByAddress",
+		Params: []Params{{
+			Address: "0xC6CDE7C39eB2f0F0095F41570af89eFC2C1Ea828",
+			Page:    1,
+			PerPage: 20}},
+	}
+	reqParam, err := json.Marshal(parameter)
+
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	reqBody := strings.NewReader(string(reqParam))
+	url := "https://old-quick-smoke.quiknode.pro/dfc7c444161fa2f70aa0554796f7717f06a37450/"
+	req, _ := http.NewRequest("POST", url, reqBody)
+	req.Header.Add("accept", "application/json")
+
+	res, _ := http.DefaultClient.Do(req)
+	defer res.Body.Close()
+	body, _ := io.ReadAll(res.Body)
+	//fmt.Println(string(body))
+	var txs EthereumContractTX
+	if err := json.Unmarshal(body, &txs); err != nil { // Parse []byte to go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+	}
+
+	//log.Println(txs)
+	time.Sleep(1 * time.Second)
+	sumbitMap := make(map[string]int64)
+	commitMap := make(map[string]int64)
+	for _, tx := range txs.Result.PaginatedItems {
+		log.Println(tx.TransactionHash)
+		//获取交易tx hash
+		_txHash := tx.TransactionHash
+		time.Sleep(1 * time.Second)
+		_address := getPeddingBlackedAddress(_txHash)
+
+		if len(_address) > 0 {
+			//说明是pendding的地址，直接获取余额
+			log.Println("待定黑名单地址：", _address)
+			time.Sleep(1 * time.Second)
+			balance, err := getUSDTBalance(_address)
+			if err != nil {
+			}
+			sumbitMap[_address] = balance
+			log.Println(balance)
+		}
+		if len(_address) == 0 {
+			//说明是已经拉入黑名单
+			//fmt.Println(_address)
+			_address := getBlackAddress(_txHash)
+			time.Sleep(1 * time.Second)
+			if len(_address) > 0 {
+				log.Println("黑名单地址：", _address)
+				balance, err := getUSDTBalance(_address)
+				if err != nil {
+				}
+				commitMap[_address] = balance
+				log.Println(balance)
+			}
+		}
+	}
+
+	//export excel
+
+	log.Println("==========================已提交的====================================")
+	for tx, _balance := range sumbitMap {
+		log.Println(tx, _balance)
+
+	}
+	exportExcel(sumbitMap, "24小时内以太坊预冻结.xlsx")
+
+	time.Sleep(1 * time.Second)
+	//filePath1 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\api\\v1\\system\\24小时内以太坊预冻结.xlsx"
+	filePath1 := "/soft/shiled-platform/server/24小时内以太坊网络预冻结.xlsx"
+	sendTelegram(filePath1)
+	log.Println("==========================已确认的====================================")
+	for tx, _balance := range commitMap {
+		log.Println(tx, _balance)
+
+	}
+	exportExcel(commitMap, "24小时内以太坊已冻结.xlsx")
+	time.Sleep(1 * time.Second)
+	//filePath2 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\api\\v1\\system\\24小时内以太坊已冻结.xlsx"
+	filePath2 := "/soft/shiled-platform/server/24小时内以太坊网络已冻结.xlsx"
+	sendTelegram(filePath2)
+
+}
+
+type GetTransactionByHash_JSONData struct {
+	Method  string   `json:"method"`
+	Params  []string `json:"params"`
+	ID      int      `json:"id"`
+	Jsonrpc string   `json:"jsonrpc"`
+}
+
+func getPeddingBlackedAddress(_txHash string) string {
+	parameter := GetTransactionByHash_JSONData{
+		ID:      1,
+		Jsonrpc: "2.0",
+		Method:  "eth_getTransactionByHash",
+		Params:  []string{_txHash},
+	}
+	reqParam, err := json.Marshal(parameter)
+
+	if err != nil {
+
+		return ""
+	}
+	reqBody := strings.NewReader(string(reqParam))
+	url := "https://old-quick-smoke.quiknode.pro/dfc7c444161fa2f70aa0554796f7717f06a37450/"
+	req, _ := http.NewRequest("POST", url, reqBody)
+	req.Header.Add("accept", "application/json")
+
+	res, _ := http.DefaultClient.Do(req)
+	defer res.Body.Close()
+	body, _ := io.ReadAll(res.Body)
+	//fmt.Println(string(body))
+	var tx EthereumTX
+	if err := json.Unmarshal(body, &tx); err != nil { // Parse []byte to go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+	}
+
+	if len(tx.Result.Input) > 300 {
+
+		fmt.Println("地址：", "0x"+tx.Result.Input[298:298+40])
+
+		return "0x" + tx.Result.Input[298:298+40]
+	} else {
+		return ""
+	}
+}
+
+func getBlackAddress(_txHash string) string {
+	parameter := GetTransactionByHash_JSONData{
+		ID:      1,
+		Jsonrpc: "2.0",
+		Method:  "eth_getTransactionReceipt",
+		Params:  []string{_txHash},
+	}
+	reqParam, err := json.Marshal(parameter)
+
+	if err != nil {
+
+		return ""
+	}
+	reqBody := strings.NewReader(string(reqParam))
+	url := "https://old-quick-smoke.quiknode.pro/dfc7c444161fa2f70aa0554796f7717f06a37450/"
+	req, _ := http.NewRequest("POST", url, reqBody)
+	req.Header.Add("accept", "application/json")
+
+	res, _ := http.DefaultClient.Do(req)
+	defer res.Body.Close()
+	body, _ := io.ReadAll(res.Body)
+	//fmt.Println(string(body))
+	var txlogs Confirm_JSONData
+	if err := json.Unmarshal(body, &txlogs); err != nil { // Parse []byte to go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+	}
+
+	//log.Println("地址: ", "0x"+txlogs.Result.Logs[1].Data[26:26+40])
+
+	if len(txlogs.Result.Logs) > 1 {
+
+		if "0x42e160154868087d6bfdc0ca23d96a1c1cfa32f1b72ba9ba27b69b98a0d819dc" == txlogs.Result.Logs[1].Topics[0] {
+			log.Println("Topics : ", txlogs.Result.Logs[1].Topics[0])
+			return "0x" + txlogs.Result.Logs[1].Data[26:26+40]
+		}
+		return ""
+	}
+	return ""
+}
+
+func getUSDTBalance(_address string) (int64, error) {
+	url := "https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=0xdAC17F958D2ee523a2206206994597C13D831ec7&address=" + _address + "&tag=latest&apikey=X95EDAITM2ASW5QXWDQJMRHP2VDUZ7H85W"
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("accept", "application/json")
+
+	res, _ := http.DefaultClient.Do(req)
+	defer res.Body.Close()
+	body, _ := io.ReadAll(res.Body)
+	//fmt.Println(string(body))
+	var result EthereumERC20
+	if err := json.Unmarshal(body, &result); err != nil { // Parse []byte to go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+	}
+
+	log.Println("余额: ", result.Result)
+
+	i, err := strconv.ParseInt(result.Result, 10, 64)
+
+	return i, err
 }
 
 func sendTelegram(_filePath string) error {
@@ -411,6 +623,28 @@ func getTronAddress(result TransactionInfo) string {
 	return tAddress
 }
 
+// Function to adjust the column width based on the longest cell content in the column
+func autoAdjustColumnWidth(f *excelize.File, sheet, col string) {
+	// Get the maximum length of the content in the column
+	maxLength := 0
+	rows, err := f.GetRows(sheet)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, row := range rows {
+		// Only check the cell in the given column
+		if len(row) > 0 && len(row[0]) > maxLength {
+			maxLength = len(row[0])
+		}
+	}
+
+	// Set the column width (here, you can adjust the factor to make it more or less wide)
+	// `float64(maxLength)` sets the column width based on the longest string's length
+	if maxLength > 0 {
+		f.SetColWidth(sheet, col, col, float64(maxLength)+2) // "+2" adds a bit of padding
+	}
+}
 func exportExcel(source map[string]int64, fileName string) {
 	data := map[string]float64{}
 	for k, v := range source {
@@ -434,6 +668,7 @@ func exportExcel(source map[string]int64, fileName string) {
 	for address, value := range data {
 		// 写入地址
 		cell, _ := excelize.CoordinatesToCellName(1, row)
+		f.SetColWidth("Sheet1", "1", "2", 50)
 		f.SetCellValue("Sheet1", cell, address)
 
 		// 写入值
@@ -452,7 +687,7 @@ func exportExcel(source map[string]int64, fileName string) {
 	}
 
 	f.SetCellValue("Sheet1", _cell2, _total)
-
+	autoAdjustColumnWidth(f, "Sheet1", "A")
 	// 创建折线图
 	if err := createLineChart(f, len(data)); err != nil {
 		log.Fatalf("创建折线图失败: %v", err)
@@ -489,7 +724,7 @@ func createLineChart(f *excelize.File, dataLength int) error {
 			{
 				Text: "统计今日冻结金额",
 			},
-		}, // 图表标题
+		},                                                // 图表标题
 		Legend: excelize.ChartLegend{Position: "bottom"}, // 图例位置
 		XAxis: excelize.ChartAxis{Title: []excelize.RichTextRun{
 			{
@@ -602,21 +837,117 @@ func (s *OperationRecordApi) GetSysOperationRecordList(c *gin.Context) {
 	//	return
 	//}
 
-	list2 := make([]system.SysOperationRecord, 0, 2)
-	total := 2
+	list2 := make([]system.SysOperationRecord, 0, 4)
+	total := 4
 
 	var record1 system.SysOperationRecord
-	record1.Method = "今日预冻结"
+	record1.Method = "24小时内波场网络预冻结"
 	record1.ID = 1
+	record1.Path = "/soft/24小时内波场网络预冻结.xlsx"
 
 	var record2 system.SysOperationRecord
-	record2.Method = "今日已冻结"
+	record2.Method = "24小时内波场网络已冻结"
 	record2.ID = 2
-	list2 = append(list2, record1, record2)
+	record2.Path = "/soft/24小时内波场网络已冻结.xlsx"
+
+	var record3 system.SysOperationRecord
+	record3.Method = "24小时内以太坊网络预冻结"
+	record3.ID = 3
+	record3.Path = "/soft/24小时内波场网络预冻结.xlsx"
+
+	var record4 system.SysOperationRecord
+	record4.Method = "24小时内以太坊网络已冻结"
+	record4.ID = 4
+	record4.Path = "/soft/24小时内以太坊网络已冻结.xlsx"
+	list2 = append(list2, record1, record2, record3, record4)
 	response.OkWithDetailed(response.PageResult{
 		List:     list2,
 		Total:    int64(total),
 		Page:     pageInfo.Page,
 		PageSize: pageInfo.PageSize,
 	}, "获取成功", c)
+}
+
+type EthereumTX struct {
+	Jsonrpc string `json:"jsonrpc"`
+	ID      int    `json:"id"`
+	Result  struct {
+		BlockHash            string        `json:"blockHash"`
+		BlockNumber          string        `json:"blockNumber"`
+		From                 string        `json:"from"`
+		Gas                  string        `json:"gas"`
+		GasPrice             string        `json:"gasPrice"`
+		MaxFeePerGas         string        `json:"maxFeePerGas"`
+		MaxPriorityFeePerGas string        `json:"maxPriorityFeePerGas"`
+		Hash                 string        `json:"hash"`
+		Input                string        `json:"input"`
+		Nonce                string        `json:"nonce"`
+		To                   string        `json:"to"`
+		TransactionIndex     string        `json:"transactionIndex"`
+		Value                string        `json:"value"`
+		Type                 string        `json:"type"`
+		AccessList           []interface{} `json:"accessList"`
+		ChainID              string        `json:"chainId"`
+		V                    string        `json:"v"`
+		R                    string        `json:"r"`
+		S                    string        `json:"s"`
+		YParity              string        `json:"yParity"`
+	} `json:"result"`
+}
+type EthereumContractTX struct {
+	Jsonrpc string `json:"jsonrpc"`
+	ID      int    `json:"id"`
+	Result  struct {
+		Address        string      `json:"address"`
+		EnsName        interface{} `json:"ensName"`
+		PaginatedItems []struct {
+			BlockTimestamp   time.Time   `json:"blockTimestamp"`
+			TransactionHash  string      `json:"transactionHash"`
+			BlockNumber      string      `json:"blockNumber"`
+			TransactionIndex int         `json:"transactionIndex"`
+			FromAddress      string      `json:"fromAddress"`
+			ToAddress        string      `json:"toAddress"`
+			ContractAddress  interface{} `json:"contractAddress"`
+			Value            string      `json:"value"`
+			Status           string      `json:"status"`
+		} `json:"paginatedItems"`
+		TotalPages int `json:"totalPages"`
+		TotalItems int `json:"totalItems"`
+		PageNumber int `json:"pageNumber"`
+	} `json:"result"`
+}
+type Confirm_JSONData struct {
+	Jsonrpc string `json:"jsonrpc"`
+	ID      int    `json:"id"`
+	Result  struct {
+		BlockHash         string      `json:"blockHash"`
+		BlockNumber       string      `json:"blockNumber"`
+		ContractAddress   interface{} `json:"contractAddress"`
+		CumulativeGasUsed string      `json:"cumulativeGasUsed"`
+		EffectiveGasPrice string      `json:"effectiveGasPrice"`
+		From              string      `json:"from"`
+		GasUsed           string      `json:"gasUsed"`
+		Logs              []struct {
+			Address          string   `json:"address"`
+			Topics           []string `json:"topics"`
+			Data             string   `json:"data"`
+			BlockNumber      string   `json:"blockNumber"`
+			TransactionHash  string   `json:"transactionHash"`
+			TransactionIndex string   `json:"transactionIndex"`
+			BlockHash        string   `json:"blockHash"`
+			LogIndex         string   `json:"logIndex"`
+			Removed          bool     `json:"removed"`
+		} `json:"logs"`
+		LogsBloom        string `json:"logsBloom"`
+		Status           string `json:"status"`
+		To               string `json:"to"`
+		TransactionHash  string `json:"transactionHash"`
+		TransactionIndex string `json:"transactionIndex"`
+		Type             string `json:"type"`
+	} `json:"result"`
+}
+type EthereumERC20 struct {
+	Status  string `json:"status"`
+	Message string `json:"message"`
+	Result  string `json:"result"`
 }
