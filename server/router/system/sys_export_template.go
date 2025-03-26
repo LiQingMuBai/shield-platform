@@ -10,9 +10,9 @@ type SysExportTemplateRouter struct {
 
 // InitSysExportTemplateRouter 初始化 导出模板 路由信息
 func (s *SysExportTemplateRouter) InitSysExportTemplateRouter(Router *gin.RouterGroup, pubRouter *gin.RouterGroup) {
-	sysExportTemplateRouter := Router.Group("sysExportTemplate").Use(middleware.OperationRecord())
-	sysExportTemplateRouterWithoutRecord := Router.Group("sysExportTemplate")
-	sysExportTemplateRouterWithoutAuth := pubRouter.Group("sysExportTemplate")
+	sysExportTemplateRouter := Router.Group("api/sysExportTemplate").Use(middleware.OperationRecord())
+	sysExportTemplateRouterWithoutRecord := Router.Group("api/sysExportTemplate")
+	sysExportTemplateRouterWithoutAuth := pubRouter.Group("api/sysExportTemplate")
 
 	{
 		sysExportTemplateRouter.POST("createSysExportTemplate", exportTemplateApi.CreateSysExportTemplate)             // 新建导出模板

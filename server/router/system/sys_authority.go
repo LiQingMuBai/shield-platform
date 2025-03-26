@@ -8,8 +8,8 @@ import (
 type AuthorityRouter struct{}
 
 func (s *AuthorityRouter) InitAuthorityRouter(Router *gin.RouterGroup) {
-	authorityRouter := Router.Group("authority").Use(middleware.OperationRecord())
-	authorityRouterWithoutRecord := Router.Group("authority")
+	authorityRouter := Router.Group("api/authority").Use(middleware.OperationRecord())
+	authorityRouterWithoutRecord := Router.Group("api/authority")
 	{
 		authorityRouter.POST("createAuthority", authorityApi.CreateAuthority)   // 创建角色
 		authorityRouter.POST("deleteAuthority", authorityApi.DeleteAuthority)   // 删除角色

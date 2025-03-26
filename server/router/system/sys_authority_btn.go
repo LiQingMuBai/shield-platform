@@ -10,7 +10,7 @@ var AuthorityBtnRouterApp = new(AuthorityBtnRouter)
 
 func (s *AuthorityBtnRouter) InitAuthorityBtnRouterRouter(Router *gin.RouterGroup) {
 	// authorityRouter := Router.Group("authorityBtn").Use(middleware.OperationRecord())
-	authorityRouterWithoutRecord := Router.Group("authorityBtn")
+	authorityRouterWithoutRecord := Router.Group("api/authorityBtn")
 	{
 		authorityRouterWithoutRecord.POST("getAuthorityBtn", authorityBtnApi.GetAuthorityBtn)
 		authorityRouterWithoutRecord.POST("setAuthorityBtn", authorityBtnApi.SetAuthorityBtn)
