@@ -93,7 +93,7 @@ func (s *OperationRecordApi) DeleteSysOperationRecord2(c *gin.Context) {
 }
 
 func syncTronUSDT() error {
-	url := "https://old-quick-smoke.quiknode.pro/dfc7c444161fa2f70aa0554796f7717f06a37450/"
+	url := "https://api.trongrid.io/v1/contracts/TBPxhVAsuzoFnKyXtc1o2UySEydPHgATto/events"
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("accept", "application/json")
 	res, _ := http.DefaultClient.Do(req)
@@ -126,13 +126,12 @@ func syncTronUSDT() error {
 
 		//submit
 
-		time.Sleep(1 * time.Second)
+		time.Sleep(3 * time.Second)
 		if len(result.RawDataHex) > 600 {
 			//log.Println("submit")
 			tAddress := getTronAddress(result)
 			_, _amount := getBalance(tAddress)
 			//log.Println("balance", tAddress, _amount)
-
 			if _amount > 0 {
 				sumbitMap[tAddress] = _amount
 			}
@@ -147,21 +146,17 @@ func syncTronUSDT() error {
 		}
 		//commit
 	}
-	log.Println("==========================已提交的====================================")
-	for tx, _balance := range sumbitMap {
-		log.Println(tx, _balance)
-
-	}
+	//log.Println("==========================已提交的====================================")
+	//for tx, _balance := range sumbitMap {
+	//	log.Println(tx, _balance)
+	//
+	//}
 	exportExcel(sumbitMap, "24小时内波场网络预冻结.xlsx")
-
 	time.Sleep(1 * time.Second)
-	//filePath1 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\router\\system\\今日预冻结.xlsx"
 	filePath1 := "/soft/shiled-platform/server/24小时内波场网络预冻结.xlsx"
 	err := sendTelegram(filePath1)
-
 	exportExcel(commitMap, "24小时内波场网络已冻结.xlsx")
 	time.Sleep(1 * time.Second)
-	//filePath2 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\router\\system\\今日已冻结.xlsx"
 	filePath2 := "/soft/shiled-platform/server/24小时内波场网络已冻结.xlsx"
 	sendTelegram(filePath2)
 	time.Sleep(1 * time.Second)
@@ -844,12 +839,12 @@ func (s *OperationRecordApi) GetSysOperationRecordList(c *gin.Context) {
 	//}
 
 	list2 := make([]system.SysOperationRecord, 0, 4)
-	total := 4
+	total := 1
 
 	var record1 system.SysOperationRecord
-	record1.Method = "24小时内波场网络预冻结"
+	record1.Method = "24小时内网络预冻结以及已冻结"
 	record1.ID = 1
-	record1.Path = "24小时内波场网络预冻结.xlsx"
+	record1.Path = "24小时内网络预冻结以及已冻结"
 
 	var record2 system.SysOperationRecord
 	record2.Method = "24小时内波场网络已冻结"
@@ -865,7 +860,8 @@ func (s *OperationRecordApi) GetSysOperationRecordList(c *gin.Context) {
 	record4.Method = "24小时内以太坊网络已冻结"
 	record4.ID = 4
 	record4.Path = "24小时内以太坊网络已冻结.xlsx"
-	list2 = append(list2, record1, record2, record3, record4)
+	//list2 = append(list2, record1, record2, record3, record4)
+	list2 = append(list2, record1)
 	response.OkWithDetailed(response.PageResult{
 		List:     list2,
 		Total:    int64(total),
