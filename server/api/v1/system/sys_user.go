@@ -368,6 +368,7 @@ func (b *BaseApi) SetUserInfo(c *gin.Context) {
 		HeaderImg: user.HeaderImg,
 		Phone:     user.Phone,
 		Email:     user.Email,
+		Address:   user.Address,
 		Enable:    user.Enable,
 	})
 	if err != nil {

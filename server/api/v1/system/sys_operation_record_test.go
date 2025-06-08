@@ -3,16 +3,17 @@ package system
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/xuri/excelize/v2"
 	"io"
 	"log"
 	"net/http"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/xuri/excelize/v2"
 )
 
-func TestExport(t *testing.T) {
+func TestGetEthereumAddress(t *testing.T) {
 	parameter := GetTransactionsByAddress_JSONData{
 		ID:      67,
 		Jsonrpc: "2.0",
@@ -29,7 +30,7 @@ func TestExport(t *testing.T) {
 		return
 	}
 	reqBody := strings.NewReader(string(reqParam))
-	url := "https://old-quick-smoke.quiknode.pro/dfc7c444161fa2f70aa0554796f7717f06a37450/"
+	url := "https://alpha-alien-sheet.quiknode.pro/88f18a5e3da4679705954edbb2859e5144c16a5a/"
 	req, _ := http.NewRequest("POST", url, reqBody)
 	req.Header.Add("accept", "application/json")
 
@@ -43,20 +44,20 @@ func TestExport(t *testing.T) {
 	}
 
 	//log.Println(txs)
-	time.Sleep(1 * time.Second)
+	// time.Sleep(1 * time.Second)
 	sumbitMap := make(map[string]int64)
 	commitMap := make(map[string]int64)
 	for _, tx := range txs.Result.PaginatedItems {
 		log.Println(tx.TransactionHash)
 		//获取交易tx hash
 		_txHash := tx.TransactionHash
-		time.Sleep(1 * time.Second)
+		// time.Sleep(1 * time.Second)
 		_address := getPeddingBlackedAddress(_txHash)
 
 		if len(_address) > 0 {
 			//说明是pendding的地址，直接获取余额
 			log.Println("待定黑名单地址：", _address)
-			time.Sleep(1 * time.Second)
+			// time.Sleep(1 * time.Second)
 			balance, err := getUSDTBalance(_address)
 			if err != nil {
 			}
@@ -92,20 +93,20 @@ func TestExport(t *testing.T) {
 	}
 	exportExcel(sumbitMap, "24小时内以太坊预冻结.xlsx")
 
-	time.Sleep(1 * time.Second)
-	filePath1 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\api\\v1\\system\\24小时内以太坊预冻结.xlsx"
+	// time.Sleep(1 * time.Second)
+	//filePath1 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\api\\v1\\system\\24小时内以太坊预冻结.xlsx"
 	//filePath1 := "/soft/shiled-platform/server/今日预冻结.xlsx"
-	sendTelegram(filePath1)
+	//sendTelegram(filePath1)
 	log.Println("==========================已确认的====================================")
 	for tx, _balance := range commitMap {
 		log.Println(tx, _balance)
 
 	}
 	exportExcel(commitMap, "24小时内以太坊已冻结.xlsx")
-	time.Sleep(1 * time.Second)
-	filePath2 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\api\\v1\\system\\24小时内以太坊已冻结.xlsx"
+	// time.Sleep(1 * time.Second)
+	//filePath2 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\api\\v1\\system\\24小时内以太坊已冻结.xlsx"
 	//filePath2 := "/soft/shiled-platform/server/今日已冻结.xlsx"
-	sendTelegram(filePath2)
+	//sendTelegram(filePath2)
 
 }
 func TestSysExportTemplateApi_FindSysExportTemplate(t *testing.T) {
@@ -116,6 +117,20 @@ func TestSysExportTemplateApi_FindSysExportTemplate(t *testing.T) {
 	ExportExcel2(commitMap, "online 24hours.xlsx")
 }
 
+func TestExport2(t *testing.T) {
+	// 示例数据：map[string]int64
+
+	source := map[string]int64{
+		"address1": 333333333,
+		"address2": 22222222,
+		"address3": 1111111111,
+		"address4": 88888888,
+		"address5": 77777777,
+		"address6": 5555555,
+	}
+
+	exportExcel(source, "output.xlsx")
+}
 func ExportExcel2(source map[string]int64, fileName string) {
 	data := map[string]float64{}
 	for k, v := range source {

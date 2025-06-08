@@ -1,24 +1,10 @@
 package system
 
 import (
-	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/fbsobreira/gotron-sdk/pkg/client"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
-	"github.com/gin-gonic/gin"
-	"github.com/mymmrac/telego"
-	tu "github.com/mymmrac/telego/telegoutil"
-	"github.com/xuri/excelize/v2"
-	"go.uber.org/zap"
-	"google.golang.org/grpc"
 	"io"
 	"log"
 	"math/big"
@@ -27,6 +13,18 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/fbsobreira/gotron-sdk/pkg/client"
+	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
+	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	"github.com/gin-gonic/gin"
+	"github.com/xuri/excelize/v2"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
 type OperationRecordApi struct{}
@@ -93,6 +91,25 @@ func (s *OperationRecordApi) DeleteSysOperationRecord2(c *gin.Context) {
 }
 
 func syncTronUSDT() error {
+	sumbitMap, commitMap := GetTronAddressMap()
+	//log.Println("==========================已提交的====================================")
+	//for tx, _balance := range sumbitMap {
+	//	log.Println(tx, _balance)
+	//
+	//}
+	exportExcel(sumbitMap, "24小时内波场网络预冻结.xlsx")
+	time.Sleep(1 * time.Second)
+	filePath1 := "/soft/shiled-platform/server/24小时内波场网络预冻结.xlsx"
+	err := sendTelegram(filePath1)
+	exportExcel(commitMap, "24小时内波场网络已冻结.xlsx")
+	time.Sleep(1 * time.Second)
+	filePath2 := "/soft/shiled-platform/server/24小时内波场网络已冻结.xlsx"
+	sendTelegram(filePath2)
+	time.Sleep(1 * time.Second)
+	return err
+}
+
+func GetTronAddressMap() (map[string]int64, map[string]int64) {
 	url := "https://api.trongrid.io/v1/contracts/TBPxhVAsuzoFnKyXtc1o2UySEydPHgATto/events"
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("accept", "application/json")
@@ -146,21 +163,7 @@ func syncTronUSDT() error {
 		}
 		//commit
 	}
-	//log.Println("==========================已提交的====================================")
-	//for tx, _balance := range sumbitMap {
-	//	log.Println(tx, _balance)
-	//
-	//}
-	exportExcel(sumbitMap, "24小时内波场网络预冻结.xlsx")
-	time.Sleep(1 * time.Second)
-	filePath1 := "/soft/shiled-platform/server/24小时内波场网络预冻结.xlsx"
-	err := sendTelegram(filePath1)
-	exportExcel(commitMap, "24小时内波场网络已冻结.xlsx")
-	time.Sleep(1 * time.Second)
-	filePath2 := "/soft/shiled-platform/server/24小时内波场网络已冻结.xlsx"
-	sendTelegram(filePath2)
-	time.Sleep(1 * time.Second)
-	return err
+	return sumbitMap, commitMap
 }
 
 type GetTransactionsByAddress_JSONData struct {
@@ -176,6 +179,38 @@ type Params struct {
 }
 
 func syncEthereumUSDT() {
+	sumbitMap, commitMap, done := GetEthereumAddress()
+	if done {
+		return
+	}
+
+	//export excel
+
+	log.Println("==========================已提交的====================================")
+	for tx, _balance := range sumbitMap {
+		log.Println(tx, _balance)
+
+	}
+	exportExcel(sumbitMap, "24小时内以太坊预冻结.xlsx")
+
+	time.Sleep(1 * time.Second)
+	//filePath1 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\api\\v1\\system\\24小时内以太坊预冻结.xlsx"
+	filePath1 := "/soft/shiled-platform/server/24小时内以太坊预冻结.xlsx"
+	sendTelegram(filePath1)
+	log.Println("==========================已确认的====================================")
+	for tx, _balance := range commitMap {
+		log.Println(tx, _balance)
+
+	}
+	exportExcel(commitMap, "24小时内以太坊已冻结.xlsx")
+	time.Sleep(1 * time.Second)
+	//filePath2 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\api\\v1\\system\\24小时内以太坊已冻结.xlsx"
+	filePath2 := "/soft/shiled-platform/server/24小时内以太坊已冻结.xlsx"
+	sendTelegram(filePath2)
+
+}
+
+func GetEthereumAddress() (map[string]int64, map[string]int64, bool) {
 	parameter := GetTransactionsByAddress_JSONData{
 		ID:      67,
 		Jsonrpc: "2.0",
@@ -189,7 +224,7 @@ func syncEthereumUSDT() {
 
 	if err != nil {
 		log.Fatal(err)
-		return
+		return nil, nil, true
 	}
 	reqBody := strings.NewReader(string(reqParam))
 	url := "https://old-quick-smoke.quiknode.pro/dfc7c444161fa2f70aa0554796f7717f06a37450/"
@@ -245,31 +280,7 @@ func syncEthereumUSDT() {
 			}
 		}
 	}
-
-	//export excel
-
-	log.Println("==========================已提交的====================================")
-	for tx, _balance := range sumbitMap {
-		log.Println(tx, _balance)
-
-	}
-	exportExcel(sumbitMap, "24小时内以太坊预冻结.xlsx")
-
-	time.Sleep(1 * time.Second)
-	//filePath1 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\api\\v1\\system\\24小时内以太坊预冻结.xlsx"
-	filePath1 := "/soft/shiled-platform/server/24小时内以太坊预冻结.xlsx"
-	sendTelegram(filePath1)
-	log.Println("==========================已确认的====================================")
-	for tx, _balance := range commitMap {
-		log.Println(tx, _balance)
-
-	}
-	exportExcel(commitMap, "24小时内以太坊已冻结.xlsx")
-	time.Sleep(1 * time.Second)
-	//filePath2 := "C:\\Users\\Administrator\\Documents\\shiled-platform\\server\\api\\v1\\system\\24小时内以太坊已冻结.xlsx"
-	filePath2 := "/soft/shiled-platform/server/24小时内以太坊已冻结.xlsx"
-	sendTelegram(filePath2)
-
+	return sumbitMap, commitMap, false
 }
 
 type GetTransactionByHash_JSONData struct {
@@ -293,7 +304,7 @@ func getPeddingBlackedAddress(_txHash string) string {
 		return ""
 	}
 	reqBody := strings.NewReader(string(reqParam))
-	url := "https://old-quick-smoke.quiknode.pro/dfc7c444161fa2f70aa0554796f7717f06a37450/"
+	url := "https://alpha-alien-sheet.quiknode.pro/88f18a5e3da4679705954edbb2859e5144c16a5a/"
 	req, _ := http.NewRequest("POST", url, reqBody)
 	req.Header.Add("accept", "application/json")
 
@@ -330,7 +341,7 @@ func getBlackAddress(_txHash string) string {
 		return ""
 	}
 	reqBody := strings.NewReader(string(reqParam))
-	url := "https://old-quick-smoke.quiknode.pro/dfc7c444161fa2f70aa0554796f7717f06a37450/"
+	url := "https://alpha-alien-sheet.quiknode.pro/88f18a5e3da4679705954edbb2859e5144c16a5a/"
 	req, _ := http.NewRequest("POST", url, reqBody)
 	req.Header.Add("accept", "application/json")
 
@@ -378,43 +389,45 @@ func getUSDTBalance(_address string) (int64, error) {
 }
 
 func sendTelegram(_filePath string) error {
-	ctx := context.Background()
-	//botToken := os.Getenv("TOKEN")
-	botToken := "7668068911:AAFOXuA7KpWOfur0rcoVbZTwGOgsBCjkI3s"
+
+	return nil
+	//ctx := context.Background()
+	////botToken := os.Getenv("TOKEN")
 	//botToken := "7668068911:AAFOXuA7KpWOfur0rcoVbZTwGOgsBCjkI3s"
-	//chatID := -4657809905
-	filePath := _filePath
-	// Note: Please keep in mind that default logger may expose sensitive information, use in development only
-	bot, err := telego.NewBot(botToken, telego.WithDefaultDebugLogger())
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-
-	// Document parameters
-	document := tu.Document(
-		// Chat ID as Integer
-		tu.ID(int64(-4657809905)),
-
-		// Send using file from disk
-		tu.File(mustOpen(filePath)),
-
-		// Send using external URL
-		// tu.FileFromURL("https://example.com/my_file.txt"),
-
-		// Send using file ID
-		// tu.FileFromID("<file ID of your file>"),
-	).WithCaption("來自於U盾情報部")
-
-	// Sending document
-	_, err = bot.SendDocument(ctx, document)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	//fmt.Println(msg.Document)
-
-	return err
+	////botToken := "7668068911:AAFOXuA7KpWOfur0rcoVbZTwGOgsBCjkI3s"
+	////chatID := -4657809905
+	//filePath := _filePath
+	//// Note: Please keep in mind that default logger may expose sensitive information, use in development only
+	//bot, err := telego.NewBot(botToken, telego.WithDefaultDebugLogger())
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return err
+	//}
+	//
+	//// Document parameters
+	//document := tu.Document(
+	//	// Chat ID as Integer
+	//	tu.ID(int64(-4657809905)),
+	//
+	//	// Send using file from disk
+	//	tu.File(mustOpen(filePath)),
+	//
+	//	// Send using external URL
+	//	// tu.FileFromURL("https://example.com/my_file.txt"),
+	//
+	//	// Send using file ID
+	//	// tu.FileFromID("<file ID of your file>"),
+	//).WithCaption("來自於U盾情報部")
+	//
+	//// Sending document
+	//_, err = bot.SendDocument(ctx, document)
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return err
+	//}
+	////fmt.Println(msg.Document)
+	//
+	//return err
 }
 
 // Helper function to open file or panic
@@ -665,7 +678,7 @@ func exportExcel(source map[string]int64, fileName string) {
 	}
 
 	// 填充数据
-	row := 2 // 从第二行开始填充数据
+	row := 1 // 从第二行开始填充数据
 	for address, value := range data {
 		// 写入地址
 		cell, _ := excelize.CoordinatesToCellName(1, row)
@@ -756,6 +769,10 @@ func getBalance(tAddress string) (error, int64) {
 
 	balance, err := conn.TRC20ContractBalance(address, trc20Contract)
 
+	if err != nil {
+		return err, 0
+	}
+	log.Println(err)
 	log.Println("余额：", balance)
 	return err, balance.Int64()
 }

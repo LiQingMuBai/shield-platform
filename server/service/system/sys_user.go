@@ -112,6 +112,19 @@ func (userService *UserService) GetUserInfoList(info systemReq.GetUserList) (lis
 	return userList, total, err
 }
 
+func (userService *UserService) GetUserInfoListAndAddressNotNull() (list []system.SysUser, total int64, err error) {
+
+	db := global.GVA_DB.Model(&system.SysUser{}).Where("address IS NOT NULL AND address != ''")
+	var userList []system.SysUser
+
+	err = db.Count(&total).Error
+	if err != nil {
+		return
+	}
+	err = db.Find(&userList).Error
+	return userList, total, err
+}
+
 //@author: [piexlmax](https://github.com/piexlmax)
 //@function: SetUserAuthority
 //@description: 设置一个用户的权限
@@ -228,7 +241,7 @@ func (userService *UserService) DeleteUser(id int) (err error) {
 
 func (userService *UserService) SetUserInfo(req system.SysUser) error {
 	return global.GVA_DB.Model(&system.SysUser{}).
-		Select("updated_at", "nick_name", "header_img", "phone", "email", "enable").
+		Select("updated_at", "nick_name", "header_img", "phone", "email", "address", "enable").
 		Where("id=?", req.ID).
 		Updates(map[string]interface{}{
 			"updated_at": time.Now(),
@@ -236,6 +249,7 @@ func (userService *UserService) SetUserInfo(req system.SysUser) error {
 			"header_img": req.HeaderImg,
 			"phone":      req.Phone,
 			"email":      req.Email,
+			"address":    req.Address,
 			"enable":     req.Enable,
 		}).Error
 }

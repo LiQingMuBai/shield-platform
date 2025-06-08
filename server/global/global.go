@@ -37,6 +37,8 @@ var (
 	GVA_ACTIVE_DBNAME       *string
 	BlackCache              local_cache.Cache
 	lock                    sync.RWMutex
+
+	TRONGRID_KEYS []string
 )
 
 // GetGlobalDBByDBName 通过名称获取db list中的db

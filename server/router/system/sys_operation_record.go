@@ -7,7 +7,7 @@ import (
 type OperationRecordRouter struct{}
 
 func (s *OperationRecordRouter) InitSysOperationRecordRouter(Router *gin.RouterGroup) {
-	operationRecordRouter := Router.Group("api/sysOperationRecord")
+	operationRecordRouter := Router.Group("sysOperationRecord")
 	{
 		operationRecordRouter.POST("createSysOperationRecord", operationRecordApi.CreateSysOperationRecord) // 新建SysOperationRecord
 		//operationRecordRouter.DELETE("deleteSysOperationRecord", operationRecordApi.DeleteSysOperationRecord)           // 删除SysOperationRecord
