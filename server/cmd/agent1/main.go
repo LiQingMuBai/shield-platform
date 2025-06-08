@@ -198,7 +198,7 @@ func (a *App) executeTask() {
 
 					//trxfeeClient.Order(sysOrder.OrderNo, sysOrder.FromAddress, 65_000*count)
 
-					global.GVA_LOG.Info(fmt.Sprintf("发送（%d）笔能量，订单号 %s", count, orderNo))
+					global.GVA_LOG.Info(fmt.Sprintf("发送（%d）笔能量，订单号 %s\n", count, orderNo))
 				}
 			}
 		}
