@@ -1,0 +1,15 @@
+package ushield
+
+type ServiceGroup struct {
+	UserTrxSubscriptionsService
+	UserUsdtSubscriptionsService
+	UserPackageSubscriptionsService
+	TgUsersService
+	UserOperationBundlesService
+	UserAddressMonitorEventService
+	UserAddressMonitorService
+	UserTrxPlaceholdersService
+	UserUsdtPlaceholdersService
+	UserTrxDepositsService
+	UserUsdtDepositsService
+}
