@@ -36,6 +36,10 @@ func (tgUsersService *TgUsersService) UpdateTgUsers(ctx context.Context, tgUsers
 	err = global.GVA_DB.Model(&ushield.TgUsers{}).Where("id = ?", tgUsers.Id).Updates(&tgUsers).Error
 	return err
 }
+func (tgUsersService *TgUsersService) UpdateTgUsersTimes(ctx context.Context) (err error) {
+	err = global.GVA_DB.Model(&ushield.TgUsers{}).Update("status", 0).Error
+	return err
+}
 
 // GetTgUsers 根据id获取tgUsers表记录
 // Author [yourname](https://github.com/yourname)
