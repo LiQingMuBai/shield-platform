@@ -1,23 +1,19 @@
 package main
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/fbsobreira/gotron-sdk/pkg/client"
 	"github.com/flipped-aurora/gin-vue-admin/server/core"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/initialize"
 	"github.com/flipped-aurora/gin-vue-admin/server/service"
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
 	"io"
 	"log"
-	"math/big"
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -45,7 +41,7 @@ func main() {
 	global.GVA_VP = core.Viper() // 初始化Viper
 
 	buddha := `============================================
-                       紧急通知上线
+                       以太坊紧急通知上线
    `
 	fmt.Println(buddha)
 	global.GVA_DB = initialize.Gorm() // gorm连接数据库
@@ -65,7 +61,7 @@ func main() {
 	// 初始化应用
 	app := &App{
 		done:   make(chan bool),
-		logger: log.New(os.Stdout, "TRACE-ADDRESS-TASK: ", log.LstdFlags),
+		logger: log.New(os.Stdout, "ETHEREUM-TRACE-ADDRESS-TASK: ", log.LstdFlags),
 	}
 
 	// 每隔1min启动定时任务
@@ -98,52 +94,79 @@ func (a *App) startScheduler(interval time.Duration) {
 	}()
 }
 func (a *App) executeTask() {
-	a.logger.Println("紧急通知-执行定时任务...")
+	a.logger.Println("以太坊紧急通知-执行定时任务...")
 	startTime := time.Now()
 
 	time.Sleep(10 * time.Second)
 
-	url := "https://api.trongrid.io/v1/contracts/TBPxhVAsuzoFnKyXtc1o2UySEydPHgATto/events"
-	req, _ := http.NewRequest("GET", url, nil)
+	parameter := GetTransactionsByAddress_JSONData{
+		ID:      67,
+		Jsonrpc: "2.0",
+		Method:  "qn_getTransactionsByAddress",
+		Params: []Params{{
+			Address: "0xC6CDE7C39eB2f0F0095F41570af89eFC2C1Ea828",
+			Page:    1,
+			PerPage: 20}},
+	}
+	reqParam, err := json.Marshal(parameter)
+
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	reqBody := strings.NewReader(string(reqParam))
+	url := "https://alpha-alien-sheet.quiknode.pro/88f18a5e3da4679705954edbb2859e5144c16a5a/"
+	req, _ := http.NewRequest("POST", url, reqBody)
 	req.Header.Add("accept", "application/json")
+
 	res, _ := http.DefaultClient.Do(req)
 	defer res.Body.Close()
 	body, _ := io.ReadAll(res.Body)
 	//fmt.Println(string(body))
-	var events TronEvents
-	if err := json.Unmarshal(body, &events); err != nil { // Parse []byte to go struct pointer
+	var txs EthereumContractTX
+	if err := json.Unmarshal(body, &txs); err != nil { // Parse []byte to go struct pointer
 		fmt.Println("Can not unmarshal JSON")
 	}
-	var txIDMap map[string]string /*创建集合 */
-	txIDMap = make(map[string]string)
 
-	for _, datum := range events.Data {
-		//log.Println(datum.EventName)
-		//log.Println(datum.TransactionID)
-		txIDMap[datum.TransactionID] = datum.EventName
-	}
-
+	//log.Println(txs)
+	// time.Sleep(1 * time.Second)
 	sumbitMap := make(map[string]int64)
 	commitMap := make(map[string]int64)
-	for txID := range txIDMap {
-		result := getTransactionData(txID)
+	for _, tx := range txs.Result.PaginatedItems {
+		log.Println(tx.TransactionHash)
+		//获取交易tx hash
+		_txHash := tx.TransactionHash
+		// time.Sleep(1 * time.Second)
+		_address := getPeddingBlackedAddress(_txHash)
 
-		if len(result.RawDataHex) > 600 {
-			tAddress := getTronAddress(result)
-			_, _amount := getBalance(tAddress)
-			//预备拉入黑名單
-			sumbitMap[tAddress] = _amount
-		} else {
-			//已經拉入黑名單
-			_address, _amount := getCommitAddressBalance(txID)
-			commitMap[_address] = _amount
+		if len(_address) > 0 {
+			//说明是pendding的地址，直接获取余额
+			log.Println("待定黑名单地址：", _address)
+			// time.Sleep(1 * time.Second)
+			balance, err := getUSDTBalance(_address)
+			if err != nil {
+			}
+			if balance > 0 {
+				sumbitMap[_address] = balance
+				log.Println(balance)
+			}
 		}
-	}
-
-	for address, target := range sumbitMap {
-
-		log.Println("address ", address)
-		log.Println("amount ", target)
+		if len(_address) == 0 {
+			//说明是已经拉入黑名单
+			//fmt.Println(_address)
+			_address := getBlackAddress(_txHash)
+			time.Sleep(1 * time.Second)
+			if len(_address) > 0 {
+				log.Println("黑名单地址：", _address)
+				balance, err := getUSDTBalance(_address)
+				if err != nil {
+				}
+				if balance > 0 {
+					commitMap[_address] = balance
+					log.Println(balance)
+				}
+			}
+		}
 	}
 
 	a.logger.Printf("任务完成， 耗时: %v", time.Since(startTime))
@@ -167,218 +190,204 @@ func (a *App) waitForShutdown() {
 	time.Sleep(1 * time.Second) // 可根据需要调整
 }
 
-func getTransactionData(_txid string) TransactionInfo {
-	//txid := ""
-	url := "https://api.trongrid.io/walletsolidity/gettransactionbyid"
+type GetTransactionsByAddress_JSONData struct {
+	ID      int      `json:"id"`
+	Jsonrpc string   `json:"jsonrpc"`
+	Method  string   `json:"method"`
+	Params  []Params `json:"params"`
+}
+type Params struct {
+	Address string `json:"address"`
+	Page    int    `json:"page"`
+	PerPage int    `json:"perPage"`
+}
 
-	payload := strings.NewReader("{\"value\":\"" + _txid + "\"}")
+type EthereumContractTX struct {
+	Jsonrpc string `json:"jsonrpc"`
+	ID      int    `json:"id"`
+	Result  struct {
+		Address        string      `json:"address"`
+		EnsName        interface{} `json:"ensName"`
+		PaginatedItems []struct {
+			BlockTimestamp   time.Time   `json:"blockTimestamp"`
+			TransactionHash  string      `json:"transactionHash"`
+			BlockNumber      string      `json:"blockNumber"`
+			TransactionIndex int         `json:"transactionIndex"`
+			FromAddress      string      `json:"fromAddress"`
+			ToAddress        string      `json:"toAddress"`
+			ContractAddress  interface{} `json:"contractAddress"`
+			Value            string      `json:"value"`
+			Status           string      `json:"status"`
+		} `json:"paginatedItems"`
+		TotalPages int `json:"totalPages"`
+		TotalItems int `json:"totalItems"`
+		PageNumber int `json:"pageNumber"`
+	} `json:"result"`
+}
+type Confirm_JSONData struct {
+	Jsonrpc string `json:"jsonrpc"`
+	ID      int    `json:"id"`
+	Result  struct {
+		BlockHash         string      `json:"blockHash"`
+		BlockNumber       string      `json:"blockNumber"`
+		ContractAddress   interface{} `json:"contractAddress"`
+		CumulativeGasUsed string      `json:"cumulativeGasUsed"`
+		EffectiveGasPrice string      `json:"effectiveGasPrice"`
+		From              string      `json:"from"`
+		GasUsed           string      `json:"gasUsed"`
+		Logs              []struct {
+			Address          string   `json:"address"`
+			Topics           []string `json:"topics"`
+			Data             string   `json:"data"`
+			BlockNumber      string   `json:"blockNumber"`
+			TransactionHash  string   `json:"transactionHash"`
+			TransactionIndex string   `json:"transactionIndex"`
+			BlockHash        string   `json:"blockHash"`
+			LogIndex         string   `json:"logIndex"`
+			Removed          bool     `json:"removed"`
+		} `json:"logs"`
+		LogsBloom        string `json:"logsBloom"`
+		Status           string `json:"status"`
+		To               string `json:"to"`
+		TransactionHash  string `json:"transactionHash"`
+		TransactionIndex string `json:"transactionIndex"`
+		Type             string `json:"type"`
+	} `json:"result"`
+}
+type EthereumERC20 struct {
+	Status  string `json:"status"`
+	Message string `json:"message"`
+	Result  string `json:"result"`
+}
 
-	req, _ := http.NewRequest("POST", url, payload)
+type GetTransactionByHash_JSONData struct {
+	Method  string   `json:"method"`
+	Params  []string `json:"params"`
+	ID      int      `json:"id"`
+	Jsonrpc string   `json:"jsonrpc"`
+}
 
-	req.Header.Add("accept", "application/json")
-	req.Header.Add("content-type", "application/json")
-
-	res, _ := http.DefaultClient.Do(req)
-
-	defer res.Body.Close()
-	body, _ := io.ReadAll(res.Body)
-
-	var result TransactionInfo
-	if err := json.Unmarshal(body, &result); err != nil { // Parse []byte to go struct pointer
-		fmt.Println("Can not unmarshal JSON")
+func getPeddingBlackedAddress(_txHash string) string {
+	parameter := GetTransactionByHash_JSONData{
+		ID:      1,
+		Jsonrpc: "2.0",
+		Method:  "eth_getTransactionByHash",
+		Params:  []string{_txHash},
 	}
-	return result
-}
+	reqParam, err := json.Marshal(parameter)
 
-type TronEvents struct {
-	Data []struct {
-		BlockNumber           int    `json:"block_number"`
-		BlockTimestamp        int64  `json:"block_timestamp"`
-		CallerContractAddress string `json:"caller_contract_address"`
-		ContractAddress       string `json:"contract_address"`
-		EventIndex            int    `json:"event_index"`
-		EventName             string `json:"event_name"`
-		Result                struct {
-			Num0          string `json:"0"`
-			TransactionID string `json:"transactionId"`
-		} `json:"result"`
-		ResultType struct {
-			TransactionID string `json:"transactionId"`
-		} `json:"result_type"`
-		Event         string `json:"event"`
-		TransactionID string `json:"transaction_id"`
-	} `json:"data"`
-	Success bool `json:"success"`
-	Meta    struct {
-		At          int64  `json:"at"`
-		Fingerprint string `json:"fingerprint"`
-		Links       struct {
-			Next string `json:"next"`
-		} `json:"links"`
-		PageSize int `json:"page_size"`
-	} `json:"meta"`
-}
+	if err != nil {
 
-func getCommitAddressBalance(txid string) (string, int64) {
-	url := "https://api.trongrid.io/v1/transactions/" + txid + "/events"
-	req, _ := http.NewRequest("GET", url, nil)
+		return ""
+	}
+	reqBody := strings.NewReader(string(reqParam))
+	url := "https://alpha-alien-sheet.quiknode.pro/88f18a5e3da4679705954edbb2859e5144c16a5a/"
+	req, _ := http.NewRequest("POST", url, reqBody)
 	req.Header.Add("accept", "application/json")
+
 	res, _ := http.DefaultClient.Do(req)
 	defer res.Body.Close()
 	body, _ := io.ReadAll(res.Body)
 	//fmt.Println(string(body))
-	var result TronTxEvent
+	var tx EthereumTX
+	if err := json.Unmarshal(body, &tx); err != nil { // Parse []byte to go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+	}
+
+	if len(tx.Result.Input) > 300 {
+
+		fmt.Println("地址：", "0x"+tx.Result.Input[298:298+40])
+
+		return "0x" + tx.Result.Input[298:298+40]
+	} else {
+		return ""
+	}
+}
+
+type EthereumTX struct {
+	Jsonrpc string `json:"jsonrpc"`
+	ID      int    `json:"id"`
+	Result  struct {
+		BlockHash            string        `json:"blockHash"`
+		BlockNumber          string        `json:"blockNumber"`
+		From                 string        `json:"from"`
+		Gas                  string        `json:"gas"`
+		GasPrice             string        `json:"gasPrice"`
+		MaxFeePerGas         string        `json:"maxFeePerGas"`
+		MaxPriorityFeePerGas string        `json:"maxPriorityFeePerGas"`
+		Hash                 string        `json:"hash"`
+		Input                string        `json:"input"`
+		Nonce                string        `json:"nonce"`
+		To                   string        `json:"to"`
+		TransactionIndex     string        `json:"transactionIndex"`
+		Value                string        `json:"value"`
+		Type                 string        `json:"type"`
+		AccessList           []interface{} `json:"accessList"`
+		ChainID              string        `json:"chainId"`
+		V                    string        `json:"v"`
+		R                    string        `json:"r"`
+		S                    string        `json:"s"`
+		YParity              string        `json:"yParity"`
+	} `json:"result"`
+}
+
+func getBlackAddress(_txHash string) string {
+	parameter := GetTransactionByHash_JSONData{
+		ID:      1,
+		Jsonrpc: "2.0",
+		Method:  "eth_getTransactionReceipt",
+		Params:  []string{_txHash},
+	}
+	reqParam, err := json.Marshal(parameter)
+
+	if err != nil {
+
+		return ""
+	}
+	reqBody := strings.NewReader(string(reqParam))
+	url := "https://alpha-alien-sheet.quiknode.pro/88f18a5e3da4679705954edbb2859e5144c16a5a/"
+	req, _ := http.NewRequest("POST", url, reqBody)
+	req.Header.Add("accept", "application/json")
+
+	res, _ := http.DefaultClient.Do(req)
+	defer res.Body.Close()
+	body, _ := io.ReadAll(res.Body)
+	//fmt.Println(string(body))
+	var txlogs Confirm_JSONData
+	if err := json.Unmarshal(body, &txlogs); err != nil { // Parse []byte to go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+	}
+
+	//log.Println("地址: ", "0x"+txlogs.Result.Logs[1].Data[26:26+40])
+
+	if len(txlogs.Result.Logs) > 1 {
+
+		if "0x42e160154868087d6bfdc0ca23d96a1c1cfa32f1b72ba9ba27b69b98a0d819dc" == txlogs.Result.Logs[1].Topics[0] {
+			log.Println("Topics : ", txlogs.Result.Logs[1].Topics[0])
+			return "0x" + txlogs.Result.Logs[1].Data[26:26+40]
+		}
+		return ""
+	}
+	return ""
+}
+
+func getUSDTBalance(_address string) (int64, error) {
+	url := "https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=0xdAC17F958D2ee523a2206206994597C13D831ec7&address=" + _address + "&tag=latest&apikey=X95EDAITM2ASW5QXWDQJMRHP2VDUZ7H85W"
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("accept", "application/json")
+
+	res, _ := http.DefaultClient.Do(req)
+	defer res.Body.Close()
+	body, _ := io.ReadAll(res.Body)
+	//fmt.Println(string(body))
+	var result EthereumERC20
 	if err := json.Unmarshal(body, &result); err != nil { // Parse []byte to go struct pointer
 		fmt.Println("Can not unmarshal JSON")
 	}
-	//log.Println(result)
 
-	for index, datum := range result.Data {
+	log.Println("余额: ", result.Result)
 
-		if index == 1 {
-			//log.Println(datum.Result.Num0)
+	i, err := strconv.ParseInt(result.Result, 10, 64)
 
-			address41 := strings.ReplaceAll(datum.Result.Num0, "0x", "41")
-			target, _ := Convert41ToTAddress(address41)
-			//log.Println(target)
-			_, amount := getBalance(target)
-
-			return target, amount
-		}
-	}
-	return "", 0
-}
-func getBalance(tAddress string) (error, int64) {
-	trc20Contract := "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" // USDT
-	address := tAddress
-
-	conn := client.NewGrpcClient("grpc.trongrid.io:50051")
-	err := conn.Start(grpc.WithInsecure())
-
-	balance, err := conn.TRC20ContractBalance(address, trc20Contract)
-
-	if err != nil {
-		return err, 0
-	}
-	//log.Println(err)
-	//log.Println("余额：", balance)
-	return err, balance.Int64()
-}
-
-func getTronAddress(result TransactionInfo) string {
-	address41 := result.RawDataHex[558 : 558+42]
-	tAddress, _ := Convert41ToTAddress(address41)
-	//log.Println("41address ", address41)
-	//log.Println("taddress ", tAddress)
-	return tAddress
-}
-
-// Convert a 41-prefixed address to a T-prefixed address
-func Convert41ToTAddress(address41 string) (string, error) {
-	// Step 1: Validate the input address
-	if len(address41) < 2 || address41[:2] != tronAddressPrefix {
-		return "", fmt.Errorf("invalid 41-prefixed address")
-	}
-
-	// Step 2: Decode the hex address into bytes
-	addrBytes, err := hex.DecodeString(address41)
-	if err != nil {
-		return "", fmt.Errorf("failed to decode hex address: %v", err)
-	}
-
-	// Step 3: Compute checksum (double SHA256 of the address bytes)
-	sha256Hash := sha256.Sum256(addrBytes)
-	sha256Hash2 := sha256.Sum256(sha256Hash[:])
-	checksum := sha256Hash2[:4]
-
-	// Step 4: Combine address bytes and checksum
-	finalAddress := append(addrBytes, checksum...)
-
-	// Step 5: Encode the result in Base58
-	tAddress := base58Encode(finalAddress)
-	return tAddress, nil
-}
-
-// Base58 encoding function
-func base58Encode(input []byte) string {
-	// Convert the byte array to a big integer
-	x := new(big.Int).SetBytes(input)
-	base := big.NewInt(58)
-	zero := big.NewInt(0)
-	mod := new(big.Int)
-
-	var result string
-	for x.Cmp(zero) > 0 {
-		x.DivMod(x, base, mod)
-		result = string(base58Alphabet[mod.Int64()]) + result
-	}
-
-	// Add leading '1's for leading zeros in the input
-	for _, b := range input {
-		if b != 0 {
-			break
-		}
-		result = "1" + result
-	}
-
-	return result
-}
-
-const (
-	// Tron address prefix (hex)
-	tronAddressPrefix = "41"
-	// Base58 alphabet
-	base58Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-)
-
-type TronTxEvent struct {
-	Data []struct {
-		BlockNumber           int    `json:"block_number"`
-		BlockTimestamp        int64  `json:"block_timestamp"`
-		CallerContractAddress string `json:"caller_contract_address"`
-		ContractAddress       string `json:"contract_address"`
-		EventIndex            int    `json:"event_index"`
-		EventName             string `json:"event_name"`
-		Result                struct {
-			Num0          string `json:"0"`
-			TransactionID string `json:"transactionId"`
-		} `json:"result"`
-		ResultType struct {
-			TransactionID string `json:"transactionId"`
-		} `json:"result_type"`
-		Event         string `json:"event"`
-		TransactionID string `json:"transaction_id"`
-	} `json:"data"`
-	Success bool `json:"success"`
-	Meta    struct {
-		At       int64 `json:"at"`
-		PageSize int   `json:"page_size"`
-	} `json:"meta"`
-}
-
-type TransactionInfo struct {
-	Ret []struct {
-		ContractRet string `json:"contractRet"`
-	} `json:"ret"`
-	Signature []string `json:"signature"`
-	TxID      string   `json:"txID"`
-	RawData   struct {
-		Contract []struct {
-			Parameter struct {
-				Value struct {
-					Data            string `json:"data"`
-					OwnerAddress    string `json:"owner_address"`
-					ContractAddress string `json:"contract_address"`
-				} `json:"value"`
-				TypeURL string `json:"type_url"`
-			} `json:"parameter"`
-			Type string `json:"type"`
-		} `json:"contract"`
-		RefBlockBytes string `json:"ref_block_bytes"`
-		RefBlockHash  string `json:"ref_block_hash"`
-		Expiration    int64  `json:"expiration"`
-		FeeLimit      int    `json:"fee_limit"`
-		Timestamp     int64  `json:"timestamp"`
-	} `json:"raw_data"`
-	RawDataHex string `json:"raw_data_hex"`
+	return i, err
 }
