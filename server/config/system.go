@@ -24,4 +24,5 @@ type System struct {
 	ChatID        string `mapstructure:"chat-id" json:"chat-id" yaml:"chat-id"`
 	MasterAddress string `mapstructure:"master-address" json:"master-address" yaml:"master-address"`
 	MasterPK      string `mapstructure:"master-pk" json:"master-pk" yaml:"master-pk"`
+	QuicknodeRPC  string `mapstructure:"quicknode-rpc" json:"quicknode-rpc" yaml:"quicknode-rpc"`
 }
