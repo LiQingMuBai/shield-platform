@@ -25,4 +25,7 @@ type System struct {
 	MasterAddress string `mapstructure:"master-address" json:"master-address" yaml:"master-address"`
 	MasterPK      string `mapstructure:"master-pk" json:"master-pk" yaml:"master-pk"`
 	QuicknodeRPC  string `mapstructure:"quicknode-rpc" json:"quicknode-rpc" yaml:"quicknode-rpc"`
+
+	GroupBotToken string `mapstructure:"group-bot-token" json:"group-bot-token" yaml:"group-bot-token"`
+	GroupChatID   int64  `mapstructure:"group-chat-id" json:"group-chat-id" yaml:"group-chat-id"`
 }
