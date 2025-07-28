@@ -1,6 +1,6 @@
 package ushield
 
-import "github.com/flipped-aurora/gin-vue-admin/server/service"
+import "github.com/ushield/aurora-admin/server/service"
 
 type ApiGroup struct {
 	UserTrxSubscriptionsApi

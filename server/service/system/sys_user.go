@@ -3,14 +3,14 @@ package system
 import (
 	"errors"
 	"fmt"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common"
-	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
+	"github.com/ushield/aurora-admin/server/model/common"
+	systemReq "github.com/ushield/aurora-admin/server/model/system/request"
 	"time"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/google/uuid"
+	"github.com/ushield/aurora-admin/server/global"
+	"github.com/ushield/aurora-admin/server/model/system"
+	"github.com/ushield/aurora-admin/server/utils"
 	"gorm.io/gorm"
 )
 

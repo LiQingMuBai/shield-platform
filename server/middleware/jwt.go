@@ -2,14 +2,14 @@ package middleware
 
 import (
 	"errors"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/ushield/aurora-admin/server/global"
+	"github.com/ushield/aurora-admin/server/utils"
 	"strconv"
 	"time"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
 	"github.com/gin-gonic/gin"
+	"github.com/ushield/aurora-admin/server/model/common/response"
 )
 
 func JWTAuth() gin.HandlerFunc {

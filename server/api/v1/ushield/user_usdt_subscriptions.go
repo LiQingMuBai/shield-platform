@@ -1,18 +1,15 @@
 package ushield
 
 import (
-	
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-    "github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
-    "github.com/flipped-aurora/gin-vue-admin/server/model/ushield"
-    ushieldReq "github.com/flipped-aurora/gin-vue-admin/server/model/ushield/request"
-    "github.com/gin-gonic/gin"
-    "go.uber.org/zap"
+	"github.com/gin-gonic/gin"
+	"github.com/ushield/aurora-admin/server/global"
+	"github.com/ushield/aurora-admin/server/model/common/response"
+	"github.com/ushield/aurora-admin/server/model/ushield"
+	ushieldReq "github.com/ushield/aurora-admin/server/model/ushield/request"
+	"go.uber.org/zap"
 )
 
-type UserUsdtSubscriptionsApi struct {}
-
-
+type UserUsdtSubscriptionsApi struct{}
 
 // CreateUserUsdtSubscriptions 创建userUsdtSubscriptions表
 // @Tags UserUsdtSubscriptions
@@ -24,8 +21,8 @@ type UserUsdtSubscriptionsApi struct {}
 // @Success 200 {object} response.Response{msg=string} "创建成功"
 // @Router /userUsdtSubscriptions/createUserUsdtSubscriptions [post]
 func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) CreateUserUsdtSubscriptions(c *gin.Context) {
-    // 创建业务用Context
-    ctx := c.Request.Context()
+	// 创建业务用Context
+	ctx := c.Request.Context()
 
 	var userUsdtSubscriptions ushield.UserUsdtSubscriptions
 	err := c.ShouldBindJSON(&userUsdtSubscriptions)
@@ -33,13 +30,13 @@ func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) CreateUserUsdtSubscrip
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = userUsdtSubscriptionsService.CreateUserUsdtSubscriptions(ctx,&userUsdtSubscriptions)
+	err = userUsdtSubscriptionsService.CreateUserUsdtSubscriptions(ctx, &userUsdtSubscriptions)
 	if err != nil {
-        global.GVA_LOG.Error("创建失败!", zap.Error(err))
-		response.FailWithMessage("创建失败:" + err.Error(), c)
+		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		response.FailWithMessage("创建失败:"+err.Error(), c)
 		return
 	}
-    response.OkWithMessage("创建成功", c)
+	response.OkWithMessage("创建成功", c)
 }
 
 // DeleteUserUsdtSubscriptions 删除userUsdtSubscriptions表
@@ -52,14 +49,14 @@ func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) CreateUserUsdtSubscrip
 // @Success 200 {object} response.Response{msg=string} "删除成功"
 // @Router /userUsdtSubscriptions/deleteUserUsdtSubscriptions [delete]
 func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) DeleteUserUsdtSubscriptions(c *gin.Context) {
-    // 创建业务用Context
-    ctx := c.Request.Context()
+	// 创建业务用Context
+	ctx := c.Request.Context()
 
 	id := c.Query("id")
-	err := userUsdtSubscriptionsService.DeleteUserUsdtSubscriptions(ctx,id)
+	err := userUsdtSubscriptionsService.DeleteUserUsdtSubscriptions(ctx, id)
 	if err != nil {
-        global.GVA_LOG.Error("删除失败!", zap.Error(err))
-		response.FailWithMessage("删除失败:" + err.Error(), c)
+		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		response.FailWithMessage("删除失败:"+err.Error(), c)
 		return
 	}
 	response.OkWithMessage("删除成功", c)
@@ -74,14 +71,14 @@ func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) DeleteUserUsdtSubscrip
 // @Success 200 {object} response.Response{msg=string} "批量删除成功"
 // @Router /userUsdtSubscriptions/deleteUserUsdtSubscriptionsByIds [delete]
 func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) DeleteUserUsdtSubscriptionsByIds(c *gin.Context) {
-    // 创建业务用Context
-    ctx := c.Request.Context()
+	// 创建业务用Context
+	ctx := c.Request.Context()
 
 	ids := c.QueryArray("ids[]")
-	err := userUsdtSubscriptionsService.DeleteUserUsdtSubscriptionsByIds(ctx,ids)
+	err := userUsdtSubscriptionsService.DeleteUserUsdtSubscriptionsByIds(ctx, ids)
 	if err != nil {
-        global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
-		response.FailWithMessage("批量删除失败:" + err.Error(), c)
+		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
+		response.FailWithMessage("批量删除失败:"+err.Error(), c)
 		return
 	}
 	response.OkWithMessage("批量删除成功", c)
@@ -97,8 +94,8 @@ func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) DeleteUserUsdtSubscrip
 // @Success 200 {object} response.Response{msg=string} "更新成功"
 // @Router /userUsdtSubscriptions/updateUserUsdtSubscriptions [put]
 func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) UpdateUserUsdtSubscriptions(c *gin.Context) {
-    // 从ctx获取标准context进行业务行为
-    ctx := c.Request.Context()
+	// 从ctx获取标准context进行业务行为
+	ctx := c.Request.Context()
 
 	var userUsdtSubscriptions ushield.UserUsdtSubscriptions
 	err := c.ShouldBindJSON(&userUsdtSubscriptions)
@@ -106,10 +103,10 @@ func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) UpdateUserUsdtSubscrip
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = userUsdtSubscriptionsService.UpdateUserUsdtSubscriptions(ctx,userUsdtSubscriptions)
+	err = userUsdtSubscriptionsService.UpdateUserUsdtSubscriptions(ctx, userUsdtSubscriptions)
 	if err != nil {
-        global.GVA_LOG.Error("更新失败!", zap.Error(err))
-		response.FailWithMessage("更新失败:" + err.Error(), c)
+		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		response.FailWithMessage("更新失败:"+err.Error(), c)
 		return
 	}
 	response.OkWithMessage("更新成功", c)
@@ -125,18 +122,19 @@ func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) UpdateUserUsdtSubscrip
 // @Success 200 {object} response.Response{data=ushield.UserUsdtSubscriptions,msg=string} "查询成功"
 // @Router /userUsdtSubscriptions/findUserUsdtSubscriptions [get]
 func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) FindUserUsdtSubscriptions(c *gin.Context) {
-    // 创建业务用Context
-    ctx := c.Request.Context()
+	// 创建业务用Context
+	ctx := c.Request.Context()
 
 	id := c.Query("id")
-	reuserUsdtSubscriptions, err := userUsdtSubscriptionsService.GetUserUsdtSubscriptions(ctx,id)
+	reuserUsdtSubscriptions, err := userUsdtSubscriptionsService.GetUserUsdtSubscriptions(ctx, id)
 	if err != nil {
-        global.GVA_LOG.Error("查询失败!", zap.Error(err))
-		response.FailWithMessage("查询失败:" + err.Error(), c)
+		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		response.FailWithMessage("查询失败:"+err.Error(), c)
 		return
 	}
 	response.OkWithData(reuserUsdtSubscriptions, c)
 }
+
 // GetUserUsdtSubscriptionsList 分页获取userUsdtSubscriptions表列表
 // @Tags UserUsdtSubscriptions
 // @Summary 分页获取userUsdtSubscriptions表列表
@@ -147,8 +145,8 @@ func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) FindUserUsdtSubscripti
 // @Success 200 {object} response.Response{data=response.PageResult,msg=string} "获取成功"
 // @Router /userUsdtSubscriptions/getUserUsdtSubscriptionsList [get]
 func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) GetUserUsdtSubscriptionsList(c *gin.Context) {
-    // 创建业务用Context
-    ctx := c.Request.Context()
+	// 创建业务用Context
+	ctx := c.Request.Context()
 
 	var pageInfo ushieldReq.UserUsdtSubscriptionsSearch
 	err := c.ShouldBindQuery(&pageInfo)
@@ -156,18 +154,18 @@ func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) GetUserUsdtSubscriptio
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	list, total, err := userUsdtSubscriptionsService.GetUserUsdtSubscriptionsInfoList(ctx,pageInfo)
+	list, total, err := userUsdtSubscriptionsService.GetUserUsdtSubscriptionsInfoList(ctx, pageInfo)
 	if err != nil {
-	    global.GVA_LOG.Error("获取失败!", zap.Error(err))
-        response.FailWithMessage("获取失败:" + err.Error(), c)
-        return
-    }
-    response.OkWithDetailed(response.PageResult{
-        List:     list,
-        Total:    total,
-        Page:     pageInfo.Page,
-        PageSize: pageInfo.PageSize,
-    }, "获取成功", c)
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败:"+err.Error(), c)
+		return
+	}
+	response.OkWithDetailed(response.PageResult{
+		List:     list,
+		Total:    total,
+		Page:     pageInfo.Page,
+		PageSize: pageInfo.PageSize,
+	}, "获取成功", c)
 }
 
 // GetUserUsdtSubscriptionsPublic 不需要鉴权的userUsdtSubscriptions表接口
@@ -178,13 +176,13 @@ func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) GetUserUsdtSubscriptio
 // @Success 200 {object} response.Response{data=object,msg=string} "获取成功"
 // @Router /userUsdtSubscriptions/getUserUsdtSubscriptionsPublic [get]
 func (userUsdtSubscriptionsApi *UserUsdtSubscriptionsApi) GetUserUsdtSubscriptionsPublic(c *gin.Context) {
-    // 创建业务用Context
-    ctx := c.Request.Context()
+	// 创建业务用Context
+	ctx := c.Request.Context()
 
-    // 此接口不需要鉴权
-    // 示例为返回了一个固定的消息接口，一般本接口用于C端服务，需要自己实现业务逻辑
-    userUsdtSubscriptionsService.GetUserUsdtSubscriptionsPublic(ctx)
-    response.OkWithDetailed(gin.H{
-       "info": "不需要鉴权的userUsdtSubscriptions表接口信息",
-    }, "获取成功", c)
+	// 此接口不需要鉴权
+	// 示例为返回了一个固定的消息接口，一般本接口用于C端服务，需要自己实现业务逻辑
+	userUsdtSubscriptionsService.GetUserUsdtSubscriptionsPublic(ctx)
+	response.OkWithDetailed(gin.H{
+		"info": "不需要鉴权的userUsdtSubscriptions表接口信息",
+	}, "获取成功", c)
 }

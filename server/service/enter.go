@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/service/example"
-	"github.com/flipped-aurora/gin-vue-admin/server/service/system"
-	"github.com/flipped-aurora/gin-vue-admin/server/service/ushield"
+	"github.com/ushield/aurora-admin/server/service/example"
+	"github.com/ushield/aurora-admin/server/service/system"
+	"github.com/ushield/aurora-admin/server/service/ushield"
 )
 
 var ServiceGroupApp = new(ServiceGroup)

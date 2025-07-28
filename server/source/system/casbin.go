@@ -4,8 +4,8 @@ import (
 	"context"
 
 	adapter "github.com/casbin/gorm-adapter/v3"
-	"github.com/flipped-aurora/gin-vue-admin/server/service/system"
 	"github.com/pkg/errors"
+	"github.com/ushield/aurora-admin/server/service/system"
 	"gorm.io/gorm"
 )
 

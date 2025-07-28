@@ -4,11 +4,11 @@ import (
 	"net"
 	"time"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/ushield/aurora-admin/server/global"
+	"github.com/ushield/aurora-admin/server/model/system"
+	systemReq "github.com/ushield/aurora-admin/server/model/system/request"
 )
 
 func ClearToken(c *gin.Context) {

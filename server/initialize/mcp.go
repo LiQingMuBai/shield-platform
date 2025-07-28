@@ -1,9 +1,9 @@
 package initialize
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	mcpTool "github.com/flipped-aurora/gin-vue-admin/server/mcp"
 	"github.com/mark3labs/mcp-go/server"
+	"github.com/ushield/aurora-admin/server/global"
+	mcpTool "github.com/ushield/aurora-admin/server/mcp"
 )
 
 func McpRun() *server.SSEServer {

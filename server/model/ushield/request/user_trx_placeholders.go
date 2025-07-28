@@ -1,11 +1,9 @@
-
 package request
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
-	
+	"github.com/ushield/aurora-admin/server/model/common/request"
 )
 
-type UserTrxPlaceholdersSearch struct{
-    request.PageInfo
+type UserTrxPlaceholdersSearch struct {
+	request.PageInfo
 }

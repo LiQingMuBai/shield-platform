@@ -3,10 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/flipped-aurora/gin-vue-admin/server/core"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/initialize"
-	"github.com/flipped-aurora/gin-vue-admin/server/service"
+	"github.com/ushield/aurora-admin/server/core"
+	"github.com/ushield/aurora-admin/server/global"
+	"github.com/ushield/aurora-admin/server/initialize"
+	"github.com/ushield/aurora-admin/server/service"
 	"go.uber.org/zap"
 	"io"
 	"log"
@@ -362,6 +362,7 @@ func getBlackAddress(_txHash string) string {
 
 	if len(txlogs.Result.Logs) > 1 {
 
+		log.Println("地址： ", "0x"+txlogs.Result.Logs[1].Data[26:26+40])
 		if "0x42e160154868087d6bfdc0ca23d96a1c1cfa32f1b72ba9ba27b69b98a0d819dc" == txlogs.Result.Logs[1].Topics[0] {
 			log.Println("Topics : ", txlogs.Result.Logs[1].Topics[0])
 			return "0x" + txlogs.Result.Logs[1].Data[26:26+40]

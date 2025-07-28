@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils/ast"
 	"github.com/mholt/archives"
 	cp "github.com/otiai10/copy"
 	"github.com/pkg/errors"
+	"github.com/ushield/aurora-admin/server/global"
+	"github.com/ushield/aurora-admin/server/model/system"
+	"github.com/ushield/aurora-admin/server/model/system/request"
+	"github.com/ushield/aurora-admin/server/utils"
+	"github.com/ushield/aurora-admin/server/utils/ast"
 	"go.uber.org/zap"
 	"go/parser"
 	"go/printer"
@@ -170,7 +170,7 @@ func (s *autoCodePlugin) PubPlug(plugName string) (zipPath string, err error) {
 	// (compression is not required; you could use Tar directly)
 	format := archives.CompressedArchive{
 		//Compression: archives.Gz{},
-		Archival:    archives.Zip{},
+		Archival: archives.Zip{},
 	}
 
 	// create the archive

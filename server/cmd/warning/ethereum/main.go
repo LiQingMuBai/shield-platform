@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fbsobreira/gotron-sdk/pkg/client"
-	"github.com/flipped-aurora/gin-vue-admin/server/core"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/robfig/cron/v3"
+	"github.com/ushield/aurora-admin/server/core"
+	"github.com/ushield/aurora-admin/server/global"
 	"github.com/xuri/excelize/v2"
 	"google.golang.org/grpc"
 	"io"
@@ -81,7 +81,7 @@ func (a *App) executeTask() {
 		return
 	}
 	reqBody := strings.NewReader(string(reqParam))
-	url := "https://long-bold-telescope.quiknode.pro/f1143beb9eb5ad0a749d1b6037049e926647e8cd/"
+	url := "https://docs-demo.quiknode.pro/"
 	req, _ := http.NewRequest("POST", url, reqBody)
 	req.Header.Add("accept", "application/json")
 
@@ -102,7 +102,7 @@ func (a *App) executeTask() {
 		log.Println(tx.TransactionHash)
 		//获取交易tx hash
 		_txHash := tx.TransactionHash
-		// time.Sleep(1 * time.Second)
+		time.Sleep(1 * time.Second)
 		_address := getPeddingBlackedAddress(_txHash)
 
 		if len(_address) > 0 {
@@ -302,7 +302,7 @@ func getPeddingBlackedAddress(_txHash string) string {
 		return ""
 	}
 	reqBody := strings.NewReader(string(reqParam))
-	url := "https://long-bold-telescope.quiknode.pro/f1143beb9eb5ad0a749d1b6037049e926647e8cd/"
+	url := "https://docs-demo.quiknode.pro/"
 	req, _ := http.NewRequest("POST", url, reqBody)
 	req.Header.Add("accept", "application/json")
 
@@ -366,7 +366,7 @@ func getBlackAddress(_txHash string) string {
 		return ""
 	}
 	reqBody := strings.NewReader(string(reqParam))
-	url := "https://long-bold-telescope.quiknode.pro/f1143beb9eb5ad0a749d1b6037049e926647e8cd/"
+	url := "https://docs-demo.quiknode.pro/"
 	req, _ := http.NewRequest("POST", url, reqBody)
 	req.Header.Add("accept", "application/json")
 
@@ -515,7 +515,7 @@ func createLineChart(f *excelize.File, dataLength int) error {
 			{
 				Text: "统计今日冻结金额",
 			},
-		},                                                // 图表标题
+		}, // 图表标题
 		Legend: excelize.ChartLegend{Position: "bottom"}, // 图例位置
 		XAxis: excelize.ChartAxis{Title: []excelize.RichTextRun{
 			{

@@ -1,8 +1,8 @@
 package system
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/middleware"
 	"github.com/gin-gonic/gin"
+	"github.com/ushield/aurora-admin/server/middleware"
 )
 
 type MenuRouter struct{}

@@ -2,9 +2,9 @@ package ushield
 
 import (
 	"context"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/ushield"
-	ushieldReq "github.com/flipped-aurora/gin-vue-admin/server/model/ushield/request"
+	"github.com/ushield/aurora-admin/server/global"
+	"github.com/ushield/aurora-admin/server/model/ushield"
+	ushieldReq "github.com/ushield/aurora-admin/server/model/ushield/request"
 )
 
 type UserUsdtDepositsService struct{}

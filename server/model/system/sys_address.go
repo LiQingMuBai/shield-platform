@@ -1,6 +1,6 @@
 package system
 
-import "github.com/flipped-aurora/gin-vue-admin/server/global"
+import "github.com/ushield/aurora-admin/server/global"
 
 type SysAddress struct {
 	global.GVA_MODEL

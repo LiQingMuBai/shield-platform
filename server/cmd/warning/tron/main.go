@@ -6,10 +6,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fbsobreira/gotron-sdk/pkg/client"
-	"github.com/flipped-aurora/gin-vue-admin/server/core"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/robfig/cron/v3"
+	"github.com/ushield/aurora-admin/server/core"
+	"github.com/ushield/aurora-admin/server/global"
 	"github.com/xuri/excelize/v2"
 	"google.golang.org/grpc"
 	"io"
@@ -290,7 +290,7 @@ func createLineChart(f *excelize.File, dataLength int) error {
 			{
 				Text: "统计今日冻结金额",
 			},
-		},                                                // 图表标题
+		}, // 图表标题
 		Legend: excelize.ChartLegend{Position: "bottom"}, // 图例位置
 		XAxis: excelize.ChartAxis{Title: []excelize.RichTextRun{
 			{
