@@ -14,6 +14,7 @@ type RouterGroup struct {
 	UserUsdtPlaceholdersRouter
 	UserTrxDepositsRouter
 	UserUsdtDepositsRouter
+	SysAnnouncementsInfoRouter
 }
 
 var (
@@ -28,4 +29,5 @@ var (
 	userUsdtPlaceholdersApi     = api.ApiGroupApp.UshieldApiGroup.UserUsdtPlaceholdersApi
 	userTrxDepositsApi          = api.ApiGroupApp.UshieldApiGroup.UserTrxDepositsApi
 	userUsdtDepositsApi         = api.ApiGroupApp.UshieldApiGroup.UserUsdtDepositsApi
+	sysAnnouncementsInfoApi     = api.ApiGroupApp.UshieldApiGroup.SysAnnouncementsInfoApi
 )

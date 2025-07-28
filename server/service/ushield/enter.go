@@ -12,4 +12,5 @@ type ServiceGroup struct {
 	UserUsdtPlaceholdersService
 	UserTrxDepositsService
 	UserUsdtDepositsService
+	SysAnnouncementsInfoService
 }

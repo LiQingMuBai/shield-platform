@@ -8,7 +8,7 @@ import (
 
 func bizModel() error {
 	db := global.GVA_DB
-	err := db.AutoMigrate(system.UserUsdtDeposits{}, ushield.UserTrxSubscriptions{}, ushield.UserUsdtSubscriptions{}, ushield.UserPackageSubscriptions{}, ushield.TgUsers{}, ushield.UserOperationBundles{}, ushield.UserAddressMonitorEvent{}, ushield.UserAddressMonitor{}, ushield.UserTrxPlaceholders{}, ushield.UserTrxDeposits{}, ushield.UserUsdtDeposits{})
+	err := db.AutoMigrate(system.UserUsdtDeposits{}, ushield.UserTrxSubscriptions{}, ushield.UserUsdtSubscriptions{}, ushield.UserPackageSubscriptions{}, ushield.TgUsers{}, ushield.UserOperationBundles{}, ushield.UserAddressMonitorEvent{}, ushield.UserAddressMonitor{}, ushield.UserTrxPlaceholders{}, ushield.UserTrxDeposits{}, ushield.UserUsdtDeposits{}, ushield.SysAnnouncementsInfo{})
 	if err != nil {
 		return err
 	}
