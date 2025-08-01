@@ -109,6 +109,13 @@ func (dictionaryDetailService *DictionaryDetailService) GetDictionaryInfoByValue
 	return sysDictionaryDetail, err
 }
 
+// 按照字典id+字典内容value获取单条字典内容
+func (dictionaryDetailService *DictionaryDetailService) GetDictionaryInfoByLabel(_label string) (detail system.SysDictionaryDetail, err error) {
+	var sysDictionaryDetail system.SysDictionaryDetail
+	err = global.GVA_DB.First(&sysDictionaryDetail, "label = ?  ", _label).Error
+	return sysDictionaryDetail, err
+}
+
 // 按照字典type+字典内容value获取单条字典内容
 func (dictionaryDetailService *DictionaryDetailService) GetDictionaryInfoByTypeValue(t string, value string) (detail system.SysDictionaryDetail, err error) {
 	var sysDictionaryDetails system.SysDictionaryDetail

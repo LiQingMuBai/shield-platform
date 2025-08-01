@@ -15,6 +15,8 @@ type ApiGroup struct {
 	UserTrxDepositsApi
 	UserUsdtDepositsApi
 	SysAnnouncementsInfoApi
+	UserEnergyOrdersApi
+	UserBundleEnergyOrdersApi
 }
 
 var (
@@ -30,4 +32,6 @@ var (
 	userTrxDepositsService          = service.ServiceGroupApp.UshieldServiceGroup.UserTrxDepositsService
 	userUsdtDepositsService         = service.ServiceGroupApp.UshieldServiceGroup.UserUsdtDepositsService
 	sysAnnouncementsInfoService     = service.ServiceGroupApp.UshieldServiceGroup.SysAnnouncementsInfoService
+	userEnergyOrdersService         = service.ServiceGroupApp.UshieldServiceGroup.UserEnergyOrdersService
+	userBundleEnergyOrdersService   = service.ServiceGroupApp.UshieldServiceGroup.UserBundleEnergyOrdersService
 )

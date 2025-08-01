@@ -115,7 +115,7 @@ func (a *App) executeTask() {
 		return
 	}
 	reqBody := strings.NewReader(string(reqParam))
-	url := "https://alpha-alien-sheet.quiknode.pro/88f18a5e3da4679705954edbb2859e5144c16a5a/"
+	url := "https://docs-demo.quiknode.pro/"
 	req, _ := http.NewRequest("POST", url, reqBody)
 	req.Header.Add("accept", "application/json")
 
@@ -281,7 +281,7 @@ func getPeddingBlackedAddress(_txHash string) string {
 		return ""
 	}
 	reqBody := strings.NewReader(string(reqParam))
-	url := "https://alpha-alien-sheet.quiknode.pro/88f18a5e3da4679705954edbb2859e5144c16a5a/"
+	url := "https://docs-demo.quiknode.pro/"
 	req, _ := http.NewRequest("POST", url, reqBody)
 	req.Header.Add("accept", "application/json")
 
@@ -345,7 +345,7 @@ func getBlackAddress(_txHash string) string {
 		return ""
 	}
 	reqBody := strings.NewReader(string(reqParam))
-	url := "https://alpha-alien-sheet.quiknode.pro/88f18a5e3da4679705954edbb2859e5144c16a5a/"
+	url := "https://docs-demo.quiknode.pro/"
 	req, _ := http.NewRequest("POST", url, reqBody)
 	req.Header.Add("accept", "application/json")
 

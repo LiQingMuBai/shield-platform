@@ -69,3 +69,14 @@ func AddMultipleStringNumbers(numbers ...string) (string, error) {
 
 	return strconv.FormatFloat(total, 'f', -1, 64), nil
 }
+
+func StringToFloat64(str string) (float64, error) {
+	// 处理可能存在的逗号小数点
+	str = strings.Replace(str, ",", ".", -1)
+
+	// 去除前后空格
+	str = strings.TrimSpace(str)
+
+	// 转换为 float64
+	return strconv.ParseFloat(str, 64)
+}

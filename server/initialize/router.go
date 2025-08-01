@@ -117,6 +117,8 @@ func Routers() *gin.Engine {
 		ushieldRouter.InitUserTrxDepositsRouter(PrivateGroup, PublicGroup)
 		ushieldRouter.InitUserUsdtDepositsRouter(PrivateGroup, PublicGroup)
 		ushieldRouter.InitSysAnnouncementsInfoRouter(PrivateGroup, PublicGroup)
+		ushieldRouter.InitUserEnergyOrdersRouter(PrivateGroup, PublicGroup)
+		ushieldRouter.InitUserBundleEnergyOrdersRouter(PrivateGroup, PublicGroup)
 	}
 
 	//插件路由安装

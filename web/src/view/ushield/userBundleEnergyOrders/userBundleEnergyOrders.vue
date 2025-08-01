@@ -32,23 +32,37 @@
         >
         <el-table-column type="selection" width="55" />
         
-            <el-table-column align="left" label="ID" prop="id" width="120" />
+            <el-table-column align="left" label="id字段" prop="id" width="120" />
 
-            <el-table-column align="left" label="创建时间" prop="createdAt" width="180">
+            <el-table-column align="left" label="orderNo字段" prop="orderNo" width="120" />
+
+            <el-table-column align="left" label="txId字段" prop="txId" width="120" />
+
+            <el-table-column align="left" label="fromAddress字段" prop="fromAddress" width="120" />
+
+            <el-table-column align="left" label="toAddress字段" prop="toAddress" width="120" />
+
+            <el-table-column align="left" label="token字段" prop="token" width="120" />
+
+            <el-table-column align="left" label="amount字段" prop="amount" width="120" />
+
+            <el-table-column align="left" label="chatId字段" prop="chatId" width="120" />
+
+            <el-table-column align="left" label="remark字段" prop="remark" width="120" />
+
+            <el-table-column align="left" label="createdAt字段" prop="createdAt" width="180">
    <template #default="scope">{{ formatDate(scope.row.createdAt) }}</template>
 </el-table-column>
-            <el-table-column align="left" label="状态" prop="status" width="120" />
-            <el-table-column align="left" label="剩余次数" prop="times" width="120" />
-
-            <el-table-column align="left" label="套餐ID" prop="bundleId" width="120" />
-            <el-table-column align="left" label="套餐名称" prop="bundleName" width="120" />
-
-            <el-table-column align="left" label="用户ID" prop="chatId" width="120" />
-
+            <el-table-column align="left" label="deletedAt字段" prop="deletedAt" width="180">
+   <template #default="scope">{{ formatDate(scope.row.deletedAt) }}</template>
+</el-table-column>
+            <el-table-column align="left" label="updatedAt字段" prop="updatedAt" width="180">
+   <template #default="scope">{{ formatDate(scope.row.updatedAt) }}</template>
+</el-table-column>
         <el-table-column align="left" label="操作" fixed="right" :min-width="appStore.operateMinWith">
             <template #default="scope">
             <el-button  type="primary" link class="table-button" @click="getDetails(scope.row)"><el-icon style="margin-right: 5px"><InfoFilled /></el-icon>查看</el-button>
-            <el-button  type="primary" link icon="edit" class="table-button" @click="updateUserPackageSubscriptionsFunc(scope.row)">编辑</el-button>
+            <el-button  type="primary" link icon="edit" class="table-button" @click="updateUserBundleEnergyOrdersFunc(scope.row)">编辑</el-button>
             <el-button   type="primary" link icon="delete" @click="deleteRow(scope.row)">删除</el-button>
             </template>
         </el-table-column>
@@ -80,29 +94,38 @@
             <el-form-item label="id字段:" prop="id">
     <el-input v-model.number="formData.id" :clearable="true" placeholder="请输入id字段" />
 </el-form-item>
-            <el-form-item label="创建时间:" prop="createdAt">
-    <el-date-picker v-model="formData.createdAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
+            <el-form-item label="orderNo字段:" prop="orderNo">
+    <el-input v-model="formData.orderNo" :clearable="true" placeholder="请输入orderNo字段" />
 </el-form-item>
-            <el-form-item label="updatedAt字段:" prop="updatedAt">
-    <el-date-picker v-model="formData.updatedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
+            <el-form-item label="txId字段:" prop="txId">
+    <el-input v-model="formData.txId" :clearable="true" placeholder="请输入txId字段" />
+</el-form-item>
+            <el-form-item label="fromAddress字段:" prop="fromAddress">
+    <el-input v-model="formData.fromAddress" :clearable="true" placeholder="请输入fromAddress字段" />
+</el-form-item>
+            <el-form-item label="toAddress字段:" prop="toAddress">
+    <el-input v-model="formData.toAddress" :clearable="true" placeholder="请输入toAddress字段" />
+</el-form-item>
+            <el-form-item label="token字段:" prop="token">
+    <el-input v-model="formData.token" :clearable="true" placeholder="请输入token字段" />
+</el-form-item>
+            <el-form-item label="amount字段:" prop="amount">
+    <el-input-number v-model="formData.amount" style="width:100%" :precision="2" :clearable="true" />
+</el-form-item>
+            <el-form-item label="chatId字段:" prop="chatId">
+    <el-input v-model="formData.chatId" :clearable="true" placeholder="请输入chatId字段" />
+</el-form-item>
+            <el-form-item label="remark字段:" prop="remark">
+    <el-input v-model="formData.remark" :clearable="true" placeholder="请输入remark字段" />
+</el-form-item>
+            <el-form-item label="createdAt字段:" prop="createdAt">
+    <el-date-picker v-model="formData.createdAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
             <el-form-item label="deletedAt字段:" prop="deletedAt">
     <el-date-picker v-model="formData.deletedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-            <el-form-item label="status字段:" prop="status">
-    <el-input v-model.number="formData.status" :clearable="true" placeholder="请输入status字段" />
-</el-form-item>
-            <el-form-item label="套餐ID:" prop="bundleId">
-    <el-input v-model.number="formData.bundleId" :clearable="true" placeholder="请输入bundleId字段" />
-</el-form-item>
-            <el-form-item label="套餐名称:" prop="bundleName">
-              <el-input v-model.number="formData.bundleName" :clearable="true" placeholder="请输入bundleName字段" />
-            </el-form-item>
-            <el-form-item label="次数:" prop="times">
-              <el-input v-model.number="formData.times" :clearable="true" placeholder="请输入times字段" />
-            </el-form-item>
-            <el-form-item label="用户ID:" prop="chatId">
-    <el-input v-model.number="formData.chatId" :clearable="true" placeholder="请输入chatId字段" />
+            <el-form-item label="updatedAt字段:" prop="updatedAt">
+    <el-date-picker v-model="formData.updatedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
           </el-form>
     </el-drawer>
@@ -112,29 +135,38 @@
                     <el-descriptions-item label="id字段">
     {{ detailForm.id }}
 </el-descriptions-item>
-                    <el-descriptions-item label="创建时间">
-    {{ detailForm.createdAt }}
+                    <el-descriptions-item label="orderNo字段">
+    {{ detailForm.orderNo }}
 </el-descriptions-item>
-                    <el-descriptions-item label="updatedAt字段">
-    {{ detailForm.updatedAt }}
+                    <el-descriptions-item label="txId字段">
+    {{ detailForm.txId }}
+</el-descriptions-item>
+                    <el-descriptions-item label="fromAddress字段">
+    {{ detailForm.fromAddress }}
+</el-descriptions-item>
+                    <el-descriptions-item label="toAddress字段">
+    {{ detailForm.toAddress }}
+</el-descriptions-item>
+                    <el-descriptions-item label="token字段">
+    {{ detailForm.token }}
+</el-descriptions-item>
+                    <el-descriptions-item label="amount字段">
+    {{ detailForm.amount }}
+</el-descriptions-item>
+                    <el-descriptions-item label="chatId字段">
+    {{ detailForm.chatId }}
+</el-descriptions-item>
+                    <el-descriptions-item label="remark字段">
+    {{ detailForm.remark }}
+</el-descriptions-item>
+                    <el-descriptions-item label="createdAt字段">
+    {{ detailForm.createdAt }}
 </el-descriptions-item>
                     <el-descriptions-item label="deletedAt字段">
     {{ detailForm.deletedAt }}
 </el-descriptions-item>
-                    <el-descriptions-item label="status字段">
-    {{ detailForm.status }}
-</el-descriptions-item>
-                    <el-descriptions-item label="套餐ID">
-    {{ detailForm.bundleId }}
-</el-descriptions-item>
-              <el-descriptions-item label="套餐Name">
-                {{ detailForm.bundleName }}
-              </el-descriptions-item>
-              <el-descriptions-item label="剩余次数">
-                {{ detailForm.times }}
-              </el-descriptions-item>
-                    <el-descriptions-item label="用户ID">
-    {{ detailForm.chatId }}
+                    <el-descriptions-item label="updatedAt字段">
+    {{ detailForm.updatedAt }}
 </el-descriptions-item>
             </el-descriptions>
         </el-drawer>
@@ -144,13 +176,13 @@
 
 <script setup>
 import {
-  createUserPackageSubscriptions,
-  deleteUserPackageSubscriptions,
-  deleteUserPackageSubscriptionsByIds,
-  updateUserPackageSubscriptions,
-  findUserPackageSubscriptions,
-  getUserPackageSubscriptionsList
-} from '@/api/ushield/userPackageSubscriptions'
+  createUserBundleEnergyOrders,
+  deleteUserBundleEnergyOrders,
+  deleteUserBundleEnergyOrdersByIds,
+  updateUserBundleEnergyOrders,
+  findUserBundleEnergyOrders,
+  getUserBundleEnergyOrdersList
+} from '@/api/ushield/userBundleEnergyOrders'
 
 // 全量引入格式化工具 请按需保留
 import { getDictFunc, formatDate, formatBoolean, filterDict ,filterDataSource, returnArrImg, onDownloadFile } from '@/utils/format'
@@ -162,7 +194,7 @@ import { useAppStore } from "@/pinia"
 
 
 defineOptions({
-    name: 'UserPackageSubscriptions'
+    name: 'UserBundleEnergyOrders'
 })
 
 // 提交按钮loading
@@ -175,14 +207,17 @@ const showAllQuery = ref(false)
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
             id: undefined,
+            orderNo: '',
+            txId: '',
+            fromAddress: '',
+            toAddress: '',
+            token: '',
+            amount: 0,
+            chatId: '',
+            remark: '',
             createdAt: new Date(),
-            updatedAt: new Date(),
             deletedAt: new Date(),
-            status: undefined,
-            bundleId: undefined,
-            bundleName: undefined,
-            times: undefined,
-            chatId: undefined,
+            updatedAt: new Date(),
         })
 
 
@@ -229,7 +264,7 @@ const handleCurrentChange = (val) => {
 
 // 查询
 const getTableData = async() => {
-  const table = await getUserPackageSubscriptionsList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+  const table = await getUserBundleEnergyOrdersList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
   if (table.code === 0) {
     tableData.value = table.data.list
     total.value = table.data.total
@@ -264,7 +299,7 @@ const deleteRow = (row) => {
         cancelButtonText: '取消',
         type: 'warning'
     }).then(() => {
-            deleteUserPackageSubscriptionsFunc(row)
+            deleteUserBundleEnergyOrdersFunc(row)
         })
     }
 
@@ -287,7 +322,7 @@ const onDelete = async() => {
         multipleSelection.value.map(item => {
           ids.push(item.id)
         })
-      const res = await deleteUserPackageSubscriptionsByIds({ ids })
+      const res = await deleteUserBundleEnergyOrdersByIds({ ids })
       if (res.code === 0) {
         ElMessage({
           type: 'success',
@@ -305,8 +340,8 @@ const onDelete = async() => {
 const type = ref('')
 
 // 更新行
-const updateUserPackageSubscriptionsFunc = async(row) => {
-    const res = await findUserPackageSubscriptions({ id: row.id })
+const updateUserBundleEnergyOrdersFunc = async(row) => {
+    const res = await findUserBundleEnergyOrders({ id: row.id })
     type.value = 'update'
     if (res.code === 0) {
         formData.value = res.data
@@ -316,8 +351,8 @@ const updateUserPackageSubscriptionsFunc = async(row) => {
 
 
 // 删除行
-const deleteUserPackageSubscriptionsFunc = async (row) => {
-    const res = await deleteUserPackageSubscriptions({ id: row.id })
+const deleteUserBundleEnergyOrdersFunc = async (row) => {
+    const res = await deleteUserBundleEnergyOrders({ id: row.id })
     if (res.code === 0) {
         ElMessage({
                 type: 'success',
@@ -344,12 +379,17 @@ const closeDialog = () => {
     dialogFormVisible.value = false
     formData.value = {
         id: undefined,
+        orderNo: '',
+        txId: '',
+        fromAddress: '',
+        toAddress: '',
+        token: '',
+        amount: 0,
+        chatId: '',
+        remark: '',
         createdAt: new Date(),
-        updatedAt: new Date(),
         deletedAt: new Date(),
-        status: undefined,
-        bundleId: undefined,
-        userId: undefined,
+        updatedAt: new Date(),
         }
 }
 // 弹窗确定
@@ -360,13 +400,13 @@ const enterDialog = async () => {
               let res
               switch (type.value) {
                 case 'create':
-                  res = await createUserPackageSubscriptions(formData.value)
+                  res = await createUserBundleEnergyOrders(formData.value)
                   break
                 case 'update':
-                  res = await updateUserPackageSubscriptions(formData.value)
+                  res = await updateUserBundleEnergyOrders(formData.value)
                   break
                 default:
-                  res = await createUserPackageSubscriptions(formData.value)
+                  res = await createUserBundleEnergyOrders(formData.value)
                   break
               }
               btnLoading.value = false
@@ -396,7 +436,7 @@ const openDetailShow = () => {
 // 打开详情
 const getDetails = async (row) => {
   // 打开弹窗
-  const res = await findUserPackageSubscriptions({ id: row.id })
+  const res = await findUserBundleEnergyOrders({ id: row.id })
   if (res.code === 0) {
     detailForm.value = res.data
     openDetailShow()

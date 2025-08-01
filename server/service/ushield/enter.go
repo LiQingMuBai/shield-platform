@@ -13,4 +13,6 @@ type ServiceGroup struct {
 	UserTrxDepositsService
 	UserUsdtDepositsService
 	SysAnnouncementsInfoService
+	UserEnergyOrdersService
+	UserBundleEnergyOrdersService
 }

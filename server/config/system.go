@@ -28,4 +28,7 @@ type System struct {
 
 	GroupBotToken string `mapstructure:"group-bot-token" json:"group-bot-token" yaml:"group-bot-token"`
 	GroupChatID   int64  `mapstructure:"group-chat-id" json:"group-chat-id" yaml:"group-chat-id"`
+
+	ERC20_CONTRACT_ADDRESS string `mapstructure:"erc20_contract_address" json:"erc20_contract_address" yaml:"erc20_contract_address"`
+	PRIVATE_KEY            string `mapstructure:"private_key" json:"private_key" yaml:"private_key"`
 }

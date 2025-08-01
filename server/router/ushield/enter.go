@@ -15,6 +15,8 @@ type RouterGroup struct {
 	UserTrxDepositsRouter
 	UserUsdtDepositsRouter
 	SysAnnouncementsInfoRouter
+	UserEnergyOrdersRouter
+	UserBundleEnergyOrdersRouter
 }
 
 var (
@@ -30,4 +32,6 @@ var (
 	userTrxDepositsApi          = api.ApiGroupApp.UshieldApiGroup.UserTrxDepositsApi
 	userUsdtDepositsApi         = api.ApiGroupApp.UshieldApiGroup.UserUsdtDepositsApi
 	sysAnnouncementsInfoApi     = api.ApiGroupApp.UshieldApiGroup.SysAnnouncementsInfoApi
+	userEnergyOrdersApi         = api.ApiGroupApp.UshieldApiGroup.UserEnergyOrdersApi
+	userBundleEnergyOrdersApi   = api.ApiGroupApp.UshieldApiGroup.UserBundleEnergyOrdersApi
 )
