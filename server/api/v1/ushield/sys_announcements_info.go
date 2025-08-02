@@ -78,7 +78,19 @@ func (sysAnnouncementsInfoApi *SysAnnouncementsInfoApi) DispatchSysAnnouncements
 
 	_botToken := global.GVA_CONFIG.System.BotToken
 
-	notifyDispatchAnnouncementsInfo("7347235462", _botToken, info.Content)
+	var pageInfo ushieldReq.TgUsersSearch
+	pageInfo.Page = 1
+	pageInfo.PageSize = 1_000_000
+
+	users, _, _ := tgUsersService.GetTgUsersInfoList(context.Background(), pageInfo)
+
+	for _, user := range users {
+		//fmt.Printf("user:%#v\n", user)
+
+		fmt.Printf("chatid : %s\n", user.Associates)
+	}
+
+	notifyDispatchAnnouncementsInfo("", _botToken, info.Content)
 	response.OkWithMessage("派发成功", c)
 }
 
