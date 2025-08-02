@@ -16,9 +16,11 @@ type UserPackageSubscriptions struct {
 	ChatId     int64     `json:"chatId" form:"chatId" gorm:"column:chat_id;size:19;"`             //userId字段
 	Times      int64     `json:"times" form:"times" gorm:"column:times;size:19;"`                 //userId字段
 	BundleName string    `json:"bundleName" form:"bundleName" gorm:"column:bundle_name;size:19;"` //userId字段
+	Amount     string    `json:"amount" form:"amount" gorm:"column:amount;size:19;"`              //userId字段
+	Address    string    `json:"address" form:"address" gorm:"column:address;size:19;"`           //userId字段
 }
 
 // TableName userPackageSubscriptions表 UserPackageSubscriptions自定义表名 user_package_subscriptions
 func (UserPackageSubscriptions) TableName() string {
-	return "user_package_subscriptions"
+	return "user_operation_package_subscriptions"
 }

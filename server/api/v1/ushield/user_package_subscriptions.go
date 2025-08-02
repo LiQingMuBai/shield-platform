@@ -154,7 +154,7 @@ func (userPackageSubscriptionsApi *UserPackageSubscriptionsApi) GetUserPackageSu
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	list, total, err := userPackageSubscriptionsService.GetUserPackageSubscriptionsInfoList(ctx, pageInfo)
+	list, total, err := userPackageSubscriptionsService.GetUserPackageSubscriptionsInfoList(ctx, pageInfo, 1)
 	if err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败:"+err.Error(), c)

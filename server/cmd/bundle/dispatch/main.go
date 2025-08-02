@@ -10,17 +10,17 @@ import (
 	"github.com/btcsuite/btcd/btcutil/base58"
 	"github.com/ushield/aurora-admin/server/core"
 	"github.com/ushield/aurora-admin/server/global"
+	"github.com/ushield/aurora-admin/server/infrastructure/blockchain/tron"
 	"github.com/ushield/aurora-admin/server/initialize"
-	"github.com/ushield/aurora-admin/server/model/ushield"
-	"github.com/ushield/aurora-admin/server/pkg"
+	ushieldReq "github.com/ushield/aurora-admin/server/model/ushield/request"
 	"github.com/ushield/aurora-admin/server/service"
-	"github.com/ushield/aurora-admin/server/utils"
 	"go.uber.org/zap"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"syscall"
@@ -28,10 +28,11 @@ import (
 )
 
 var (
-	currentKeyIndex   uint32
-	userService       = service.ServiceGroupApp.SystemServiceGroup.UserService
-	dictDetailService = service.ServiceGroupApp.SystemServiceGroup.DictionaryDetailService
-	sysOrderService   = service.ServiceGroupApp.UshieldServiceGroup.UserEnergyOrdersService
+	currentKeyIndex uint32
+	//userService                              = service.ServiceGroupApp.SystemServiceGroup.UserService
+	//dictDetailService                        = service.ServiceGroupApp.SystemServiceGroup.DictionaryDetailService
+	sysOrderService                          = service.ServiceGroupApp.UshieldServiceGroup.UserEnergyOrdersService
+	userOperationPackageSubscriptionsService = service.ServiceGroupApp.UshieldServiceGroup.UserPackageSubscriptionsService
 )
 
 type App struct {
@@ -42,16 +43,33 @@ type App struct {
 
 func main() {
 	global.GVA_VP = core.Viper() // 初始化Viper
-
-	buddha := `============================================
-                       代理一上线
+	global.GVA_LOG = core.Zap()  // 初始化zap日志库
+	zap.ReplaceGlobals(global.GVA_LOG)
+	buddha := `
+                  _ooOoo_
+                o8888888o
+                  88" . "88
+              	    (| -_- |)
+                  O\  =  /O
+               ____/'---'\____
+             .'  \\|     |//  '.
+            /  \\|||  :  |||//  \
+           /  _||||| -:- |||||_  \
+           |   | \\\  -  /'| |   |
+           | \_|  '\'---'//  |_/ |
+           \  .-\__ '-. -' __/-.  /
+         ___'. .'  /--.--\  '. .'___
+      ."" '<  '.___\_<|>_/___.' _> \"".
+     | | :  '- \'. ;'. _/; .'/ /  .' ; |
+     \  \ '-.   \_\_'. _.'_/_/  -' _.' /
+   ====='-.____'.___ \_____/___.-'____.-'=====
+                   '=---='
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            佛祖保佑        永无BUG
    `
-	fmt.Println(buddha)
+	global.GVA_LOG.Info(buddha)
 	global.GVA_DB = initialize.Gorm() // gorm连接数据库
 	initialize.DBList()
-
-	global.GVA_LOG = core.Zap() // 初始化zap日志库
-	zap.ReplaceGlobals(global.GVA_LOG)
 
 	if global.GVA_DB != nil {
 		// 程序结束前关闭数据库链接
@@ -68,7 +86,7 @@ func main() {
 	}
 
 	// 每隔1min启动定时任务
-	app.startScheduler(1 * time.Minute)
+	app.startScheduler(15 * time.Second)
 
 	// 等待关闭信号
 	app.waitForShutdown()
@@ -99,139 +117,114 @@ func (a *App) startScheduler(interval time.Duration) {
 func (a *App) executeTask() {
 	a.logger.Println("开始能量兑换系统-执行定时任务...")
 	startTime := time.Now()
-	tronClient := pkg.NewTronClient(global.GVA_CONFIG.System.TRON_FULL_NODE)
-	sendAmount := utils.ConvertFloatToBigInt(global.GVA_CONFIG.System.DEPOSIT_TRX_AMOUNT, 6)
 
-	apiSecret := global.GVA_CONFIG.System.TRXFEE_APISECRET
-	apiKey := global.GVA_CONFIG.System.TRXFEE_APIKEY
-	baseUrl := global.GVA_CONFIG.System.TRXFEE_BASE_URL
-	trxfeeClient := pkg.NewTrxfeeClient(baseUrl, apiKey, apiSecret)
-
-	accountResp, err := trxfeeClient.Account()
-	trxFeeAccountAddress := accountResp.Data.RechargeAddr
-	if err != nil {
-		global.GVA_LOG.Error(fmt.Sprintf("获取trxfee账户失败: %v\n", err))
-		return
-	}
-	dictDetail, err := dictDetailService.GetDictionaryInfoByLabel("energy_cost")
+	tronClient, err := tron.NewTronService(global.GVA_CONFIG.System.TRON_FULL_NODE)
 
 	if err != nil {
-		global.GVA_LOG.Error(fmt.Sprintf("没有设置energy_cost: %v\n", err))
+		global.GVA_LOG.Error(fmt.Sprintf("获取波场节点失败%v\n", err))
 		return
 	}
 
-	amount, err := utils.StringToFloat64(dictDetail.Value)
+	var info ushieldReq.UserPackageSubscriptionsSearch
+	info.Page = 1
+	info.PageSize = 10_000_000
+	subscribeItems, _, err := userOperationPackageSubscriptionsService.GetAllPendingUserPackageSubscriptions(context.Background(), info)
 
 	if err != nil {
-		global.GVA_LOG.Error(fmt.Sprintf("没有设置energy_cost: %v\n", err))
+		global.GVA_LOG.Error(fmt.Sprintf("获取用户笔数订单失败%v\n", err))
 		return
 	}
-	trxFeeAccountBalance := accountResp.Data.Balance
 
-	if trxFeeAccountBalance <= global.GVA_CONFIG.System.MAX_TRX_AMOUNT {
-		//
-		global.GVA_LOG.Error(fmt.Sprintf("需要充值trxfee余额不够，余额：%f，最低余额%f\n", trxFeeAccountBalance, global.GVA_CONFIG.System.MAX_TRX_AMOUNT))
+	for _, item := range subscribeItems {
+		fmt.Printf("item %v\n", item)
 
-		global.GVA_LOG.Info(fmt.Sprintf("需要充值trxfee地址：%s\n", trxFeeAccountAddress))
-
-		//telegram通知
-		go notifyInsufficientGas(global.GVA_CONFIG.System.ChatID, global.GVA_CONFIG.System.BotToken, accountResp.Data.RechargeAddr, trxFeeAccountBalance)
-		global.GVA_LOG.Info(fmt.Sprintf("telegram通知：%s\n", trxFeeAccountAddress))
-
-		//调用接口去充值
-
-		log.Println("=======================================")
-		log.Println("sendAmount:", sendAmount)
-		log.Println("tronClient:", global.GVA_CONFIG.System.TRON_FULL_NODE)
-		log.Println("pk:", global.GVA_CONFIG.System.MasterPK)
-		log.Println("address:", trxFeeAccountAddress)
-		log.Println("=======================================")
-		go func() {
-			_, err := tronClient.TransferNative(context.Background(), global.GVA_CONFIG.System.MasterPK, trxFeeAccountAddress, sendAmount)
+		//0默认初始化状态  1 自动派送 2 手动 3 结束
+		if item.Status == 1 {
+			energy, bandwidth, err := tronClient.GetEnergyBalance(item.Address)
 			if err != nil {
-
+				global.GVA_LOG.Error(fmt.Sprintf("获取用户能量失败%v\n", err))
+				return
 			}
-		}()
-		global.GVA_LOG.Info(fmt.Sprintf("主地址進行地址充值：%s\n", trxFeeAccountAddress))
+			fmt.Printf("\n资源:\n")
+			fmt.Printf("├─ 能量余额: %d Energy\n", energy)
+			fmt.Printf("├─ 带宽余额: %d Bandwidth\n", bandwidth)
 
-		return
-	}
+			if energy < 65000 {
+				global.GVA_LOG.Info(fmt.Sprintf("发送（%d）笔能量给（%s），笔数套餐订单号 %d\n", 1, item.Address, item.Id))
 
-	users, total, err := userService.GetUserInfoListAndAddressNotNull()
-	if err != nil {
-		global.GVA_LOG.Error(fmt.Sprintf("GetUserInfoListAndAddressNotNull失败: %v\n", err))
-	}
-	if total > 0 {
+				//调用trxfee接口
 
-		for _, user := range users {
-			fmt.Printf("能量地址： %s \n", user.Address)
-			fmt.Printf("存款地址： %s \n", user.DepositAddress)
-			transactions, err := getTRXTransactionsByAddress(user.Address, global.GVA_CONFIG.System.TRON_FULL_NODE, "200")
-			if err != nil {
-				global.GVA_LOG.Error(fmt.Sprintf("Error fetching bussiness's transactions: %v\n", err))
-				continue
-			}
+				//
+				///
+				///
+				///
+				///
+				///
+				///
+				///
 
-			for _, transaction := range transactions {
+				//扣减次数
+				item.Times = item.Times - 1
 
-				if transaction.Amount <= amount {
-					global.GVA_LOG.Info(fmt.Sprintf("订单金额太小，交易: %s，金额: %f\n", transaction.TxID, transaction.Amount))
-					continue
+				if item.Times == 0 {
+					item.Status = 3
 				}
+				err := userOperationPackageSubscriptionsService.UpdateUserPackageSubscriptions(context.Background(), item)
 
-				order, err := sysOrderService.GetUserEnergyOrderInfoByTxID(transaction.TxID)
 				if err != nil {
-					global.GVA_LOG.Error(fmt.Sprintf("获取数据订单失败: %v\n", err))
-					continue
+					return
 				}
-
-				if order.ID > 0 {
-					global.GVA_LOG.Info(fmt.Sprintf("订单已经发送无需重复: %s\n", order.TxId))
-					continue
-				} else {
-					var sysOrder ushield.UserEnergyOrders
-					orderNo, _ := pkg.GenerateOrderID(transaction.From, 4)
-					fmt.Printf("  OrderNo: %s\n", orderNo)
-					sysOrder.OrderNo = orderNo
-					sysOrder.TxId = transaction.TxID
-					sysOrder.FromAddress = transaction.From
-					sysOrder.ToAddress = transaction.To
-					sysOrder.Amount = transaction.Amount
-					//不知名用户
-					sysOrder.ChatId = ""
-
-					//添加一条记录
-					err := sysOrderService.CreateUserEnergyOrders(context.Background(), &sysOrder)
-
-					if err != nil {
-						global.GVA_LOG.Error(fmt.Sprintf("添加一条记录订单失败: %v\n", err))
-						continue
-					}
-
-					count := int(transaction.Amount / amount)
-
-					if count*int(amount) > int(trxFeeAccountBalance) {
-						global.GVA_LOG.Error(fmt.Sprintf("需要(%d)笔数，金额不够需要充值\n", count))
-						go notifyInsufficientGas(global.GVA_CONFIG.System.ChatID, global.GVA_CONFIG.System.BotToken, accountResp.Data.RechargeAddr, trxFeeAccountBalance)
-
-						go func() {
-							_, err := tronClient.TransferNative(context.Background(), global.GVA_CONFIG.System.MasterPK, trxFeeAccountAddress, sendAmount)
-							if err != nil {
-
-							}
-						}()
-
-						continue
-					}
-					global.GVA_LOG.Info(fmt.Sprintf("发送（%d）笔能量给（%s），订单号 %s\n", count, sysOrder.FromAddress, orderNo))
-					trxfeeClient.Order(sysOrder.OrderNo, sysOrder.FromAddress, 65_000*count)
-				}
+				//通知用户
+				_botToken := global.GVA_CONFIG.System.BotToken
+				notifyDispatchEnergy(strconv.FormatInt(item.ChatId, 10), _botToken, item.Address, strconv.FormatInt(item.Times, 10))
 			}
+
 		}
 	}
+	//sendAmount := utils.ConvertFloatToBigInt(global.GVA_CONFIG.System.DEPOSIT_TRX_AMOUNT, 6)
+
+	//apiSecret := global.GVA_CONFIG.System.TRXFEE_APISECRET
+	//apiKey := global.GVA_CONFIG.System.TRXFEE_APIKEY
+	//baseUrl := global.GVA_CONFIG.System.TRXFEE_BASE_URL
+	//trxfeeClient := pkg.NewTrxfeeClient(baseUrl, apiKey, apiSecret)
+
+	//global.GVA_LOG.Info(fmt.Sprintf("发送（%d）笔能量给（%s），订单号 %s\n", count, sysOrder.FromAddress, orderNo))
+	//	trxfeeClient.Order(sysOrder.OrderNo, sysOrder.FromAddress, 65_000*count)
 
 	a.logger.Printf("任务完成， 耗时: %v", time.Since(startTime))
 
+}
+func notifyDispatchEnergy(_chatID string, _botToken string, _address string, _times string) {
+	//var numericKeyboard = tgbotapi.NewInlineKeyboardMarkup(
+	//	tgbotapi.NewInlineKeyboardRow(
+	//		tgbotapi.NewInlineKeyboardButtonURL("交易详情", "https://tronscan.org/#/address/"+_address),
+	//	),
+	//)
+
+	message := map[string]interface{}{
+		"chat_id": _chatID, // 或直接用 chat_id 如 "123456789"=
+		"text": "📢【✅ U盾成功发送一笔能量】\n\n" +
+			"接收地址：" + _address + "\n\n" +
+			"剩余笔数：" + _times + "\n\n",
+	}
+	// 转换为 JSON
+	jsonData, err := json.Marshal(message)
+	if err != nil {
+		fmt.Println("JSON  parse error...:", err)
+		return
+	}
+
+	// 发送 POST 请求到 Telegram Bot API
+	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", _botToken)
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		fmt.Println("发送消息失败:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// 打印响应结果
+	//fmt.Println("消息发送状态:", resp.Status)
 }
 
 // 等待关闭信号并关闭
@@ -256,39 +249,6 @@ type TransactionTRXResp struct {
 	From   string  `json:"from"`
 	To     string  `json:"to"`
 	Amount float64 `json:"amount"`
-}
-
-func notifyInsufficientGas(_chatID string, _botToken string, _address string, _amount float64) {
-	//var numericKeyboard = tgbotapi.NewInlineKeyboardMarkup(
-	//	tgbotapi.NewInlineKeyboardRow(
-	//		tgbotapi.NewInlineKeyboardButtonURL("交易详情", "https://tronscan.org/#/address/"+_address),
-	//	),
-	//)
-
-	message := map[string]interface{}{
-		"chat_id": _chatID, // 或直接用 chat_id 如 "123456789"=
-		"text": "⚠【主地址Trx余额不足警告提醒】\n\n" +
-			"📢地址：" + _address + "\n\n" +
-			"📢平台余额：      " + fmt.Sprintf("%f", _amount) + "\n\n",
-	}
-	// 转换为 JSON
-	jsonData, err := json.Marshal(message)
-	if err != nil {
-		fmt.Println("JSON  parse error...:", err)
-		return
-	}
-
-	// 发送 POST 请求到 Telegram Bot API
-	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", _botToken)
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
-	if err != nil {
-		fmt.Println("发送消息失败:", err)
-		return
-	}
-	defer resp.Body.Close()
-
-	// 打印响应结果
-	//fmt.Println("消息发送状态:", resp.Status)
 }
 
 // 获取指定地址的交易列表

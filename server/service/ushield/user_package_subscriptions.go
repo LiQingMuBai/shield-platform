@@ -46,11 +46,12 @@ func (userPackageSubscriptionsService *UserPackageSubscriptionsService) GetUserP
 
 // GetUserPackageSubscriptionsInfoList 分页获取userPackageSubscriptions表记录
 // Author [yourname](https://github.com/yourname)
-func (userPackageSubscriptionsService *UserPackageSubscriptionsService) GetUserPackageSubscriptionsInfoList(ctx context.Context, info ushieldReq.UserPackageSubscriptionsSearch) (list []ushield.UserPackageSubscriptions, total int64, err error) {
+func (userPackageSubscriptionsService *UserPackageSubscriptionsService) GetUserPackageSubscriptionsInfoList(ctx context.Context, info ushieldReq.UserPackageSubscriptionsSearch, _status int64) (list []ushield.UserPackageSubscriptions, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&ushield.UserPackageSubscriptions{})
+	//识别状态=1，就是需要监听地址没能量自动打款的
+	db := global.GVA_DB.Model(&ushield.UserPackageSubscriptions{}).Where("status = ?", _status)
 	var userPackageSubscriptionss []ushield.UserPackageSubscriptions
 	// 如果有条件搜索 下方会自动创建搜索语句
 
@@ -66,6 +67,31 @@ func (userPackageSubscriptionsService *UserPackageSubscriptionsService) GetUserP
 	err = db.Find(&userPackageSubscriptionss).Error
 	return userPackageSubscriptionss, total, err
 }
+
+// GetUserPackageSubscriptionsInfoList 分页获取userPackageSubscriptions表记录
+// Author [yourname](https://github.com/yourname)
+func (userPackageSubscriptionsService *UserPackageSubscriptionsService) GetAllPendingUserPackageSubscriptions(ctx context.Context, info ushieldReq.UserPackageSubscriptionsSearch) (list []ushield.UserPackageSubscriptions, total int64, err error) {
+	limit := info.PageSize
+	offset := info.PageSize * (info.Page - 1)
+	// 创建db
+	//识别状态=1，就是需要监听地址没能量自动打款的
+	db := global.GVA_DB.Model(&ushield.UserPackageSubscriptions{}).Where("status = ?", 1).Where("times > ?", 0)
+	var userPackageSubscriptionss []ushield.UserPackageSubscriptions
+	// 如果有条件搜索 下方会自动创建搜索语句
+
+	err = db.Count(&total).Error
+	if err != nil {
+		return
+	}
+
+	if limit != 0 {
+		db = db.Limit(limit).Offset(offset)
+	}
+
+	err = db.Find(&userPackageSubscriptionss).Error
+	return userPackageSubscriptionss, total, err
+}
+
 func (userPackageSubscriptionsService *UserPackageSubscriptionsService) GetUserPackageSubscriptionsPublic(ctx context.Context) {
 	// 此方法为获取数据源定义的数据
 	// 请自行实现
