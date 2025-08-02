@@ -43,6 +43,7 @@
             <el-table-column align="left" label="名称" prop="name" width="200" />
 
             <el-table-column align="left" label="费用" prop="amount" width="120" />
+            <el-table-column align="left" label="代币" prop="token" width="120" />
 
         <el-table-column align="left" label="操作" fixed="right" :min-width="appStore.operateMinWith">
             <template #default="scope">
@@ -91,12 +92,15 @@
             <el-form-item label="status字段:" prop="status">
     <el-input v-model.number="formData.status" :clearable="true" placeholder="请输入status字段" />
 </el-form-item>
-            <el-form-item label="name字段:" prop="name">
+            <el-form-item label="名称:" prop="name">
     <el-input v-model="formData.name" :clearable="true" placeholder="请输入name字段" />
 </el-form-item>
-            <el-form-item label="amount字段:" prop="amount">
+            <el-form-item label="金额:" prop="amount">
     <el-input v-model="formData.amount" :clearable="true" placeholder="请输入amount字段" />
 </el-form-item>
+            <el-form-item label="代币:" prop="amount">
+              <el-input v-model="formData.token" :clearable="true" placeholder="代币名称" />
+            </el-form-item>
           </el-form>
     </el-drawer>
 

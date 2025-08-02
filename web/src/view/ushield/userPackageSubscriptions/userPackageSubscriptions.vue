@@ -37,11 +37,12 @@
             <el-table-column align="left" label="创建时间" prop="createdAt" width="180">
    <template #default="scope">{{ formatDate(scope.row.createdAt) }}</template>
 </el-table-column>
-            <el-table-column align="left" label="状态" prop="status" width="120" />
-            <el-table-column align="left" label="剩余次数" prop="times" width="120" />
+            <el-table-column align="left" label="状态" prop="status" width="80" />
+            <el-table-column align="left" label="剩余次数" prop="times" width="80" />
 
             <el-table-column align="left" label="套餐ID" prop="bundleId" width="120" />
-            <el-table-column align="left" label="套餐名称" prop="bundleName" width="120" />
+            <el-table-column align="left" label="套餐名称" prop="bundleName" width="200" />
+            <el-table-column align="left" label="地址" prop="address" width="200" />
 
             <el-table-column align="left" label="用户ID" prop="chatId" width="120" />
 

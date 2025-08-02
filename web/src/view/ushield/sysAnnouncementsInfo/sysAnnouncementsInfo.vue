@@ -46,7 +46,7 @@
             <el-button  type="primary" link class="table-button" @click="getDetails(scope.row)"><el-icon style="margin-right: 5px"><InfoFilled /></el-icon>查看</el-button>
             <el-button  type="primary" link icon="edit" class="table-button" @click="updateSysAnnouncementsInfoFunc(scope.row)">编辑</el-button>
               <el-button   type="primary" link icon="plus" @click="deleteRow(scope.row)">发送</el-button>
-            <el-button   type="primary" link icon="delete" @click="deleteRow(scope.row)">删除</el-button>
+<!--            <el-button   type="primary" link icon="delete" @click="deleteRow(scope.row)">删除</el-button>-->
 
             </template>
         </el-table-column>
@@ -82,7 +82,7 @@
     <el-input v-model="formData.title" :clearable="true" placeholder="请输入公告标题" />
 </el-form-item>
             <el-form-item label="公告内容:" prop="content">
-    <el-input v-model="formData.content" :clearable="true" placeholder="请输入公告内容" />
+    <el-input   type="textarea"  v-model="formData.content"   :rows="4" :clearable="true" placeholder="请输入公告内容" />
 </el-form-item>
             <el-form-item label="createdAt字段:" prop="createdAt">
     <el-date-picker v-model="formData.createdAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
@@ -236,7 +236,7 @@ const handleSelectionChange = (val) => {
 
 // 删除行
 const deleteRow = (row) => {
-    ElMessageBox.confirm('确定要删除吗?', '提示', {
+    ElMessageBox.confirm('确定要发送吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -298,7 +298,7 @@ const deleteSysAnnouncementsInfoFunc = async (row) => {
     if (res.code === 0) {
         ElMessage({
                 type: 'success',
-                message: '删除成功'
+                message: '派发成功'
             })
             if (tableData.value.length === 1 && page.value > 1) {
             page.value--

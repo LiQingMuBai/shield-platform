@@ -10,7 +10,7 @@
     <el-input v-model="formData.title" :clearable="true" placeholder="请输入公告标题" />
 </el-form-item>
         <el-form-item label="公告内容:" prop="content">
-    <el-input v-model="formData.content" :clearable="true" placeholder="请输入公告内容" />
+    <el-input type="textarea"  v-model="formData.content"   :rows="4"  :clearable="true" placeholder="请输入公告内容" />
 </el-form-item>
         <el-form-item label="createdAt字段:" prop="createdAt">
     <el-date-picker v-model="formData.createdAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />

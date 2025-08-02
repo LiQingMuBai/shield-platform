@@ -44,9 +44,9 @@
 
             <el-table-column align="left" label="状态" prop="status" width="120" />
 
-            <el-table-column align="left" label="网络" prop="network" width="120" />
+<!--            <el-table-column align="left" label="网络" prop="network" width="120" />-->
 
-            <el-table-column align="left" label="地址" prop="address" width="150" />
+            <el-table-column align="left" label="地址" prop="address" width="400" />
 
         <el-table-column align="left" label="操作" fixed="right" :min-width="appStore.operateMinWith">
             <template #default="scope">
