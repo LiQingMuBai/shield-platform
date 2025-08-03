@@ -46,11 +46,11 @@ func (userAddressMonitorEventService *UserAddressMonitorEventService) GetUserAdd
 
 // GetUserAddressMonitorEventInfoList 分页获取userAddressMonitorEvent表记录
 // Author [yourname](https://github.com/yourname)
-func (userAddressMonitorEventService *UserAddressMonitorEventService) GetUserAddressMonitorEventInfoList(ctx context.Context, info ushieldReq.UserAddressMonitorEventSearch) (list []ushield.UserAddressMonitorEvent, total int64, err error) {
+func (userAddressMonitorEventService *UserAddressMonitorEventService) GetUserAddressMonitorEventInfoList(ctx context.Context, info ushieldReq.UserAddressMonitorEventSearch, _status int64) (list []ushield.UserAddressMonitorEvent, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&ushield.UserAddressMonitorEvent{})
+	db := global.GVA_DB.Model(&ushield.UserAddressMonitorEvent{}).Where("status = ?", _status)
 	var userAddressMonitorEvents []ushield.UserAddressMonitorEvent
 	// 如果有条件搜索 下方会自动创建搜索语句
 

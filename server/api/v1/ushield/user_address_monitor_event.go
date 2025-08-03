@@ -154,7 +154,7 @@ func (userAddressMonitorEventApi *UserAddressMonitorEventApi) GetUserAddressMoni
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	list, total, err := userAddressMonitorEventService.GetUserAddressMonitorEventInfoList(ctx, pageInfo)
+	list, total, err := userAddressMonitorEventService.GetUserAddressMonitorEventInfoList(ctx, pageInfo, 1)
 	if err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败:"+err.Error(), c)

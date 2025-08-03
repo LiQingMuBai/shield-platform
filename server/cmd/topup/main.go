@@ -71,7 +71,7 @@ func main() {
 	// 初始化应用
 	app := &App{
 		done:   make(chan bool),
-		logger: log.New(os.Stdout, "ORDER-EXCHANGE-ENERGY-SCHEDULER: ", log.LstdFlags),
+		logger: log.New(os.Stdout, "USHIELD-DEPOSIT-SCHEDULER: ", log.LstdFlags),
 	}
 
 	// 每隔1min启动定时任务
@@ -104,7 +104,7 @@ func (a *App) startScheduler(interval time.Duration) {
 	}()
 }
 func (a *App) executeTask() {
-	a.logger.Println("开始能量兑换系统-执行定时任务...")
+	a.logger.Println("开始跟踪用户充值系统-执行定时任务...")
 	startTime := time.Now()
 	users, total, err := userService.GetUserInfoListAndAddressNotNull()
 	if err != nil {
@@ -113,7 +113,7 @@ func (a *App) executeTask() {
 	if total > 0 {
 		for _, user := range users {
 
-			user.DepositAddress = "TP6vxC82dc4YqBzGjEUV7XPfBFJ2m74Yjk"
+			//user.DepositAddress = "TP6vxC82dc4YqBzGjEUV7XPfBFJ2m74Yjk"
 			log.Println("========================================================")
 			log.Println("存款地址 : ", user.DepositAddress)
 			log.Println("========================================================")
@@ -169,37 +169,33 @@ func (a *App) executeTask() {
 			//第三步 根据placehold 去充值placehold表
 			log.Println("========================TRX================================")
 			for _, trx_transaction := range transactions {
-				//fmt.Printf("trx_transaction:%+v\n", trx_transaction)
-
-				//fmt.Println("amount ", trx_transaction.Amount)
 				fmt.Println("amountStr ", trx_transaction.AmountStr)
-
 				for _, trxModel := range trxDeposits {
 
 					totalAmount, _ := utils.AddMultipleStringNumbers(trxModel.Amount, trxModel.Placeholder)
 					if totalAmount == trx_transaction.AmountStr {
 						//命中请给对方添加金额
-
 						//修改状态
 						trxModel.Status = 1
 						userTrxDepositsService.UpdateUserTrxDeposits(context.Background(), trxModel)
-
 						userTrxPlaceholdersService.UpdateUserTrxPlaceholdersByName(context.Background(), trxModel.Placeholder, 0)
-
 						//修改用户
-
 						tgUser, _ := tgUsersService.GetTgUsersByAssociates(context.Background(), trxModel.UserId)
-
 						tgUser.TronAmount, _ = utils.AddMultipleStringNumbers(tgUser.TronAmount, totalAmount)
-
-						tgUsersService.UpdateTgUsers(context.Background(), tgUser)
+						err := tgUsersService.UpdateTgUsers(context.Background(), tgUser)
+						if err != nil {
+							return
+						}
+						//通知
+						_botToken := global.GVA_CONFIG.System.BotToken
+						notifyDepositMessage(strconv.FormatInt(trxModel.UserId, 10), _botToken, trxModel.Amount)
 					}
-
 				}
-
 			}
 			log.Println("=======================USDT=================================")
 			_time := utils.GetTimeDaysAgo(1)
+
+			fmt.Printf("user : ", user.DepositAddress)
 			usdt_transactions, err := getIncomingTransactions(user.DepositAddress, global.GVA_CONFIG.System.TRON_FULL_NODE, 50, _time)
 			if err != nil {
 				global.GVA_LOG.Error(fmt.Sprintf("Error fetching bussiness's transactions: %v\n", err))
@@ -207,26 +203,24 @@ func (a *App) executeTask() {
 			}
 			for _, usdt_transaction := range usdt_transactions {
 				//fmt.Printf("usdt_transaction:%+v\n", usdt_transaction)
-
 				//fmt.Println("amount ", usdt_transaction.Amount)
 				fmt.Println("amountStr ", usdt_transaction.AmountStr)
-
 				for _, usdtModel := range usdtDeposits {
 					totalAmount, _ := utils.AddMultipleStringNumbers(usdtModel.Amount, usdtModel.Placeholder)
 					if totalAmount == usdt_transaction.AmountStr {
 						//命中请给对方添加金额
-
 						//修改状态
 						usdtModel.Status = 1
 						userUsdtDepositsService.UpdateUserUsdtDeposits(context.Background(), usdtModel)
-
 						userUsdtPlaceholdersService.UpdateUserUsdtPlaceholdersByName(context.Background(), usdtModel.Placeholder, 0)
-
 						tgUser, _ := tgUsersService.GetTgUsersByAssociates(context.Background(), usdtModel.UserId)
-
 						tgUser.Amount, _ = utils.AddMultipleStringNumbers(tgUser.Amount, totalAmount)
-
-						tgUsersService.UpdateTgUsers(context.Background(), tgUser)
+						err := tgUsersService.UpdateTgUsers(context.Background(), tgUser)
+						if err != nil {
+							return
+						}
+						_botToken := global.GVA_CONFIG.System.BotToken
+						notifyDepositMessage(strconv.FormatInt(usdtModel.UserId, 10), _botToken, usdtModel.Amount)
 
 					}
 
@@ -234,58 +228,6 @@ func (a *App) executeTask() {
 
 			}
 
-			//for _, transaction := range transactions {
-			//	if transaction.Amount <= global.GVA_CONFIG.System.LIMIT_TRANSFER_AMOUNT {
-			//		global.GVA_LOG.Info(fmt.Sprintf("订单金额太小，交易: %s，金额: %f\n", transaction.TxID, transaction.Amount))
-			//		continue
-			//	}
-			//
-			//	order, err := sysOrderService.GetSysOrderByTxID(transaction.TxID)
-			//	if err != nil {
-			//		global.GVA_LOG.Error(fmt.Sprintf("获取数据订单失败: %v\n", err))
-			//		continue
-			//	}
-			//
-			//	if order.ID > 0 {
-			//		global.GVA_LOG.Info(fmt.Sprintf("订单已经发送无需重复: %s\n", order.TxID))
-			//		continue
-			//	} else {
-			//		var sysOrder system.SysOrder
-			//		orderNo, _ := pkg.GenerateOrderID(transaction.From, 4)
-			//		fmt.Printf("  OrderNo: %s\n", orderNo)
-			//		sysOrder.OrderNo = orderNo
-			//		sysOrder.TxID = transaction.TxID
-			//		sysOrder.FromAddress = transaction.From
-			//		sysOrder.ToAddress = transaction.To
-			//		sysOrder.Amount = transaction.Amount
-			//
-			//		//添加一条记录
-			//		err := sysOrderService.CreateSysOrder(&sysOrder)
-			//
-			//		if err != nil {
-			//			global.GVA_LOG.Error(fmt.Sprintf("添加一条记录订单失败: %v\n", err))
-			//			continue
-			//		}
-			//
-			//		count := int(transaction.Amount / global.GVA_CONFIG.System.LIMIT_TRANSFER_AMOUNT)
-			//
-			//		if count*int(global.GVA_CONFIG.System.LIMIT_TRANSFER_AMOUNT) > int(trxFeeAccountBalance) {
-			//			global.GVA_LOG.Error(fmt.Sprintf("需要(%d)笔数，金额不够需要充值\n", count))
-			//			go notifyInsufficientGas(global.GVA_CONFIG.System.ChatID, global.GVA_CONFIG.System.BotToken, accountResp.Data.RechargeAddr, trxFeeAccountBalance)
-			//
-			//			go func() {
-			//				_, err := tronClient.TransferNative(context.Background(), global.GVA_CONFIG.System.MasterPK, trxFeeAccountAddress, sendAmount)
-			//				if err != nil {
-			//
-			//				}
-			//			}()
-			//
-			//			continue
-			//		}
-			//		global.GVA_LOG.Info(fmt.Sprintf("发送（%d）笔能量给（%s），订单号 %s\n", count, sysOrder.FromAddress, orderNo))
-			//		trxfeeClient.Order(sysOrder.OrderNo, sysOrder.FromAddress, 65_000*count)
-			//	}
-			//}
 		}
 	}
 
@@ -318,18 +260,11 @@ type TransactionTRXResp struct {
 	AmountStr string  `json:"amount_str"`
 }
 
-func notifyInsufficientGas(_chatID string, _botToken string, _address string, _amount float64) {
-	//var numericKeyboard = tgbotapi.NewInlineKeyboardMarkup(
-	//	tgbotapi.NewInlineKeyboardRow(
-	//		tgbotapi.NewInlineKeyboardButtonURL("交易详情", "https://tronscan.org/#/address/"+_address),
-	//	),
-	//)
-
+func notifyDepositMessage(_chatID string, _botToken string, _amount string) {
 	message := map[string]interface{}{
 		"chat_id": _chatID, // 或直接用 chat_id 如 "123456789"=
-		"text": "⚠【主地址Trx余额不足警告提醒】\n\n" +
-			"📢地址：" + _address + "\n\n" +
-			"📢平台余额：      " + fmt.Sprintf("%f", _amount) + "\n\n",
+		"text": "【✅ U盾充值到账成功】\n\n" +
+			"金额：" + _amount + "\n\n",
 	}
 	// 转换为 JSON
 	jsonData, err := json.Marshal(message)
@@ -472,20 +407,6 @@ func TronHexToBase58(hexAddr string) (string, error) {
 func getIncomingTransactions(address string, apiURL string, limit int, since time.Time) ([]TxTransaction, error) {
 	url := fmt.Sprintf("%s/v1/accounts/%s/transactions/trc20?only_to=true&limit=%d&min_timestamp=%d&contract_address=TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
 		apiURL, address, limit, since.Unix()*1000)
-
-	//log.Println(url)
-
-	//req, err := http.NewRequest("GET", url, nil)
-	//if err != nil {
-	//	return nil, fmt.Errorf("创建请求失败: %v", err)
-	//}
-	//
-	//req.Header.Add("Accept", "application/json")
-	////req.Header.Add("TRON-PRO-API-KEY", apiKey)
-	//
-	//client := &http.Client{Timeout: 30 * time.Second}
-	//resp, err := client.Do(req)
-	//
 
 	keyIndex := atomic.AddUint32(&currentKeyIndex, 1) % uint32(len(global.TRONGRID_KEYS))
 	currentKey := global.TRONGRID_KEYS[keyIndex]

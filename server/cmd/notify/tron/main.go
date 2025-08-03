@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -9,7 +11,9 @@ import (
 	"github.com/ushield/aurora-admin/server/core"
 	"github.com/ushield/aurora-admin/server/global"
 	"github.com/ushield/aurora-admin/server/initialize"
+	ushieldReq "github.com/ushield/aurora-admin/server/model/ushield/request"
 	"github.com/ushield/aurora-admin/server/service"
+	"github.com/ushield/aurora-admin/server/utils"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"io"
@@ -18,20 +22,23 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
 )
 
 var (
-	currentKeyIndex             uint32
-	userService                 = service.ServiceGroupApp.SystemServiceGroup.UserService
-	sysOrderService             = service.ServiceGroupApp.SystemServiceGroup.SysOrderService
-	userUsdtDepositsService     = service.ServiceGroupApp.UshieldServiceGroup.UserUsdtDepositsService
-	userTrxDepositsService      = service.ServiceGroupApp.UshieldServiceGroup.UserTrxDepositsService
-	userUsdtPlaceholdersService = service.ServiceGroupApp.UshieldServiceGroup.UserUsdtPlaceholdersService
-	userTrxPlaceholdersService  = service.ServiceGroupApp.UshieldServiceGroup.UserTrxPlaceholdersService
-	tgUsersService              = service.ServiceGroupApp.UshieldServiceGroup.TgUsersService
+	currentKeyIndex                uint32
+	userService                    = service.ServiceGroupApp.SystemServiceGroup.UserService
+	sysOrderService                = service.ServiceGroupApp.SystemServiceGroup.SysOrderService
+	userUsdtDepositsService        = service.ServiceGroupApp.UshieldServiceGroup.UserUsdtDepositsService
+	userTrxDepositsService         = service.ServiceGroupApp.UshieldServiceGroup.UserTrxDepositsService
+	userUsdtPlaceholdersService    = service.ServiceGroupApp.UshieldServiceGroup.UserUsdtPlaceholdersService
+	userTrxPlaceholdersService     = service.ServiceGroupApp.UshieldServiceGroup.UserTrxPlaceholdersService
+	tgUsersService                 = service.ServiceGroupApp.UshieldServiceGroup.TgUsersService
+	dictDetailService              = service.ServiceGroupApp.SystemServiceGroup.DictionaryDetailService
+	userAddressMonitorEventService = service.ServiceGroupApp.UshieldServiceGroup.UserAddressMonitorEventService
 )
 
 type App struct {
@@ -146,8 +153,118 @@ func (a *App) executeTask() {
 		log.Println("amount ", target)
 	}
 
+	var info ushieldReq.UserAddressMonitorEventSearch
+
+	info.Page = 1
+	info.PageSize = 1_000_000
+
+	//得到正在运行的
+	monitorEvents, _, err := userAddressMonitorEventService.GetUserAddressMonitorEventInfoList(context.Background(), info, 1)
+	if err != nil {
+		return
+	}
+	botToken := global.GVA_CONFIG.System.BotToken
+	for _, event := range monitorEvents {
+
+		if sumbitMap[event.Address] > 0 {
+			event.Times = event.Times + 1
+			if event.Times <= 10 {
+				err := userAddressMonitorEventService.UpdateUserAddressMonitorEvent(context.Background(), event)
+				if err != nil {
+
+					return
+				}
+				notifyRisk(strconv.FormatInt(event.ChatId, 10), botToken, event.Address, strconv.FormatInt(event.Times, 10))
+			}
+		}
+
+		serverTrxPrice, _ := dictDetailService.GetDictionaryInfoByLabel("server_trx_price")
+		serverUSDTPrice, _ := dictDetailService.GetDictionaryInfoByLabel("server_usdt_price")
+
+		tgUser, _ := tgUsersService.GetTgUsersByAssociates(context.Background(), event.ChatId)
+
+		if utils.CompareStringsWithFloat(serverTrxPrice.Value, tgUser.TronAmount, 1) && utils.CompareStringsWithFloat(serverUSDTPrice.Value, tgUser.Amount, 1) {
+
+			if event.InsufficientTimes == 0 {
+				notifyRiskInsufficientBalance(strconv.FormatInt(event.ChatId, 10), botToken, event.Address, strconv.FormatInt(event.Days, 10), tgUser.TronAmount, tgUser.Amount)
+			}
+		}
+
+	}
+
 	a.logger.Printf("任务完成， 耗时: %v", time.Since(startTime))
 
+}
+
+func notifyRiskInsufficientBalance(_chatID string, _botToken string, _address string, _days string, _tronAmount, _amount string) {
+	currentTime := time.Now()
+
+	// 格式化时间字符串，例如：YYYY-MM-DD HH:MM:SS
+	formattedTime := currentTime.Format("2006-01-02 15:04:05")
+	message := map[string]interface{}{
+		"chat_id": _chatID, // 或直接用 chat_id 如 "123456789"=
+		"text": "📢 冻结预警服务即将到期检测余额不足推送\n\n" +
+			"📢 冻结预警服务即将到期！\n\n" +
+			"地址：" + _address + " \n\n" +
+			"剩余天数：" + _days + " 天\n\n" +
+			"到期时间：" + formattedTime + "\n\n" +
+			"🛑 到期后将自动停止监测，不再推送风险提醒\n\n" +
+			"💼 当前余额：\n\n- " + _tronAmount + "TRX：\n- " + _amount + "USDT：\n\n" +
+			"请尽快充值以继续保障资产安全",
+	}
+	// 转换为 JSON
+	jsonData, err := json.Marshal(message)
+	if err != nil {
+		fmt.Println("JSON  parse error...:", err)
+		return
+	}
+
+	// 发送 POST 请求到 Telegram Bot API
+	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", _botToken)
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		fmt.Println("发送消息失败:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// 打印响应结果
+	//fmt.Println("消息发送状态:", resp.Status)
+}
+
+func notifyRisk(_chatID string, _botToken string, _address string, _times string) {
+	currentTime := time.Now()
+
+	// 格式化时间字符串，例如：YYYY-MM-DD HH:MM:SS
+	formattedTime := currentTime.Format("2006-01-02 15:04:05")
+	message := map[string]interface{}{
+		"chat_id": _chatID,
+		"text": "🚨【USDT冻结预警】第" + _times + "/10次（持续预警中）\n\n" +
+			"⚠️ 您的地址已被风控系统标记为即将冻结！\n\n" +
+			"地址：" + _address + "\n\n" +
+			"风险类型：异常资金流动 + 与受制裁实体交互\n\n" +
+			"⚠️ 状态：冻结即将触发\n\n" +
+			"⏰ 当前时间：" + formattedTime + "\n\n" +
+			"‼️请立即转出资产！避免资产损失！\n\n",
+	}
+	// 转换为 JSON
+	jsonData, err := json.Marshal(message)
+	if err != nil {
+		fmt.Println("JSON  parse error...:", err)
+		return
+	}
+
+	// 发送 POST 请求到 Telegram Bot API
+	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", _botToken)
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		fmt.Println("发送消息失败:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// 打印响应结果
+	//fmt.Println("消息发送状态:", resp.Status)
 }
 
 // 等待关闭信号并关闭
