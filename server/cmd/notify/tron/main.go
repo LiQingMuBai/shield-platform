@@ -186,6 +186,13 @@ func (a *App) executeTask() {
 		if utils.CompareStringsWithFloat(serverTrxPrice.Value, tgUser.TronAmount, 1) && utils.CompareStringsWithFloat(serverUSDTPrice.Value, tgUser.Amount, 1) {
 
 			if event.InsufficientTimes == 0 {
+
+				event.InsufficientTimes = event.InsufficientTimes + 1
+				err := userAddressMonitorEventService.UpdateUserAddressMonitorEvent(context.Background(), event)
+				if err != nil {
+					return
+				}
+
 				notifyRiskInsufficientBalance(strconv.FormatInt(event.ChatId, 10), botToken, event.Address, strconv.FormatInt(event.Days, 10), tgUser.TronAmount, tgUser.Amount)
 			}
 		}
