@@ -3,7 +3,7 @@
   <div>
     <div class="gva-form-box">
       <el-form :model="formData" ref="elFormRef" label-position="right" :rules="rule" label-width="80px">
-        <el-form-item label="id字段:" prop="id">
+        <el-form-item label="ID:" prop="id">
     <el-input v-model.number="formData.id" :clearable="true" placeholder="请输入id字段" />
 </el-form-item>
         <el-form-item label="公告标题:" prop="title">
@@ -12,15 +12,13 @@
         <el-form-item label="公告内容:" prop="content">
     <el-input type="textarea"  v-model="formData.content"   :rows="4"  :clearable="true" placeholder="请输入公告内容" />
 </el-form-item>
-        <el-form-item label="createdAt字段:" prop="createdAt">
+        <el-form-item label="创建时间:" prop="createdAt">
     <el-date-picker v-model="formData.createdAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-        <el-form-item label="updatedAt字段:" prop="updatedAt">
+        <el-form-item label="修改时间:" prop="updatedAt">
     <el-date-picker v-model="formData.updatedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-        <el-form-item label="deletedAt字段:" prop="deletedAt">
-    <el-date-picker v-model="formData.deletedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
-</el-form-item>
+
         <el-form-item>
           <el-button :loading="btnLoading" type="primary" @click="save">保存</el-button>
           <el-button type="primary" @click="back">返回</el-button>

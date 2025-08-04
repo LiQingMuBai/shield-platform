@@ -289,7 +289,16 @@ func notifyDepositMessage(_chatID string, _botToken string, _amount string) {
 // 获取指定地址的交易列表
 func getTRXTransactionsByAddress(address string, apiURL string, pageSize string) ([]TransactionTRXResp, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
-	url := fmt.Sprintf("%s/v1/accounts/%s/transactions?only_to=true&limit="+pageSize, apiURL, address)
+	// 获取当天时间范围
+	now := time.Now()
+	startOfDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+
+	url := fmt.Sprintf("%s/v1/accounts/%s/transactions?only_to=true&min_timestamp=%d&max_timestamp=%d&limit="+pageSize, apiURL,
+		address,
+		startOfDay.UnixNano()/1e6, // 转换为毫秒
+		now.UnixNano()/1e6)
+
+	fmt.Printf("url : %s\n", url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %v", err)
@@ -343,13 +352,13 @@ func getTRXTransactionsByAddress(address string, apiURL string, pageSize string)
 					//fmt.Printf("发送方: %s\n", contract.Parameter.Value.OwnerAddress)
 					//fmt.Printf("接收方: %s\n", contract.Parameter.Value.ToAddress)
 					amount := float64(contract.Parameter.Value.Amount) / 1000000
-					//fmt.Printf("金额: %.6f TRX\n", amount)
+					fmt.Printf("金额: %.6f TRX\n", amount)
 
 					ownerAddress, _ := TronHexToBase58(contract.Parameter.Value.OwnerAddress)
 					toAddress, _ := TronHexToBase58(contract.Parameter.Value.ToAddress)
 
-					//fmt.Printf("发送方: %s\n", ownerAddress)
-					//fmt.Printf("接收方: %s\n", toAddress)
+					fmt.Printf("发送方: %s\n", ownerAddress)
+					fmt.Printf("接收方: %s\n", toAddress)
 					var resource TransactionTRXResp
 					resource.TxID = tx.TxID
 					resource.From = ownerAddress

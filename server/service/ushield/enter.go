@@ -15,4 +15,5 @@ type ServiceGroup struct {
 	SysAnnouncementsInfoService
 	UserEnergyOrdersService
 	UserBundleEnergyOrdersService
+	MerchantAddressMonitorEventService
 }

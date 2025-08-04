@@ -85,40 +85,38 @@
             </template>
 
           <el-form :model="formData" label-position="top" ref="elFormRef" :rules="rule" label-width="80px">
-            <el-form-item label="id字段:" prop="id">
+            <el-form-item label="ID:" prop="id">
     <el-input v-model.number="formData.id" :clearable="true" placeholder="请输入id字段" />
 </el-form-item>
-            <el-form-item label="createdAt字段:" prop="createdAt">
+            <el-form-item label="创建时间:" prop="createdAt">
     <el-date-picker v-model="formData.createdAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-            <el-form-item label="updatedAt字段:" prop="updatedAt">
+            <el-form-item label="修改时间:" prop="updatedAt">
     <el-date-picker v-model="formData.updatedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-            <el-form-item label="deletedAt字段:" prop="deletedAt">
-    <el-date-picker v-model="formData.deletedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
-</el-form-item>
+
             <el-form-item label="userId字段:" prop="userId">
     <el-input v-model.number="formData.userId" :clearable="true" placeholder="请输入userId字段" />
 </el-form-item>
-            <el-form-item label="status字段:" prop="status">
+            <el-form-item label="状态:" prop="status">
     <el-input v-model.number="formData.status" :clearable="true" placeholder="请输入status字段" />
 </el-form-item>
             <el-form-item label="placeholder字段:" prop="placeholder">
     <el-input v-model="formData.placeholder" :clearable="true" placeholder="请输入placeholder字段" />
 </el-form-item>
-            <el-form-item label="address字段:" prop="address">
+            <el-form-item label="地址:" prop="address">
     <el-input v-model="formData.address" :clearable="true" placeholder="请输入address字段" />
 </el-form-item>
             <el-form-item label="txHash字段:" prop="txHash">
     <el-input v-model="formData.txHash" :clearable="true" placeholder="请输入txHash字段" />
 </el-form-item>
-            <el-form-item label="amount字段:" prop="amount">
+            <el-form-item label="金额:" prop="amount">
     <el-input v-model="formData.amount" :clearable="true" placeholder="请输入amount字段" />
 </el-form-item>
             <el-form-item label="block字段:" prop="block">
     <el-input v-model="formData.block" :clearable="true" placeholder="请输入block字段" />
 </el-form-item>
-            <el-form-item label="orderNo字段:" prop="orderNo">
+            <el-form-item label="订单ID:" prop="orderNo">
     <el-input v-model="formData.orderNo" :clearable="true" placeholder="请输入orderNo字段" />
 </el-form-item>
           </el-form>
@@ -126,40 +124,40 @@
 
     <el-drawer destroy-on-close :size="appStore.drawerSize" v-model="detailShow" :show-close="true" :before-close="closeDetailShow" title="查看">
             <el-descriptions :column="1" border>
-                    <el-descriptions-item label="id字段">
+                    <el-descriptions-item label="ID">
     {{ detailForm.id }}
 </el-descriptions-item>
-                    <el-descriptions-item label="createdAt字段">
+                    <el-descriptions-item label="创建时间">
     {{ detailForm.createdAt }}
 </el-descriptions-item>
-                    <el-descriptions-item label="updatedAt字段">
+                    <el-descriptions-item label="修改时间">
     {{ detailForm.updatedAt }}
 </el-descriptions-item>
-                    <el-descriptions-item label="deletedAt字段">
+                    <el-descriptions-item label="删除时间">
     {{ detailForm.deletedAt }}
 </el-descriptions-item>
                     <el-descriptions-item label="userId字段">
     {{ detailForm.userId }}
 </el-descriptions-item>
-                    <el-descriptions-item label="status字段">
+                    <el-descriptions-item label="状态">
     {{ detailForm.status }}
 </el-descriptions-item>
                     <el-descriptions-item label="placeholder字段">
     {{ detailForm.placeholder }}
 </el-descriptions-item>
-                    <el-descriptions-item label="address字段">
+                    <el-descriptions-item label="地址">
     {{ detailForm.address }}
 </el-descriptions-item>
                     <el-descriptions-item label="txHash字段">
     {{ detailForm.txHash }}
 </el-descriptions-item>
-                    <el-descriptions-item label="amount字段">
+                    <el-descriptions-item label="金额">
     {{ detailForm.amount }}
 </el-descriptions-item>
                     <el-descriptions-item label="block字段">
     {{ detailForm.block }}
 </el-descriptions-item>
-                    <el-descriptions-item label="orderNo字段">
+                    <el-descriptions-item label="订单ID">
     {{ detailForm.orderNo }}
 </el-descriptions-item>
             </el-descriptions>

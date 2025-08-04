@@ -32,31 +32,29 @@
         >
         <el-table-column type="selection" width="55" />
         
-            <el-table-column align="left" label="id字段" prop="id" width="120" />
+            <el-table-column align="left" label="ID" prop="id" width="120" />
 
-            <el-table-column align="left" label="orderNo字段" prop="orderNo" width="120" />
+            <el-table-column align="left" label="订单ID" prop="orderNo" width="120" />
 
-            <el-table-column align="left" label="txId字段" prop="txId" width="120" />
+            <el-table-column align="left" label="交易ID" prop="txId" width="120" />
 
-            <el-table-column align="left" label="fromAddress字段" prop="fromAddress" width="120" />
+            <el-table-column align="left" label="from地址" prop="fromAddress" width="120" />
 
-            <el-table-column align="left" label="toAddress字段" prop="toAddress" width="120" />
+            <el-table-column align="left" label="to地址" prop="toAddress" width="120" />
 
-            <el-table-column align="left" label="token字段" prop="token" width="120" />
+            <el-table-column align="left" label="代币" prop="token" width="120" />
 
-            <el-table-column align="left" label="amount字段" prop="amount" width="120" />
+            <el-table-column align="left" label="金额" prop="amount" width="120" />
 
-            <el-table-column align="left" label="chatId字段" prop="chatId" width="120" />
+            <el-table-column align="left" label="飞机ID" prop="chatId" width="120" />
 
-            <el-table-column align="left" label="remark字段" prop="remark" width="120" />
+            <el-table-column align="left" label="备注" prop="remark" width="120" />
 
-            <el-table-column align="left" label="createdAt字段" prop="createdAt" width="180">
+            <el-table-column align="left" label="创建时间" prop="createdAt" width="180">
    <template #default="scope">{{ formatDate(scope.row.createdAt) }}</template>
 </el-table-column>
-            <el-table-column align="left" label="deletedAt字段" prop="deletedAt" width="180">
-   <template #default="scope">{{ formatDate(scope.row.deletedAt) }}</template>
-</el-table-column>
-            <el-table-column align="left" label="updatedAt字段" prop="updatedAt" width="180">
+
+            <el-table-column align="left" label="修改时间" prop="updatedAt" width="180">
    <template #default="scope">{{ formatDate(scope.row.updatedAt) }}</template>
 </el-table-column>
         <el-table-column align="left" label="操作" fixed="right" :min-width="appStore.operateMinWith">
@@ -91,40 +89,38 @@
             </template>
 
           <el-form :model="formData" label-position="top" ref="elFormRef" :rules="rule" label-width="80px">
-            <el-form-item label="id字段:" prop="id">
+            <el-form-item label="ID:" prop="id">
     <el-input v-model.number="formData.id" :clearable="true" placeholder="请输入id字段" />
 </el-form-item>
-            <el-form-item label="orderNo字段:" prop="orderNo">
+            <el-form-item label="订单ID:" prop="orderNo">
     <el-input v-model="formData.orderNo" :clearable="true" placeholder="请输入orderNo字段" />
 </el-form-item>
-            <el-form-item label="txId字段:" prop="txId">
+            <el-form-item label="交易ID:" prop="txId">
     <el-input v-model="formData.txId" :clearable="true" placeholder="请输入txId字段" />
 </el-form-item>
-            <el-form-item label="fromAddress字段:" prop="fromAddress">
+            <el-form-item label="from地址:" prop="fromAddress">
     <el-input v-model="formData.fromAddress" :clearable="true" placeholder="请输入fromAddress字段" />
 </el-form-item>
-            <el-form-item label="toAddress字段:" prop="toAddress">
+            <el-form-item label="to地址:" prop="toAddress">
     <el-input v-model="formData.toAddress" :clearable="true" placeholder="请输入toAddress字段" />
 </el-form-item>
-            <el-form-item label="token字段:" prop="token">
+            <el-form-item label="代币:" prop="token">
     <el-input v-model="formData.token" :clearable="true" placeholder="请输入token字段" />
 </el-form-item>
-            <el-form-item label="amount字段:" prop="amount">
+            <el-form-item label="金额:" prop="amount">
     <el-input-number v-model="formData.amount" style="width:100%" :precision="2" :clearable="true" />
 </el-form-item>
-            <el-form-item label="chatId字段:" prop="chatId">
+            <el-form-item label="飞机ID:" prop="chatId">
     <el-input v-model="formData.chatId" :clearable="true" placeholder="请输入chatId字段" />
 </el-form-item>
-            <el-form-item label="remark字段:" prop="remark">
+            <el-form-item label="备注:" prop="remark">
     <el-input v-model="formData.remark" :clearable="true" placeholder="请输入remark字段" />
 </el-form-item>
-            <el-form-item label="createdAt字段:" prop="createdAt">
+            <el-form-item label="创建时间:" prop="createdAt">
     <el-date-picker v-model="formData.createdAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-            <el-form-item label="deletedAt字段:" prop="deletedAt">
-    <el-date-picker v-model="formData.deletedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
-</el-form-item>
-            <el-form-item label="updatedAt字段:" prop="updatedAt">
+
+            <el-form-item label="修改时间:" prop="updatedAt">
     <el-date-picker v-model="formData.updatedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
           </el-form>
@@ -132,40 +128,40 @@
 
     <el-drawer destroy-on-close :size="appStore.drawerSize" v-model="detailShow" :show-close="true" :before-close="closeDetailShow" title="查看">
             <el-descriptions :column="1" border>
-                    <el-descriptions-item label="id字段">
+                    <el-descriptions-item label="ID">
     {{ detailForm.id }}
 </el-descriptions-item>
-                    <el-descriptions-item label="orderNo字段">
+                    <el-descriptions-item label="订单ID">
     {{ detailForm.orderNo }}
 </el-descriptions-item>
-                    <el-descriptions-item label="txId字段">
+                    <el-descriptions-item label="交易ID">
     {{ detailForm.txId }}
 </el-descriptions-item>
-                    <el-descriptions-item label="fromAddress字段">
+                    <el-descriptions-item label="from地址">
     {{ detailForm.fromAddress }}
 </el-descriptions-item>
-                    <el-descriptions-item label="toAddress字段">
+                    <el-descriptions-item label="to地址">
     {{ detailForm.toAddress }}
 </el-descriptions-item>
-                    <el-descriptions-item label="token字段">
+                    <el-descriptions-item label="代币">
     {{ detailForm.token }}
 </el-descriptions-item>
-                    <el-descriptions-item label="amount字段">
+                    <el-descriptions-item label="金额">
     {{ detailForm.amount }}
 </el-descriptions-item>
-                    <el-descriptions-item label="chatId字段">
+                    <el-descriptions-item label="飞机ID">
     {{ detailForm.chatId }}
 </el-descriptions-item>
-                    <el-descriptions-item label="remark字段">
+                    <el-descriptions-item label="备注">
     {{ detailForm.remark }}
 </el-descriptions-item>
-                    <el-descriptions-item label="createdAt字段">
+                    <el-descriptions-item label="创建时间">
     {{ detailForm.createdAt }}
 </el-descriptions-item>
-                    <el-descriptions-item label="deletedAt字段">
+                    <el-descriptions-item label="删除时间">
     {{ detailForm.deletedAt }}
 </el-descriptions-item>
-                    <el-descriptions-item label="updatedAt字段">
+                    <el-descriptions-item label="修改时间">
     {{ detailForm.updatedAt }}
 </el-descriptions-item>
             </el-descriptions>

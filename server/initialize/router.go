@@ -119,6 +119,7 @@ func Routers() *gin.Engine {
 		ushieldRouter.InitSysAnnouncementsInfoRouter(PrivateGroup, PublicGroup)
 		ushieldRouter.InitUserEnergyOrdersRouter(PrivateGroup, PublicGroup)
 		ushieldRouter.InitUserBundleEnergyOrdersRouter(PrivateGroup, PublicGroup)
+		ushieldRouter.InitMerchantAddressMonitorEventRouter(PrivateGroup, PublicGroup)
 	}
 
 	//插件路由安装

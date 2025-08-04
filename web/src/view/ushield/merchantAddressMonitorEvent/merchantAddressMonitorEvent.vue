@@ -34,34 +34,30 @@
         
             <el-table-column align="left" label="ID" prop="id" width="120" />
 
-            <el-table-column align="left" label="订单ID" prop="orderNo" width="120" />
 
-            <el-table-column align="left" label="交易ID" prop="txId" width="120" />
+            <el-table-column align="left" label="剩余天数" prop="days" width="120" />
 
-            <el-table-column align="left" label="from地址" prop="fromAddress" width="120" />
-
-            <el-table-column align="left" label="to地址" prop="toAddress" width="120" />
-
-            <el-table-column align="left" label="代币" prop="token" width="120" />
-
-            <el-table-column align="left" label="金额" prop="amount" width="120" />
 
             <el-table-column align="left" label="飞机ID" prop="chatId" width="120" />
 
-            <el-table-column align="left" label="备注" prop="remark" width="120" />
+            <el-table-column align="left" label="用户ID" prop="userId" width="80" />
+
+            <el-table-column align="left" label="状态" prop="status" width="80" />
+
+            <el-table-column align="left" label="地址" prop="address" width="350" />
+            <el-table-column align="left" label="回调地址" prop="callback_url" width="200" />
+
 
             <el-table-column align="left" label="创建时间" prop="createdAt" width="180">
    <template #default="scope">{{ formatDate(scope.row.createdAt) }}</template>
 </el-table-column>
 
-            <el-table-column align="left" label="修改时间" prop="updatedAt" width="180">
-   <template #default="scope">{{ formatDate(scope.row.updatedAt) }}</template>
-</el-table-column>
         <el-table-column align="left" label="操作" fixed="right" :min-width="appStore.operateMinWith">
             <template #default="scope">
             <el-button  type="primary" link class="table-button" @click="getDetails(scope.row)"><el-icon style="margin-right: 5px"><InfoFilled /></el-icon>查看</el-button>
-            <el-button  type="primary" link icon="edit" class="table-button" @click="updateUserBundleEnergyOrdersFunc(scope.row)">编辑</el-button>
+            <el-button  type="primary" link icon="edit" class="table-button" @click="updateMerchantAddressMonitorEventFunc(scope.row)">编辑</el-button>
             <el-button   type="primary" link icon="delete" @click="deleteRow(scope.row)">删除</el-button>
+            <el-button   type="primary" link icon="plus" @click="deleteRow(scope.row)">手工回调</el-button>
             </template>
         </el-table-column>
         </el-table>
@@ -92,36 +88,42 @@
             <el-form-item label="ID:" prop="id">
     <el-input v-model.number="formData.id" :clearable="true" placeholder="请输入id字段" />
 </el-form-item>
-            <el-form-item label="订单ID:" prop="orderNo">
-    <el-input v-model="formData.orderNo" :clearable="true" placeholder="请输入orderNo字段" />
-</el-form-item>
-            <el-form-item label="交易ID:" prop="txId">
-    <el-input v-model="formData.txId" :clearable="true" placeholder="请输入txId字段" />
-</el-form-item>
-            <el-form-item label="from地址:" prop="fromAddress">
-    <el-input v-model="formData.fromAddress" :clearable="true" placeholder="请输入fromAddress字段" />
-</el-form-item>
-            <el-form-item label="to地址:" prop="toAddress">
-    <el-input v-model="formData.toAddress" :clearable="true" placeholder="请输入toAddress字段" />
-</el-form-item>
-            <el-form-item label="代币:" prop="token">
-    <el-input v-model="formData.token" :clearable="true" placeholder="请输入token字段" />
-</el-form-item>
             <el-form-item label="金额:" prop="amount">
-    <el-input-number v-model="formData.amount" style="width:100%" :precision="2" :clearable="true" />
+    <el-input v-model="formData.amount" :clearable="true" placeholder="请输入amount字段" />
+</el-form-item>
+            <el-form-item label="天数:" prop="days">
+    <el-input v-model.number="formData.days" :clearable="true" placeholder="请输入days字段" />
+</el-form-item>
+            <el-form-item label="times字段:" prop="times">
+    <el-input v-model.number="formData.times" :clearable="true" placeholder="请输入times字段" />
+</el-form-item>
+            <el-form-item label="insufficientTimes字段:" prop="insufficientTimes">
+    <el-input v-model.number="formData.insufficientTimes" :clearable="true" placeholder="请输入insufficientTimes字段" />
 </el-form-item>
             <el-form-item label="飞机ID:" prop="chatId">
-    <el-input v-model="formData.chatId" :clearable="true" placeholder="请输入chatId字段" />
+    <el-input v-model.number="formData.chatId" :clearable="true" placeholder="请输入chatId字段" />
 </el-form-item>
-            <el-form-item label="备注:" prop="remark">
-    <el-input v-model="formData.remark" :clearable="true" placeholder="请输入remark字段" />
+            <el-form-item label="userId字段:" prop="userId">
+    <el-input v-model.number="formData.userId" :clearable="true" placeholder="请输入userId字段" />
 </el-form-item>
+            <el-form-item label="状态:" prop="status">
+    <el-input v-model.number="formData.status" :clearable="true" placeholder="请输入status字段" />
+</el-form-item>
+            <el-form-item label="区块链网络:" prop="network">
+    <el-input v-model="formData.network" :clearable="true" placeholder="请输入network字段" />
+</el-form-item>
+            <el-form-item label="地址:" prop="address">
+    <el-input v-model="formData.address" :clearable="true" placeholder="请输入address字段" />
+</el-form-item>
+
             <el-form-item label="创建时间:" prop="createdAt">
     <el-date-picker v-model="formData.createdAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-
             <el-form-item label="修改时间:" prop="updatedAt">
     <el-date-picker v-model="formData.updatedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
+</el-form-item>
+            <el-form-item label="createdDate字段:" prop="createdDate">
+    <el-input v-model="formData.createdDate" :clearable="true" placeholder="请输入createdDate字段" />
 </el-form-item>
           </el-form>
     </el-drawer>
@@ -131,38 +133,44 @@
                     <el-descriptions-item label="ID">
     {{ detailForm.id }}
 </el-descriptions-item>
-                    <el-descriptions-item label="订单ID">
-    {{ detailForm.orderNo }}
-</el-descriptions-item>
-                    <el-descriptions-item label="交易ID">
-    {{ detailForm.txId }}
-</el-descriptions-item>
-                    <el-descriptions-item label="from地址">
-    {{ detailForm.fromAddress }}
-</el-descriptions-item>
-                    <el-descriptions-item label="to地址">
-    {{ detailForm.toAddress }}
-</el-descriptions-item>
-                    <el-descriptions-item label="代币">
-    {{ detailForm.token }}
-</el-descriptions-item>
                     <el-descriptions-item label="金额">
     {{ detailForm.amount }}
+</el-descriptions-item>
+                    <el-descriptions-item label="天数">
+    {{ detailForm.days }}
+</el-descriptions-item>
+                    <el-descriptions-item label="times字段">
+    {{ detailForm.times }}
+</el-descriptions-item>
+                    <el-descriptions-item label="insufficientTimes字段">
+    {{ detailForm.insufficientTimes }}
 </el-descriptions-item>
                     <el-descriptions-item label="飞机ID">
     {{ detailForm.chatId }}
 </el-descriptions-item>
-                    <el-descriptions-item label="备注">
-    {{ detailForm.remark }}
+                    <el-descriptions-item label="userId字段">
+    {{ detailForm.userId }}
 </el-descriptions-item>
-                    <el-descriptions-item label="创建时间">
-    {{ detailForm.createdAt }}
+                    <el-descriptions-item label="状态">
+    {{ detailForm.status }}
+</el-descriptions-item>
+                    <el-descriptions-item label="区块链网络">
+    {{ detailForm.network }}
+</el-descriptions-item>
+                    <el-descriptions-item label="地址">
+    {{ detailForm.address }}
 </el-descriptions-item>
                     <el-descriptions-item label="删除时间">
     {{ detailForm.deletedAt }}
 </el-descriptions-item>
+                    <el-descriptions-item label="创建时间">
+    {{ detailForm.createdAt }}
+</el-descriptions-item>
                     <el-descriptions-item label="修改时间">
     {{ detailForm.updatedAt }}
+</el-descriptions-item>
+                    <el-descriptions-item label="createdDate字段">
+    {{ detailForm.createdDate }}
 </el-descriptions-item>
             </el-descriptions>
         </el-drawer>
@@ -172,13 +180,13 @@
 
 <script setup>
 import {
-  createUserBundleEnergyOrders,
-  deleteUserBundleEnergyOrders,
-  deleteUserBundleEnergyOrdersByIds,
-  updateUserBundleEnergyOrders,
-  findUserBundleEnergyOrders,
-  getUserBundleEnergyOrdersList
-} from '@/api/ushield/userBundleEnergyOrders'
+  createMerchantAddressMonitorEvent,
+  deleteMerchantAddressMonitorEvent,
+  deleteMerchantAddressMonitorEventByIds,
+  updateMerchantAddressMonitorEvent,
+  findMerchantAddressMonitorEvent,
+  getMerchantAddressMonitorEventList
+} from '@/api/ushield/merchantAddressMonitorEvent'
 
 // 全量引入格式化工具 请按需保留
 import { getDictFunc, formatDate, formatBoolean, filterDict ,filterDataSource, returnArrImg, onDownloadFile } from '@/utils/format'
@@ -190,7 +198,7 @@ import { useAppStore } from "@/pinia"
 
 
 defineOptions({
-    name: 'UserBundleEnergyOrders'
+    name: 'MerchantAddressMonitorEvent'
 })
 
 // 提交按钮loading
@@ -203,17 +211,19 @@ const showAllQuery = ref(false)
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
             id: undefined,
-            orderNo: '',
-            txId: '',
-            fromAddress: '',
-            toAddress: '',
-            token: '',
-            amount: 0,
-            chatId: '',
-            remark: '',
-            createdAt: new Date(),
+            amount: '',
+            days: undefined,
+            times: undefined,
+            insufficientTimes: undefined,
+            chatId: undefined,
+            userId: undefined,
+            status: undefined,
+            network: '',
+            address: '',
             deletedAt: new Date(),
+            createdAt: new Date(),
             updatedAt: new Date(),
+            createdDate: '',
         })
 
 
@@ -260,7 +270,7 @@ const handleCurrentChange = (val) => {
 
 // 查询
 const getTableData = async() => {
-  const table = await getUserBundleEnergyOrdersList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+  const table = await getMerchantAddressMonitorEventList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
   if (table.code === 0) {
     tableData.value = table.data.list
     total.value = table.data.total
@@ -295,7 +305,7 @@ const deleteRow = (row) => {
         cancelButtonText: '取消',
         type: 'warning'
     }).then(() => {
-            deleteUserBundleEnergyOrdersFunc(row)
+            deleteMerchantAddressMonitorEventFunc(row)
         })
     }
 
@@ -318,7 +328,7 @@ const onDelete = async() => {
         multipleSelection.value.map(item => {
           ids.push(item.id)
         })
-      const res = await deleteUserBundleEnergyOrdersByIds({ ids })
+      const res = await deleteMerchantAddressMonitorEventByIds({ ids })
       if (res.code === 0) {
         ElMessage({
           type: 'success',
@@ -336,8 +346,8 @@ const onDelete = async() => {
 const type = ref('')
 
 // 更新行
-const updateUserBundleEnergyOrdersFunc = async(row) => {
-    const res = await findUserBundleEnergyOrders({ id: row.id })
+const updateMerchantAddressMonitorEventFunc = async(row) => {
+    const res = await findMerchantAddressMonitorEvent({ id: row.id })
     type.value = 'update'
     if (res.code === 0) {
         formData.value = res.data
@@ -347,8 +357,8 @@ const updateUserBundleEnergyOrdersFunc = async(row) => {
 
 
 // 删除行
-const deleteUserBundleEnergyOrdersFunc = async (row) => {
-    const res = await deleteUserBundleEnergyOrders({ id: row.id })
+const deleteMerchantAddressMonitorEventFunc = async (row) => {
+    const res = await deleteMerchantAddressMonitorEvent({ id: row.id })
     if (res.code === 0) {
         ElMessage({
                 type: 'success',
@@ -375,17 +385,19 @@ const closeDialog = () => {
     dialogFormVisible.value = false
     formData.value = {
         id: undefined,
-        orderNo: '',
-        txId: '',
-        fromAddress: '',
-        toAddress: '',
-        token: '',
-        amount: 0,
-        chatId: '',
-        remark: '',
-        createdAt: new Date(),
+        amount: '',
+        days: undefined,
+        times: undefined,
+        insufficientTimes: undefined,
+        chatId: undefined,
+        userId: undefined,
+        status: undefined,
+        network: '',
+        address: '',
         deletedAt: new Date(),
+        createdAt: new Date(),
         updatedAt: new Date(),
+        createdDate: '',
         }
 }
 // 弹窗确定
@@ -396,13 +408,13 @@ const enterDialog = async () => {
               let res
               switch (type.value) {
                 case 'create':
-                  res = await createUserBundleEnergyOrders(formData.value)
+                  res = await createMerchantAddressMonitorEvent(formData.value)
                   break
                 case 'update':
-                  res = await updateUserBundleEnergyOrders(formData.value)
+                  res = await updateMerchantAddressMonitorEvent(formData.value)
                   break
                 default:
-                  res = await createUserBundleEnergyOrders(formData.value)
+                  res = await createMerchantAddressMonitorEvent(formData.value)
                   break
               }
               btnLoading.value = false
@@ -432,7 +444,7 @@ const openDetailShow = () => {
 // 打开详情
 const getDetails = async (row) => {
   // 打开弹窗
-  const res = await findUserBundleEnergyOrders({ id: row.id })
+  const res = await findMerchantAddressMonitorEvent({ id: row.id })
   if (res.code === 0) {
     detailForm.value = res.data
     openDetailShow()

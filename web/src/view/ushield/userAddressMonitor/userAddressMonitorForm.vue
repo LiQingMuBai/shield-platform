@@ -3,28 +3,26 @@
   <div>
     <div class="gva-form-box">
       <el-form :model="formData" ref="elFormRef" label-position="right" :rules="rule" label-width="80px">
-        <el-form-item label="id字段:" prop="id">
+        <el-form-item label="ID:" prop="id">
     <el-input v-model.number="formData.id" :clearable="true" placeholder="请输入id字段" />
 </el-form-item>
         <el-form-item label="创建时间:" prop="createdAt">
     <el-date-picker v-model="formData.createdAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-        <el-form-item label="updatedAt字段:" prop="updatedAt">
+        <el-form-item label="修改时间:" prop="updatedAt">
     <el-date-picker v-model="formData.updatedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-        <el-form-item label="deletedAt字段:" prop="deletedAt">
-    <el-date-picker v-model="formData.deletedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
-</el-form-item>
-        <el-form-item label="chatId字段:" prop="chatId">
+
+        <el-form-item label="飞机ID:" prop="chatId">
     <el-input v-model.number="formData.chatId" :clearable="true" placeholder="请输入chatId字段" />
 </el-form-item>
-        <el-form-item label="status字段:" prop="status">
+        <el-form-item label="状态:" prop="status">
     <el-input v-model.number="formData.status" :clearable="true" placeholder="请输入status字段" />
 </el-form-item>
-        <el-form-item label="network字段:" prop="network">
+        <el-form-item label="区块链网络:" prop="network">
     <el-input v-model="formData.network" :clearable="true" placeholder="请输入network字段" />
 </el-form-item>
-        <el-form-item label="address字段:" prop="address">
+        <el-form-item label="地址:" prop="address">
     <el-input v-model="formData.address" :clearable="true" placeholder="请输入address字段" />
 </el-form-item>
         <el-form-item>

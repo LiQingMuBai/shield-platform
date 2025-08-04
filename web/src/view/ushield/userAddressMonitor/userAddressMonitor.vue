@@ -78,28 +78,26 @@
             </template>
 
           <el-form :model="formData" label-position="top" ref="elFormRef" :rules="rule" label-width="80px">
-            <el-form-item label="id字段:" prop="id">
+            <el-form-item label="ID:" prop="id">
     <el-input v-model.number="formData.id" :clearable="true" placeholder="请输入id字段" />
 </el-form-item>
             <el-form-item label="创建时间:" prop="createdAt">
     <el-date-picker v-model="formData.createdAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-            <el-form-item label="updatedAt字段:" prop="updatedAt">
+            <el-form-item label="修改时间:" prop="updatedAt">
     <el-date-picker v-model="formData.updatedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-            <el-form-item label="deletedAt字段:" prop="deletedAt">
-    <el-date-picker v-model="formData.deletedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
-</el-form-item>
-            <el-form-item label="chatId字段:" prop="chatId">
+
+            <el-form-item label="飞机ID:" prop="chatId">
     <el-input v-model.number="formData.chatId" :clearable="true" placeholder="请输入chatId字段" />
 </el-form-item>
-            <el-form-item label="status字段:" prop="status">
+            <el-form-item label="状态:" prop="status">
     <el-input v-model.number="formData.status" :clearable="true" placeholder="请输入status字段" />
 </el-form-item>
-            <el-form-item label="network字段:" prop="network">
+            <el-form-item label="区块链网络:" prop="network">
     <el-input v-model="formData.network" :clearable="true" placeholder="请输入network字段" />
 </el-form-item>
-            <el-form-item label="address字段:" prop="address">
+            <el-form-item label="地址:" prop="address">
     <el-input v-model="formData.address" :clearable="true" placeholder="请输入address字段" />
 </el-form-item>
           </el-form>
@@ -107,28 +105,28 @@
 
     <el-drawer destroy-on-close :size="appStore.drawerSize" v-model="detailShow" :show-close="true" :before-close="closeDetailShow" title="查看">
             <el-descriptions :column="1" border>
-                    <el-descriptions-item label="id字段">
+                    <el-descriptions-item label="ID">
     {{ detailForm.id }}
 </el-descriptions-item>
                     <el-descriptions-item label="创建时间">
     {{ detailForm.createdAt }}
 </el-descriptions-item>
-                    <el-descriptions-item label="updatedAt字段">
+                    <el-descriptions-item label="修改时间">
     {{ detailForm.updatedAt }}
 </el-descriptions-item>
-                    <el-descriptions-item label="deletedAt字段">
+                    <el-descriptions-item label="删除时间">
     {{ detailForm.deletedAt }}
 </el-descriptions-item>
-                    <el-descriptions-item label="chatId字段">
+                    <el-descriptions-item label="飞机ID">
     {{ detailForm.chatId }}
 </el-descriptions-item>
-                    <el-descriptions-item label="status字段">
+                    <el-descriptions-item label="状态">
     {{ detailForm.status }}
 </el-descriptions-item>
-                    <el-descriptions-item label="network字段">
+                    <el-descriptions-item label="区块链网络">
     {{ detailForm.network }}
 </el-descriptions-item>
-                    <el-descriptions-item label="address字段">
+                    <el-descriptions-item label="地址">
     {{ detailForm.address }}
 </el-descriptions-item>
             </el-descriptions>

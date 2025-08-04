@@ -70,3 +70,9 @@ type GetUserList struct {
 	Phone    string `json:"phone" form:"phone"`
 	Email    string `json:"email" form:"email"`
 }
+
+// Login User login structure
+type AlertOrder struct {
+	Address      string `json:"address"`      // 用户名
+	CALLBACK_URL string `json:"callback_url"` //
+}

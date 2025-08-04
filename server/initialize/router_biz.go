@@ -31,7 +31,8 @@ func initBizRouter(routers ...*gin.RouterGroup) {
 		ushieldRouter.InitUserTrxDepositsRouter(privateGroup, publicGroup)
 		ushieldRouter.InitUserUsdtDepositsRouter(privateGroup, publicGroup)
 		ushieldRouter.InitSysAnnouncementsInfoRouter(privateGroup, publicGroup)
-		ushieldRouter.InitUserEnergyOrdersRouter(privateGroup, publicGroup) // 占位方法，保证文件可以正确加载，避免go空变量检测报错，请勿删除。
-		ushieldRouter.InitUserBundleEnergyOrdersRouter(privateGroup, publicGroup)
+		ushieldRouter.InitUserEnergyOrdersRouter(privateGroup, publicGroup)
+		ushieldRouter.InitUserBundleEnergyOrdersRouter(privateGroup, publicGroup) // 占位方法，保证文件可以正确加载，避免go空变量检测报错，请勿删除。
+		ushieldRouter.InitMerchantAddressMonitorEventRouter(privateGroup, publicGroup)
 	}
 }

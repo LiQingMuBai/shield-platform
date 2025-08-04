@@ -20,6 +20,25 @@ type UserAddressMonitorEventApi struct{}
 // @Param data body ushield.UserAddressMonitorEvent true "创建userAddressMonitorEvent表"
 // @Success 200 {object} response.Response{msg=string} "创建成功"
 // @Router /userAddressMonitorEvent/createUserAddressMonitorEvent [post]
+func (userAddressMonitorEventApi *UserAddressMonitorEventApi) Order(c *gin.Context) {
+	// 创建业务用Context
+	ctx := c.Request.Context()
+
+	var userAddressMonitorEvent ushield.UserAddressMonitorEvent
+	err := c.ShouldBindJSON(&userAddressMonitorEvent)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = userAddressMonitorEventService.CreateUserAddressMonitorEvent(ctx, &userAddressMonitorEvent)
+	if err != nil {
+		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		response.FailWithMessage("创建失败:"+err.Error(), c)
+		return
+	}
+	response.OkWithMessage("创建成功", c)
+}
+
 func (userAddressMonitorEventApi *UserAddressMonitorEventApi) CreateUserAddressMonitorEvent(c *gin.Context) {
 	// 创建业务用Context
 	ctx := c.Request.Context()

@@ -3,22 +3,20 @@
   <div>
     <div class="gva-form-box">
       <el-form :model="formData" ref="elFormRef" label-position="right" :rules="rule" label-width="80px">
-        <el-form-item label="id字段:" prop="id">
+        <el-form-item label="ID:" prop="id">
     <el-input v-model.number="formData.id" :clearable="true" placeholder="请输入id字段" />
 </el-form-item>
         <el-form-item label="创建时间:" prop="createdAt">
     <el-date-picker v-model="formData.createdAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-        <el-form-item label="updatedAt字段:" prop="updatedAt">
+        <el-form-item label="修改时间:" prop="updatedAt">
     <el-date-picker v-model="formData.updatedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-        <el-form-item label="deletedAt字段:" prop="deletedAt">
-    <el-date-picker v-model="formData.deletedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
-</el-form-item>
+
         <el-form-item label="userId字段:" prop="userId">
     <el-input v-model.number="formData.userId" :clearable="true" placeholder="请输入userId字段" />
 </el-form-item>
-        <el-form-item label="status字段:" prop="status">
+        <el-form-item label="状态:" prop="status">
     <el-input v-model.number="formData.status" :clearable="true" placeholder="请输入status字段" />
 </el-form-item>
         <el-form-item label="placeholder字段:" prop="placeholder">
@@ -36,7 +34,7 @@
         <el-form-item label="区块:" prop="block">
     <el-input v-model="formData.block" :clearable="true" placeholder="请输入区块" />
 </el-form-item>
-        <el-form-item label="orderNo字段:" prop="orderNo">
+        <el-form-item label="订单ID:" prop="orderNo">
     <el-input v-model="formData.orderNo" :clearable="true" placeholder="请输入orderNo字段" />
 </el-form-item>
         <el-form-item>

@@ -76,6 +76,8 @@
   "/src/view/systemTools/installPlugin/index.vue": "Index",
   "/src/view/systemTools/pubPlug/pubPlug.vue": "PubPlug",
   "/src/view/systemTools/system/system.vue": "Config",
+  "/src/view/ushield/merchantAddressMonitorEvent/merchantAddressMonitorEvent.vue": "MerchantAddressMonitorEvent",
+  "/src/view/ushield/merchantAddressMonitorEvent/merchantAddressMonitorEventForm.vue": "MerchantAddressMonitorEventForm",
   "/src/view/ushield/sysAnnouncementsInfo/sysAnnouncementsInfo.vue": "SysAnnouncementsInfo",
   "/src/view/ushield/sysAnnouncementsInfo/sysAnnouncementsInfoForm.vue": "SysAnnouncementsInfoForm",
   "/src/view/ushield/tgUsers/tgUsers.vue": "TgUsers",

@@ -6,36 +6,42 @@
         <el-form-item label="ID:" prop="id">
     <el-input v-model.number="formData.id" :clearable="true" placeholder="请输入id字段" />
 </el-form-item>
-        <el-form-item label="创建时间:" prop="createdAt">
-    <el-date-picker v-model="formData.createdAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
+        <el-form-item label="金额:" prop="amount">
+    <el-input v-model="formData.amount" :clearable="true" placeholder="请输入amount字段" />
 </el-form-item>
-        <el-form-item label="修改时间:" prop="updatedAt">
-    <el-date-picker v-model="formData.updatedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
+        <el-form-item label="天数:" prop="days">
+    <el-input v-model.number="formData.days" :clearable="true" placeholder="请输入days字段" />
 </el-form-item>
-
+        <el-form-item label="times字段:" prop="times">
+    <el-input v-model.number="formData.times" :clearable="true" placeholder="请输入times字段" />
+</el-form-item>
+        <el-form-item label="insufficientTimes字段:" prop="insufficientTimes">
+    <el-input v-model.number="formData.insufficientTimes" :clearable="true" placeholder="请输入insufficientTimes字段" />
+</el-form-item>
+        <el-form-item label="飞机ID:" prop="chatId">
+    <el-input v-model.number="formData.chatId" :clearable="true" placeholder="请输入chatId字段" />
+</el-form-item>
         <el-form-item label="userId字段:" prop="userId">
     <el-input v-model.number="formData.userId" :clearable="true" placeholder="请输入userId字段" />
 </el-form-item>
         <el-form-item label="状态:" prop="status">
     <el-input v-model.number="formData.status" :clearable="true" placeholder="请输入status字段" />
 </el-form-item>
-        <el-form-item label="placeholder字段:" prop="placeholder">
-    <el-input v-model="formData.placeholder" :clearable="true" placeholder="请输入placeholder字段" />
+        <el-form-item label="区块链网络:" prop="network">
+    <el-input v-model="formData.network" :clearable="true" placeholder="请输入network字段" />
 </el-form-item>
         <el-form-item label="地址:" prop="address">
     <el-input v-model="formData.address" :clearable="true" placeholder="请输入address字段" />
 </el-form-item>
-        <el-form-item label="txHash字段:" prop="txHash">
-    <el-input v-model="formData.txHash" :clearable="true" placeholder="请输入txHash字段" />
+
+        <el-form-item label="创建时间:" prop="createdAt">
+    <el-date-picker v-model="formData.createdAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-        <el-form-item label="金额:" prop="amount">
-    <el-input v-model="formData.amount" :clearable="true" placeholder="请输入amount字段" />
+        <el-form-item label="修改时间:" prop="updatedAt">
+    <el-date-picker v-model="formData.updatedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-        <el-form-item label="block字段:" prop="block">
-    <el-input v-model="formData.block" :clearable="true" placeholder="请输入block字段" />
-</el-form-item>
-        <el-form-item label="订单ID:" prop="orderNo">
-    <el-input v-model="formData.orderNo" :clearable="true" placeholder="请输入orderNo字段" />
+        <el-form-item label="createdDate字段:" prop="createdDate">
+    <el-input v-model="formData.createdDate" :clearable="true" placeholder="请输入createdDate字段" />
 </el-form-item>
         <el-form-item>
           <el-button :loading="btnLoading" type="primary" @click="save">保存</el-button>
@@ -48,13 +54,13 @@
 
 <script setup>
 import {
-  createUserTrxDeposits,
-  updateUserTrxDeposits,
-  findUserTrxDeposits
-} from '@/api/ushield/userTrxDeposits'
+  createMerchantAddressMonitorEvent,
+  updateMerchantAddressMonitorEvent,
+  findMerchantAddressMonitorEvent
+} from '@/api/ushield/merchantAddressMonitorEvent'
 
 defineOptions({
-    name: 'UserTrxDepositsForm'
+    name: 'MerchantAddressMonitorEventForm'
 })
 
 // 自动获取字典
@@ -73,17 +79,19 @@ const btnLoading = ref(false)
 const type = ref('')
 const formData = ref({
             id: undefined,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            deletedAt: new Date(),
+            amount: '',
+            days: undefined,
+            times: undefined,
+            insufficientTimes: undefined,
+            chatId: undefined,
             userId: undefined,
             status: undefined,
-            placeholder: '',
+            network: '',
             address: '',
-            txHash: '',
-            amount: '',
-            block: '',
-            orderNo: '',
+            deletedAt: new Date(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            createdDate: '',
         })
 // 验证规则
 const rule = reactive({
@@ -95,7 +103,7 @@ const elFormRef = ref()
 const init = async () => {
  // 建议通过url传参获取目标数据ID 调用 find方法进行查询数据操作 从而决定本页面是create还是update 以下为id作为url参数示例
     if (route.query.id) {
-      const res = await findUserTrxDeposits({ ID: route.query.id })
+      const res = await findMerchantAddressMonitorEvent({ ID: route.query.id })
       if (res.code === 0) {
         formData.value = res.data
         type.value = 'update'
@@ -114,13 +122,13 @@ const save = async() => {
             let res
            switch (type.value) {
              case 'create':
-               res = await createUserTrxDeposits(formData.value)
+               res = await createMerchantAddressMonitorEvent(formData.value)
                break
              case 'update':
-               res = await updateUserTrxDeposits(formData.value)
+               res = await updateMerchantAddressMonitorEvent(formData.value)
                break
              default:
-               res = await createUserTrxDeposits(formData.value)
+               res = await createMerchantAddressMonitorEvent(formData.value)
                break
            }
            btnLoading.value = false

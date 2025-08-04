@@ -3,40 +3,38 @@
   <div>
     <div class="gva-form-box">
       <el-form :model="formData" ref="elFormRef" label-position="right" :rules="rule" label-width="80px">
-        <el-form-item label="id字段:" prop="id">
+        <el-form-item label="ID:" prop="id">
     <el-input v-model.number="formData.id" :clearable="true" placeholder="请输入id字段" />
 </el-form-item>
-        <el-form-item label="orderNo字段:" prop="orderNo">
+        <el-form-item label="订单ID:" prop="orderNo">
     <el-input v-model="formData.orderNo" :clearable="true" placeholder="请输入orderNo字段" />
 </el-form-item>
-        <el-form-item label="txId字段:" prop="txId">
+        <el-form-item label="交易ID:" prop="txId">
     <el-input v-model="formData.txId" :clearable="true" placeholder="请输入txId字段" />
 </el-form-item>
-        <el-form-item label="fromAddress字段:" prop="fromAddress">
+        <el-form-item label="from地址:" prop="fromAddress">
     <el-input v-model="formData.fromAddress" :clearable="true" placeholder="请输入fromAddress字段" />
 </el-form-item>
-        <el-form-item label="toAddress字段:" prop="toAddress">
+        <el-form-item label="to地址:" prop="toAddress">
     <el-input v-model="formData.toAddress" :clearable="true" placeholder="请输入toAddress字段" />
 </el-form-item>
-        <el-form-item label="token字段:" prop="token">
+        <el-form-item label="代币:" prop="token">
     <el-input v-model="formData.token" :clearable="true" placeholder="请输入token字段" />
 </el-form-item>
-        <el-form-item label="amount字段:" prop="amount">
+        <el-form-item label="金额:" prop="amount">
     <el-input-number v-model="formData.amount" style="width:100%" :precision="2" :clearable="true" />
 </el-form-item>
-        <el-form-item label="chatId字段:" prop="chatId">
+        <el-form-item label="飞机ID:" prop="chatId">
     <el-input v-model="formData.chatId" :clearable="true" placeholder="请输入chatId字段" />
 </el-form-item>
-        <el-form-item label="remark字段:" prop="remark">
+        <el-form-item label="备注:" prop="remark">
     <el-input v-model="formData.remark" :clearable="true" placeholder="请输入remark字段" />
 </el-form-item>
-        <el-form-item label="createdAt字段:" prop="createdAt">
+        <el-form-item label="创建时间:" prop="createdAt">
     <el-date-picker v-model="formData.createdAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-        <el-form-item label="deletedAt字段:" prop="deletedAt">
-    <el-date-picker v-model="formData.deletedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
-</el-form-item>
-        <el-form-item label="updatedAt字段:" prop="updatedAt">
+
+        <el-form-item label="修改时间:" prop="updatedAt">
     <el-date-picker v-model="formData.updatedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
         <el-form-item>

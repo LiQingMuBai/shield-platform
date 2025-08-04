@@ -17,21 +17,23 @@ type ApiGroup struct {
 	SysAnnouncementsInfoApi
 	UserEnergyOrdersApi
 	UserBundleEnergyOrdersApi
+	MerchantAddressMonitorEventApi
 }
 
 var (
-	userTrxSubscriptionsService     = service.ServiceGroupApp.UshieldServiceGroup.UserTrxSubscriptionsService
-	userUsdtSubscriptionsService    = service.ServiceGroupApp.UshieldServiceGroup.UserUsdtSubscriptionsService
-	userPackageSubscriptionsService = service.ServiceGroupApp.UshieldServiceGroup.UserPackageSubscriptionsService
-	tgUsersService                  = service.ServiceGroupApp.UshieldServiceGroup.TgUsersService
-	userOperationBundlesService     = service.ServiceGroupApp.UshieldServiceGroup.UserOperationBundlesService
-	userAddressMonitorEventService  = service.ServiceGroupApp.UshieldServiceGroup.UserAddressMonitorEventService
-	userAddressMonitorService       = service.ServiceGroupApp.UshieldServiceGroup.UserAddressMonitorService
-	userTrxPlaceholdersService      = service.ServiceGroupApp.UshieldServiceGroup.UserTrxPlaceholdersService
-	userUsdtPlaceholdersService     = service.ServiceGroupApp.UshieldServiceGroup.UserUsdtPlaceholdersService
-	userTrxDepositsService          = service.ServiceGroupApp.UshieldServiceGroup.UserTrxDepositsService
-	userUsdtDepositsService         = service.ServiceGroupApp.UshieldServiceGroup.UserUsdtDepositsService
-	sysAnnouncementsInfoService     = service.ServiceGroupApp.UshieldServiceGroup.SysAnnouncementsInfoService
-	userEnergyOrdersService         = service.ServiceGroupApp.UshieldServiceGroup.UserEnergyOrdersService
-	userBundleEnergyOrdersService   = service.ServiceGroupApp.UshieldServiceGroup.UserBundleEnergyOrdersService
+	userTrxSubscriptionsService        = service.ServiceGroupApp.UshieldServiceGroup.UserTrxSubscriptionsService
+	userUsdtSubscriptionsService       = service.ServiceGroupApp.UshieldServiceGroup.UserUsdtSubscriptionsService
+	userPackageSubscriptionsService    = service.ServiceGroupApp.UshieldServiceGroup.UserPackageSubscriptionsService
+	tgUsersService                     = service.ServiceGroupApp.UshieldServiceGroup.TgUsersService
+	userOperationBundlesService        = service.ServiceGroupApp.UshieldServiceGroup.UserOperationBundlesService
+	userAddressMonitorEventService     = service.ServiceGroupApp.UshieldServiceGroup.UserAddressMonitorEventService
+	userAddressMonitorService          = service.ServiceGroupApp.UshieldServiceGroup.UserAddressMonitorService
+	userTrxPlaceholdersService         = service.ServiceGroupApp.UshieldServiceGroup.UserTrxPlaceholdersService
+	userUsdtPlaceholdersService        = service.ServiceGroupApp.UshieldServiceGroup.UserUsdtPlaceholdersService
+	userTrxDepositsService             = service.ServiceGroupApp.UshieldServiceGroup.UserTrxDepositsService
+	userUsdtDepositsService            = service.ServiceGroupApp.UshieldServiceGroup.UserUsdtDepositsService
+	sysAnnouncementsInfoService        = service.ServiceGroupApp.UshieldServiceGroup.SysAnnouncementsInfoService
+	userEnergyOrdersService            = service.ServiceGroupApp.UshieldServiceGroup.UserEnergyOrdersService
+	userBundleEnergyOrdersService      = service.ServiceGroupApp.UshieldServiceGroup.UserBundleEnergyOrdersService
+	merchantAddressMonitorEventService = service.ServiceGroupApp.UshieldServiceGroup.MerchantAddressMonitorEventService
 )
