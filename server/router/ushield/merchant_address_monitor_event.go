@@ -13,9 +13,15 @@ func (s *MerchantAddressMonitorEventRouter) InitMerchantAddressMonitorEventRoute
 	merchantAddressMonitorEventRouterWithoutRecord := Router.Group("merchantAddressMonitorEvent")
 	merchantAddressMonitorEventRouterWithoutAuth := PublicRouter.Group("merchantAddressMonitorEvent")
 	{
-		merchantAddressMonitorEventRouter.POST("createMerchantAddressMonitorEvent", merchantAddressMonitorEventApi.CreateMerchantAddressMonitorEvent)             // 新建merchantAddressMonitorEvent表
-		merchantAddressMonitorEventRouter.POST("order", merchantAddressMonitorEventApi.CreateMerchantAddressMonitorEvent)                                         // 新建merchantAddressMonitorEvent表
-		merchantAddressMonitorEventRouter.DELETE("deleteMerchantAddressMonitorEvent", merchantAddressMonitorEventApi.DeleteMerchantAddressMonitorEvent)           // 删除merchantAddressMonitorEvent表
+		merchantAddressMonitorEventRouter.POST("createMerchantAddressMonitorEvent", merchantAddressMonitorEventApi.CreateMerchantAddressMonitorEvent) // 新建merchantAddressMonitorEvent表
+
+		//厂商下订单
+		merchantAddressMonitorEventRouter.POST("order", merchantAddressMonitorEventApi.CreateMerchantAddressMonitorEvent)
+		//厂商获取详情订单
+		merchantAddressMonitorEventRouter.POST("detail", merchantAddressMonitorEventApi.FindMerchantAddressMonitorEvent)
+
+		//merchantAddressMonitorEventRouter.DELETE("deleteMerchantAddressMonitorEvent", merchantAddressMonitorEventApi.DeleteMerchantAddressMonitorEvent)           // 删除merchantAddressMonitorEvent表
+		merchantAddressMonitorEventRouter.DELETE("deleteMerchantAddressMonitorEvent", merchantAddressMonitorEventApi.InvokeMerchantAddressMonitorEvent)           // 删除merchantAddressMonitorEvent表
 		merchantAddressMonitorEventRouter.DELETE("deleteMerchantAddressMonitorEventByIds", merchantAddressMonitorEventApi.DeleteMerchantAddressMonitorEventByIds) // 批量删除merchantAddressMonitorEvent表
 		merchantAddressMonitorEventRouter.PUT("updateMerchantAddressMonitorEvent", merchantAddressMonitorEventApi.UpdateMerchantAddressMonitorEvent)              // 更新merchantAddressMonitorEvent表
 	}

@@ -32,10 +32,10 @@
         >
         <el-table-column type="selection" width="55" />
         
-            <el-table-column align="left" label="ID" prop="id" width="120" />
+            <el-table-column align="left" label="ID" prop="id" width="100" />
 
 
-            <el-table-column align="left" label="剩余天数" prop="days" width="120" />
+            <el-table-column align="left" label="天数" prop="days" width="100" />
 
 
             <el-table-column align="left" label="飞机ID" prop="chatId" width="120" />
@@ -56,7 +56,7 @@
             <template #default="scope">
             <el-button  type="primary" link class="table-button" @click="getDetails(scope.row)"><el-icon style="margin-right: 5px"><InfoFilled /></el-icon>查看</el-button>
             <el-button  type="primary" link icon="edit" class="table-button" @click="updateMerchantAddressMonitorEventFunc(scope.row)">编辑</el-button>
-            <el-button   type="primary" link icon="delete" @click="deleteRow(scope.row)">删除</el-button>
+<!--            <el-button   type="primary" link icon="delete" @click="deleteRow(scope.row)">删除</el-button>-->
             <el-button   type="primary" link icon="plus" @click="deleteRow(scope.row)">手工回调</el-button>
             </template>
         </el-table-column>
@@ -300,7 +300,7 @@ const handleSelectionChange = (val) => {
 
 // 删除行
 const deleteRow = (row) => {
-    ElMessageBox.confirm('确定要删除吗?', '提示', {
+    ElMessageBox.confirm('确定要手工回调吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -362,7 +362,7 @@ const deleteMerchantAddressMonitorEventFunc = async (row) => {
     if (res.code === 0) {
         ElMessage({
                 type: 'success',
-                message: '删除成功'
+                message: '回调成功'
             })
             if (tableData.value.length === 1 && page.value > 1) {
             page.value--

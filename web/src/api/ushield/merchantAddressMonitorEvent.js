@@ -9,7 +9,7 @@ import service from '@/utils/request'
 // @Router /merchantAddressMonitorEvent/createMerchantAddressMonitorEvent [post]
 export const createMerchantAddressMonitorEvent = (data) => {
   return service({
-    url: '/merchantAddressMonitorEvent/createMerchantAddressMonitorEvent',
+    url: '/merchantAddressMonitorEvent/order',
     method: 'post',
     data
   })
