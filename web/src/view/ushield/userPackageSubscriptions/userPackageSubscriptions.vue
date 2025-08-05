@@ -38,7 +38,7 @@
    <template #default="scope">{{ formatDate(scope.row.createdAt) }}</template>
 </el-table-column>
             <el-table-column align="left" label="状态" prop="status" width="80" />
-            <el-table-column align="left" label="剩余次数" prop="times" width="80" />
+            <el-table-column align="left" label="次数" prop="times" width="80" />
 
             <el-table-column align="left" label="套餐ID" prop="bundleId" width="120" />
             <el-table-column align="left" label="套餐名称" prop="bundleName" width="200" />
@@ -129,7 +129,7 @@
               <el-descriptions-item label="套餐Name">
                 {{ detailForm.bundleName }}
               </el-descriptions-item>
-              <el-descriptions-item label="剩余次数">
+              <el-descriptions-item label="次数">
                 {{ detailForm.times }}
               </el-descriptions-item>
                     <el-descriptions-item label="用户ID">

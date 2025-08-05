@@ -48,7 +48,7 @@
             <el-table-column align="left" label="创建时间" prop="createdAt" width="180">
    <template #default="scope">{{ formatDate(scope.row.createdAt) }}</template>
 </el-table-column>
-            <el-table-column align="left" label="剩余次数" prop="times" width="120" />
+            <el-table-column align="left" label="次数" prop="times" width="120" />
 
         <el-table-column align="left" label="操作" fixed="right" :min-width="appStore.operateMinWith">
             <template #default="scope">

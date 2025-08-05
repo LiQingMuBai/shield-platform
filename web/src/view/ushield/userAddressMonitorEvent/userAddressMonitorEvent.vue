@@ -38,7 +38,7 @@
    <template #default="scope">{{ formatDate(scope.row.createdAt) }}</template>
 </el-table-column>
 
-            <el-table-column align="left" label="剩余天数" prop="days" width="160" />
+            <el-table-column align="left" label="天数" prop="days" width="160" />
 
             <el-table-column align="left" label="ChatID" prop="chatId" width="120" />
 

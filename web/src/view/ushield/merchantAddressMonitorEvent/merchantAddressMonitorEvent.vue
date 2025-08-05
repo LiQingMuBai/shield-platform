@@ -103,7 +103,7 @@
             <el-form-item label="飞机ID:" prop="chatId">
     <el-input v-model.number="formData.chatId" :clearable="true" placeholder="请输入chatId字段" />
 </el-form-item>
-            <el-form-item label="userId字段:" prop="userId">
+            <el-form-item label="用户ID:" prop="userId">
     <el-input v-model.number="formData.userId" :clearable="true" placeholder="请输入userId字段" />
 </el-form-item>
             <el-form-item label="状态:" prop="status">
@@ -115,6 +115,10 @@
             <el-form-item label="地址:" prop="address">
     <el-input v-model="formData.address" :clearable="true" placeholder="请输入address字段" />
 </el-form-item>
+
+            <el-form-item label="回调地址:" prop="callback_url">
+              <el-input v-model="formData.callback_url" :clearable="true" placeholder="请输入回调地址字段" />
+            </el-form-item>
 
             <el-form-item label="创建时间:" prop="createdAt">
     <el-date-picker v-model="formData.createdAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
@@ -158,6 +162,9 @@
                     <el-descriptions-item label="地址">
     {{ detailForm.address }}
 </el-descriptions-item>
+              <el-descriptions-item label="回调地址">
+                {{ detailForm.callback_url }}
+              </el-descriptions-item>
                     <el-descriptions-item label="删除时间">
     {{ detailForm.deletedAt }}
 </el-descriptions-item>
@@ -216,6 +223,7 @@ const formData = ref({
             status: undefined,
             network: '',
             address: '',
+            callback_url: '',
             deletedAt: new Date(),
             createdAt: new Date(),
             updatedAt: new Date(),
