@@ -94,10 +94,10 @@
             <el-form-item label="天数:" prop="days">
     <el-input v-model.number="formData.days" :clearable="true" placeholder="请输入days字段" />
 </el-form-item>
-            <el-form-item label="times字段:" prop="times">
+            <el-form-item label="预警次数:" prop="times">
     <el-input v-model.number="formData.times" :clearable="true" placeholder="请输入times字段" />
 </el-form-item>
-            <el-form-item label="insufficientTimes字段:" prop="insufficientTimes">
+            <el-form-item label="余额不足预警次数:" prop="insufficientTimes">
     <el-input v-model.number="formData.insufficientTimes" :clearable="true" placeholder="请输入insufficientTimes字段" />
 </el-form-item>
             <el-form-item label="飞机ID:" prop="chatId">
@@ -122,9 +122,7 @@
             <el-form-item label="修改时间:" prop="updatedAt">
     <el-date-picker v-model="formData.updatedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-            <el-form-item label="createdDate字段:" prop="createdDate">
-    <el-input v-model="formData.createdDate" :clearable="true" placeholder="请输入createdDate字段" />
-</el-form-item>
+
           </el-form>
     </el-drawer>
 
@@ -139,10 +137,10 @@
                     <el-descriptions-item label="天数">
     {{ detailForm.days }}
 </el-descriptions-item>
-                    <el-descriptions-item label="times字段">
+                    <el-descriptions-item label="预警次数">
     {{ detailForm.times }}
 </el-descriptions-item>
-                    <el-descriptions-item label="insufficientTimes字段">
+                    <el-descriptions-item label="余额不足预警次数">
     {{ detailForm.insufficientTimes }}
 </el-descriptions-item>
                     <el-descriptions-item label="飞机ID">
@@ -169,9 +167,7 @@
                     <el-descriptions-item label="修改时间">
     {{ detailForm.updatedAt }}
 </el-descriptions-item>
-                    <el-descriptions-item label="createdDate字段">
-    {{ detailForm.createdDate }}
-</el-descriptions-item>
+
             </el-descriptions>
         </el-drawer>
 

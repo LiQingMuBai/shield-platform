@@ -12,10 +12,10 @@
         <el-form-item label="天数:" prop="days">
     <el-input v-model.number="formData.days" :clearable="true" placeholder="请输入days字段" />
 </el-form-item>
-        <el-form-item label="times字段:" prop="times">
+        <el-form-item label="预警次数:" prop="times">
     <el-input v-model.number="formData.times" :clearable="true" placeholder="请输入times字段" />
 </el-form-item>
-        <el-form-item label="insufficientTimes字段:" prop="insufficientTimes">
+        <el-form-item label="余额不足预警次数:" prop="insufficientTimes">
     <el-input v-model.number="formData.insufficientTimes" :clearable="true" placeholder="请输入insufficientTimes字段" />
 </el-form-item>
         <el-form-item label="飞机ID:" prop="chatId">
@@ -40,9 +40,7 @@
         <el-form-item label="修改时间:" prop="updatedAt">
     <el-date-picker v-model="formData.updatedAt" type="date" style="width:100%" placeholder="选择日期" :clearable="true" />
 </el-form-item>
-        <el-form-item label="createdDate字段:" prop="createdDate">
-    <el-input v-model="formData.createdDate" :clearable="true" placeholder="请输入createdDate字段" />
-</el-form-item>
+
         <el-form-item>
           <el-button :loading="btnLoading" type="primary" @click="save">保存</el-button>
           <el-button type="primary" @click="back">返回</el-button>

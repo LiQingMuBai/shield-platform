@@ -42,7 +42,7 @@
         <el-form-item label="userId字段:" prop="userId">
     <el-input v-model="formData.userId" :clearable="true" placeholder="请输入userId字段" />
 </el-form-item>
-        <el-form-item label="times字段:" prop="times">
+        <el-form-item label="预警次数:" prop="times">
     <el-input v-model.number="formData.times" :clearable="true" placeholder="请输入times字段" />
 </el-form-item>
         <el-form-item label="地址:" prop="address">
