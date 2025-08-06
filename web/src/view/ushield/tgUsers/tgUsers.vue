@@ -34,7 +34,7 @@
         
             <el-table-column align="left" label="ID" prop="id" width="120" />
 
-            <el-table-column align="left" label="用户名" prop="username" width="120" />
+            <el-table-column align="left" label="用户名" prop="username" width="180" />
 
             <el-table-column align="left" label="ChatID" prop="associates" width="120" />
 

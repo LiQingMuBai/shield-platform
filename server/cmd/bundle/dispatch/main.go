@@ -115,7 +115,7 @@ func (a *App) startScheduler(interval time.Duration) {
 	}()
 }
 func (a *App) executeTask() {
-	a.logger.Println("开始能量兑换系统-执行定时任务...")
+	a.logger.Println("开始笔数能量兑换系统-执行定时任务...")
 	startTime := time.Now()
 
 	tronClient, err := tron.NewTronService(global.GVA_CONFIG.System.TRON_FULL_NODE)
@@ -168,6 +168,7 @@ func (a *App) executeTask() {
 
 				if item.Times == 0 {
 					item.Status = 3
+					userOperationPackageSubscriptionsService.UpdateTimesByID(context.Background(), item.Id, 0)
 				}
 				err := userOperationPackageSubscriptionsService.UpdateUserPackageSubscriptions(context.Background(), item)
 

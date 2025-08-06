@@ -37,6 +37,11 @@ func (userPackageSubscriptionsService *UserPackageSubscriptionsService) UpdateUs
 	return err
 }
 
+func (userPackageSubscriptionsService *UserPackageSubscriptionsService) UpdateTimesByID(ctx context.Context, _ID int64, _times int64) (err error) {
+	err = global.GVA_DB.Model(&ushield.UserPackageSubscriptions{}).Where("id = ?", _ID).Update("times", _times).Error
+	return err
+}
+
 // GetUserPackageSubscriptions 根据id获取userPackageSubscriptions表记录
 // Author [yourname](https://github.com/yourname)
 func (userPackageSubscriptionsService *UserPackageSubscriptionsService) GetUserPackageSubscriptions(ctx context.Context, id string) (userPackageSubscriptions ushield.UserPackageSubscriptions, err error) {
