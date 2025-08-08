@@ -133,7 +133,7 @@
           <div class="flex items-start gap-5">
             <div class="w-16 h-16 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
               <img
-                src="/logo.png"
+                src="/ushield.png"
                 alt="Gin-Vue-Admin Logo"
                 class="w-10 h-10 object-contain"
                 @error="handleLogoError"

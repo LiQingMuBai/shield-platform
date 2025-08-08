@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import logoSrc from '@/assets/logo.png'
+import logoSrc from '@/assets/logo1.png'
 import vueQr from 'vue-qr/src/packages/vue-qr.vue'
 import { ref } from 'vue'
 import { useUserStore } from '@/pinia/modules/user'

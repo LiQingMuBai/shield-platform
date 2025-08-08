@@ -4,8 +4,9 @@
 const greenText = (text) => `\x1b[32m${text}\x1b[0m`
 
 const config = {
-  appName: 'Gin-Vue-Admin',
-  appLogo: 'logo.png',
+  // appName: 'Gin-Vue-Admin',
+  appName: 'U盾后台管理',
+  appLogo: 'ushield.png',
   showViteLogo: true,
   logs: []
 }
