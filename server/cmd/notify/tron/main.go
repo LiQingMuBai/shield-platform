@@ -75,7 +75,7 @@ func main() {
 		logger: log.New(os.Stdout, "TRON-TRACE-ADDRESS-TASK: ", log.LstdFlags),
 	}
 
-	// 每隔1min启动定时任务
+	// 每隔5min启动定时任务
 	app.startScheduler(5 * time.Minute)
 
 	// 等待关闭信号

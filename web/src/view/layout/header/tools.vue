@@ -5,7 +5,7 @@
 
 <template>
   <div class="flex items-center mx-4 gap-4">
-    <el-tooltip class="" effect="dark" content="视频教程" placement="bottom">
+<!--    <el-tooltip class="" effect="dark" content="视频教程" placement="bottom">
       <el-dropdown @command="toDoc">
         <el-icon
           class="w-8 h-8 shadow rounded-full border border-gray-200 dark:border-gray-600 cursor-pointer border-solid"
@@ -24,16 +24,16 @@
           </el-dropdown-menu>
         </template>
       </el-dropdown>
-    </el-tooltip>
+    </el-tooltip>-->
 
-    <el-tooltip class="" effect="dark" content="搜索" placement="bottom">
+<!--    <el-tooltip class="" effect="dark" content="搜索" placement="bottom">
       <el-icon
         @click="handleCommand"
         class="w-8 h-8 shadow rounded-full border border-gray-200 dark:border-gray-600 cursor-pointer border-solid"
       >
         <Search />
       </el-icon>
-    </el-tooltip>
+    </el-tooltip>-->
 
     <el-tooltip class="" effect="dark" content="系统设置" placement="bottom">
       <el-icon
