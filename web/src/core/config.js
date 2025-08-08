@@ -7,6 +7,7 @@ const config = {
   // appName: 'Gin-Vue-Admin',
   appName: 'U盾后台管理',
   appLogo: 'ushield.png',
+  appLogo2: 'logo.png',
   showViteLogo: true,
   logs: []
 }
