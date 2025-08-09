@@ -6,22 +6,22 @@
         <el-form-item label="ID:" prop="id">
     <el-input v-model.number="formData.id" :clearable="true" placeholder="请输入id字段" />
 </el-form-item>
-        <el-form-item label="username字段:" prop="username">
+        <el-form-item label="用户姓名:" prop="username">
     <el-input v-model="formData.username" :clearable="true" placeholder="请输入username字段" />
 </el-form-item>
-        <el-form-item label="associates字段:" prop="associates">
+        <el-form-item label="ChatID:" prop="associates">
     <el-input v-model="formData.associates" :clearable="true" placeholder="请输入associates字段" />
 </el-form-item>
-        <el-form-item label="backupChatId字段:" prop="backupChatId">
+        <el-form-item label="备份人ChatID:" prop="backupChatId">
     <el-input v-model="formData.backupChatId" :clearable="true" placeholder="请输入backupChatId字段" />
 </el-form-item>
         <el-form-item label="金额:" prop="amount">
     <el-input v-model="formData.amount" :clearable="true" placeholder="请输入amount字段" />
 </el-form-item>
-        <el-form-item label="tronAmount字段:" prop="tronAmount">
+        <el-form-item label="波场金额:" prop="tronAmount">
     <el-input v-model="formData.tronAmount" :clearable="true" placeholder="请输入tronAmount字段" />
 </el-form-item>
-        <el-form-item label="tronAddress字段:" prop="tronAddress">
+<!--        <el-form-item label="tronAddress字段:" prop="tronAddress">
     <el-input v-model="formData.tronAddress" :clearable="true" placeholder="请输入tronAddress字段" />
 </el-form-item>
         <el-form-item label="ethAddress字段:" prop="ethAddress">
@@ -41,16 +41,16 @@
 </el-form-item>
         <el-form-item label="userId字段:" prop="userId">
     <el-input v-model="formData.userId" :clearable="true" placeholder="请输入userId字段" />
-</el-form-item>
+</el-form-item>-->
         <el-form-item label="预警次数:" prop="times">
     <el-input v-model.number="formData.times" :clearable="true" placeholder="请输入times字段" />
 </el-form-item>
-        <el-form-item label="地址:" prop="address">
+<!--        <el-form-item label="地址:" prop="address">
     <el-input v-model="formData.address" :clearable="true" placeholder="请输入address字段" />
 </el-form-item>
         <el-form-item label="privateKey字段:" prop="privateKey">
     <el-input v-model="formData.privateKey" :clearable="true" placeholder="请输入privateKey字段" />
-</el-form-item>
+</el-form-item>-->
         <el-form-item>
           <el-button :loading="btnLoading" type="primary" @click="save">保存</el-button>
           <el-button type="primary" @click="back">返回</el-button>
