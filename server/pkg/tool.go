@@ -23,7 +23,7 @@ func GenerateOrderID(tronAddress string, suffix int) (string, error) {
 	//}
 
 	// 2. 获取当前时间的 "年月日时分"（格式：200601021504）
-	timestamp := time.Now().Format("200601021504")
+	timestamp := time.Now().Format("20060102150405")
 
 	// 3. 截取波场地址后4位
 	addressSuffix := tronAddress[len(tronAddress)-suffix:]
