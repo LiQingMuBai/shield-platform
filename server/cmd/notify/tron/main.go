@@ -216,7 +216,7 @@ func notifyRiskInsufficientBalance(_chatID string, _botToken string, _address st
 			"剩余天数：" + _days + " 天\n\n" +
 			"到期时间：" + formattedTime + "\n\n" +
 			"🛑 到期后将自动停止监测，不再推送风险提醒\n\n" +
-			"💼 当前余额：\n\n- " + _tronAmount + "TRX：\n- " + _amount + "USDT：\n\n" +
+			"💰 当前余额：\n\n-TRX：" + _tronAmount + "\n-USDT：" + _amount + "\n\n" +
 			"请尽快充值以继续保障资产安全",
 	}
 	// 转换为 JSON
