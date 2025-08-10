@@ -191,7 +191,7 @@ func (a *App) executeTask() {
 						}
 						//通知
 						_botToken := global.GVA_CONFIG.System.BotToken
-						notifyDepositMessage(strconv.FormatInt(trxModel.UserId, 10), _botToken, trxModel.Amount)
+						notifyDepositMessage(strconv.FormatInt(trxModel.UserId, 10), _botToken, trxModel.Amount, " TRX")
 					}
 				}
 			}
@@ -223,7 +223,7 @@ func (a *App) executeTask() {
 							return
 						}
 						_botToken := global.GVA_CONFIG.System.BotToken
-						notifyDepositMessage(strconv.FormatInt(usdtModel.UserId, 10), _botToken, usdtModel.Amount)
+						notifyDepositMessage(strconv.FormatInt(usdtModel.UserId, 10), _botToken, usdtModel.Amount, " USDT")
 
 					}
 
@@ -263,11 +263,11 @@ type TransactionTRXResp struct {
 	AmountStr string  `json:"amount_str"`
 }
 
-func notifyDepositMessage(_chatID string, _botToken string, _amount string) {
+func notifyDepositMessage(_chatID string, _botToken string, _amount string, _token string) {
 	message := map[string]interface{}{
 		"chat_id": _chatID, // 或直接用 chat_id 如 "123456789"=
 		"text": "【✅ U盾充值到账成功】\n\n" +
-			"金额：" + _amount + "\n\n",
+			"金额：" + _amount + _token + "\n\n",
 	}
 	// 转换为 JSON
 	jsonData, err := json.Marshal(message)
