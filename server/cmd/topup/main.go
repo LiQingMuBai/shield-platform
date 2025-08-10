@@ -198,7 +198,7 @@ func (a *App) executeTask() {
 			log.Println("=======================USDT=================================")
 			_time := utils.GetTimeDaysAgo(1)
 
-			fmt.Printf("user : ", user.DepositAddress)
+			fmt.Printf("user deposit address: %s", user.DepositAddress)
 			usdt_transactions, err := getIncomingTransactions(user.DepositAddress, global.GVA_CONFIG.System.TRON_FULL_NODE, 50, _time)
 			if err != nil {
 				global.GVA_LOG.Error(fmt.Sprintf("Error fetching bussiness's transactions: %v\n", err))
@@ -266,7 +266,7 @@ type TransactionTRXResp struct {
 func notifyDepositMessage(_chatID string, _botToken string, _amount string, _token string) {
 	message := map[string]interface{}{
 		"chat_id": _chatID, // 或直接用 chat_id 如 "123456789"=
-		"text": "【✅ U盾充值到账成功】\n\n" +
+		"text": "📢【✅ U盾充值到账成功】\n\n" +
 			"金额：" + _amount + _token + "\n\n",
 	}
 	// 转换为 JSON
