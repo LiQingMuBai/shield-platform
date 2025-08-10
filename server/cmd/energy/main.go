@@ -224,7 +224,7 @@ func (a *App) executeTask() {
 						continue
 					}
 					global.GVA_LOG.Info(fmt.Sprintf("发送（%d）笔能量给（%s），订单号 %s\n", count, sysOrder.FromAddress, orderNo))
-					//	trxfeeClient.Order(sysOrder.OrderNo, sysOrder.FromAddress, 65_000*count)
+					trxfeeClient.Order(sysOrder.OrderNo, sysOrder.FromAddress, 65_000*count)
 				}
 			}
 		}

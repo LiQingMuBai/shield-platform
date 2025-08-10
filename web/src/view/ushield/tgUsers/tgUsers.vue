@@ -153,7 +153,7 @@
                     <el-descriptions-item label="波场金额">
     {{ detailForm.tronAmount }}
 </el-descriptions-item>
-                    <el-descriptions-item label="tronAddress字段">
+<!--                    <el-descriptions-item label="tronAddress字段">
     {{ detailForm.tronAddress }}
 </el-descriptions-item>
                     <el-descriptions-item label="ethAddress字段">
@@ -173,16 +173,16 @@
 </el-descriptions-item>
                     <el-descriptions-item label="userId字段">
     {{ detailForm.userId }}
-</el-descriptions-item>
+</el-descriptions-item>-->
                     <el-descriptions-item label="预警次数">
     {{ detailForm.times }}
 </el-descriptions-item>
-                    <el-descriptions-item label="地址">
+<!--                    <el-descriptions-item label="地址">
     {{ detailForm.address }}
 </el-descriptions-item>
                     <el-descriptions-item label="privateKey字段">
     {{ detailForm.privateKey }}
-</el-descriptions-item>
+</el-descriptions-item>-->
             </el-descriptions>
         </el-drawer>
 

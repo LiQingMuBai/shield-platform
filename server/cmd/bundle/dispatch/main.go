@@ -12,7 +12,9 @@ import (
 	"github.com/ushield/aurora-admin/server/global"
 	"github.com/ushield/aurora-admin/server/infrastructure/blockchain/tron"
 	"github.com/ushield/aurora-admin/server/initialize"
+	"github.com/ushield/aurora-admin/server/model/ushield"
 	ushieldReq "github.com/ushield/aurora-admin/server/model/ushield/request"
+	"github.com/ushield/aurora-admin/server/pkg"
 	"github.com/ushield/aurora-admin/server/service"
 	"go.uber.org/zap"
 	"io"
@@ -152,17 +154,6 @@ func (a *App) executeTask() {
 			if energy < 65000 {
 				global.GVA_LOG.Info(fmt.Sprintf("发送（%d）笔能量给（%s），笔数套餐订单号 %d\n", 1, item.Address, item.Id))
 
-				//调用trxfee接口
-
-				//
-				///
-				///
-				///
-				///
-				///
-				///
-				///
-
 				//扣减次数
 				item.Times = item.Times - 1
 
@@ -178,6 +169,34 @@ func (a *App) executeTask() {
 				//通知用户
 				_botToken := global.GVA_CONFIG.System.BotToken
 				notifyDispatchEnergy(strconv.FormatInt(item.ChatId, 10), _botToken, item.Address, strconv.FormatInt(item.Times, 10))
+
+				//调用trxfee接口
+
+				var sysOrder ushield.UserEnergyOrders
+				orderNo, _ := pkg.GenerateOrderID(item.Address, 4)
+				fmt.Printf("  OrderNo: %s\n", orderNo)
+				sysOrder.OrderNo = orderNo
+				sysOrder.TxId = ""
+				sysOrder.FromAddress = item.Address
+				sysOrder.ToAddress = item.Address
+				sysOrder.Amount = 65000
+				sysOrder.ChatId = strconv.FormatInt(item.ChatId, 10)
+
+				//添加一条记录
+				errsg := sysOrderService.CreateUserEnergyOrders(context.Background(), &sysOrder)
+
+				if errsg != nil {
+					global.GVA_LOG.Error(fmt.Sprintf("添加一条记录订单失败: %v\n", err))
+					continue
+				}
+
+				apiSecret := global.GVA_CONFIG.System.TRXFEE_APISECRET
+				apiKey := global.GVA_CONFIG.System.TRXFEE_APIKEY
+				baseUrl := global.GVA_CONFIG.System.TRXFEE_BASE_URL
+				trxfeeClient := pkg.NewTrxfeeClient(baseUrl, apiKey, apiSecret)
+
+				global.GVA_LOG.Info(fmt.Sprintf("发送（%d）笔能量给（%s），订单号 %s\n", 1, sysOrder.FromAddress, orderNo))
+				trxfeeClient.Order(sysOrder.OrderNo, sysOrder.FromAddress, 65_000*1)
 			}
 
 		}
