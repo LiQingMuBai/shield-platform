@@ -137,6 +137,8 @@ func (a *App) executeTask() {
 				if minutes > 15 {
 					trxModel.Status = 2
 					userTrxDepositsService.UpdateUserTrxDeposits(context.Background(), trxModel)
+					userTrxPlaceholdersService.UpdateUserTrxPlaceholdersByName(context.Background(), trxModel.Placeholder, 0)
+
 				} else {
 					trxDeposits = append(trxDeposits, trxModel)
 				}
@@ -158,6 +160,7 @@ func (a *App) executeTask() {
 				if minutes > 15 {
 					usdtModel.Status = 2
 					userUsdtDepositsService.UpdateUserUsdtDeposits(context.Background(), usdtModel)
+					userTrxPlaceholdersService.UpdateUserTrxPlaceholdersByName(context.Background(), usdtModel.Placeholder, 0)
 				} else {
 					usdtDeposits = append(usdtDeposits, usdtModel)
 				}
