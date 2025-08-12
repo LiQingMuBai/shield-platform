@@ -210,8 +210,9 @@ func notifyRiskInsufficientBalance(_chatID string, _botToken string, _address st
 	formattedTime := currentTime.Format("2006-01-02 15:04:05")
 	message := map[string]interface{}{
 		"chat_id": _chatID, // 或直接用 chat_id 如 "123456789"=
-		"text": "📢 冻结预警服务即将到期检测余额不足推送\n\n" +
-			"📢 冻结预警服务即将到期！\n\n" +
+		"text":
+		//"📢 冻结预警服务即将到期检测余额不足推送\n\n" +
+		"📢 冻结预警服务即将到期！\n\n" +
 			"地址：" + _address + " \n\n" +
 			"剩余天数：" + _days + " 天\n\n" +
 			"到期时间：" + formattedTime + "\n\n" +
