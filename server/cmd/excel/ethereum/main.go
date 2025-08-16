@@ -42,7 +42,7 @@ func main() {
 	c := cron.New()
 
 	// 4. 每天 0 点执行任务
-	_, err := c.AddFunc("59 11 * * *", func() {
+	_, err := c.AddFunc("0 8 * * *", func() {
 		//log.Println("开始执行每日任务：更新 times=0 的 status=0")
 		app.executeTask()
 	})

@@ -67,7 +67,7 @@ func main() {
 	c := cron.New()
 
 	// 4. 每天 0 点执行任务
-	_, err := c.AddFunc("59 11 * * *", func() {
+	_, err := c.AddFunc("0 20 * * *", func() {
 		//log.Println("开始执行每日任务：更新 times=0 的 status=0")
 		app.executeTask()
 	})
@@ -290,7 +290,7 @@ func createLineChart(f *excelize.File, dataLength int) error {
 			{
 				Text: "统计今日冻结金额",
 			},
-		}, // 图表标题
+		},                                                // 图表标题
 		Legend: excelize.ChartLegend{Position: "bottom"}, // 图例位置
 		XAxis: excelize.ChartAxis{Title: []excelize.RichTextRun{
 			{
