@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/robfig/cron/v3"
 	"github.com/ushield/aurora-admin/server/core"
 	"github.com/ushield/aurora-admin/server/global"
 	"github.com/ushield/aurora-admin/server/initialize"
@@ -11,6 +13,7 @@ import (
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 	"log"
+	"os"
 	"time"
 )
 
@@ -44,69 +47,77 @@ func main() {
 		defer db.Close()
 	}
 
-	userStat, err := tgUsersService.QueryDailyNewUsersBuilder(context.Background())
+	c := cron.New()
+	// 每天 12 点执行任务
+	_, _ = c.AddFunc("0 12 * * *", func() {
+		log.Println("开始执行每日任务：发送新增用户")
+		userStat, err := tgUsersService.QueryDailyNewUsersBuilder(context.Background())
+		if err != nil {
+		}
+		for _, record := range userStat {
+			fmt.Printf("record : %v\n", record)
+		}
+		fileName, error1 := generateExcelWithChart(userStat)
+		if error1 != nil {
+			fmt.Printf("generateExcelWithChart error: %v\n", error1)
+			return
+		}
+		sendTG(fileName)
+	})
+	// 6. 启动定时任务
+	c.Start()
+	log.Println("定时任务已启动，每天 12 点执行")
 
+	// 7. 保持程序运行
+	select {}
+
+}
+func sendTG(name string) {
+
+	TG_BOT_API := "7617902102:AAEIfTBDM08SbW3U6vZP0dG-JIEQ7M_eklM"
+
+	chat_ID := 1628434262
+
+	// 1. 初始化 bot，使用你的 Telegram Bot Token
+	bot, err := tgbotapi.NewBotAPI(TG_BOT_API)
 	if err != nil {
-
-	}
-	for _, record := range userStat {
-
-		fmt.Printf("record : %v\n", record)
-
+		log.Panic(err)
 	}
 
-	generateExcelWithChart(userStat)
-	//c := cron.New()
-	//
-	//// 4. 每天 12 点执行任务
-	//_, err := c.AddFunc("0 12 * * *", func() {
-	//	log.Println("开始执行每日任务：更新 times=0 的 status=0")
-	//
-	//	// 5. 使用 GORM 更新符合条件的记录
-	//	error1 := tgUsersService.UpdateTgUsersTimes(context.Background())
-	//
-	//	if error1 != nil {
-	//		log.Printf("更新失败: %v", error1)
-	//		return
-	//	}
-	//
-	//	//log.Printf("更新成功，影响行数: %d", result.RowsAffected)
-	//})
-	//执行发送excel表格
-	//_, err = c.AddFunc("0 10 * * *", func() {
-	//	log.Println("任务2：开始更新 name=1 的记录")
-	//
-	//	result := db.Model(&TgUser{}).
-	//		Where("name = ?", "1").
-	//		Update("status", 0) // 假设你要更新 status，按需调整
-	//
-	//	if result.Error != nil {
-	//		log.Printf("任务2失败: %v", result.Error)
-	//		return
-	//	}
-	//
-	//	log.Printf("任务2成功，影响行数: %d", result.RowsAffected)
-	//})
-	//
-	//if err != nil {
-	//	log.Fatalf("定时任务设置失败: %v", err)
-	//}
+	bot.Debug = true // 开启调试模式
 
-	//if err != nil {
-	//	log.Fatalf("定时任务设置失败: %v", err)
-	//}
-	//
-	//// 6. 启动定时任务
-	//c.Start()
-	//log.Println("定时任务已启动，每天 0 点执行")
-	//
-	//// 7. 保持程序运行
-	//select {}
+	log.Printf("Authorized on account %s", bot.Self.UserName)
 
+	// 2. 准备要发送的 Excel 文件
+	filePath := "./" + name // 替换为你的 Excel 文件路径
+
+	// 3. 读取文件内容
+	fileBytes, err := os.ReadFile(filePath)
+	if err != nil {
+		log.Panicf("Error reading file: %v", err)
+	}
+
+	// 4. 创建文件上传配置
+	// 注意: 群组ID应该是负数，例如 -100123456789
+	chatID := chat_ID // 替换为你的群组ID (注意是负数)
+
+	// 5. 创建文件上传请求
+	fileConfig := tgbotapi.NewDocument(int64(chatID), tgbotapi.FileBytes{
+		Name:  name, // 接收方看到的文件名
+		Bytes: fileBytes,
+	})
+	//fileConfig.Caption = "这是要发送的 Excel 文件" // 可选的文件描述
+
+	// 6. 发送文件
+	if _, err := bot.Send(fileConfig); err != nil {
+		log.Panic(err)
+	}
+
+	log.Println("Excel file sent successfully!")
 }
 
 // generateExcelWithChart 生成包含折线图的Excel文件
-func generateExcelWithChart(stats []ushield.DailyUserStat) error {
+func generateExcelWithChart(stats []ushield.DailyUserStat) (string, error) {
 	f := excelize.NewFile()
 	defer func() {
 		if err := f.Close(); err != nil {
@@ -118,7 +129,7 @@ func generateExcelWithChart(stats []ushield.DailyUserStat) error {
 	sheetName := "用户统计"
 	index, err := f.NewSheet(sheetName)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// 设置表头
@@ -138,7 +149,7 @@ func generateExcelWithChart(stats []ushield.DailyUserStat) error {
 
 	// 创建折线图
 	if err := createLineChart(f, sheetName, len(stats)); err != nil {
-		return err
+		return "", err
 	}
 
 	// 设置默认工作表
@@ -147,10 +158,10 @@ func generateExcelWithChart(stats []ushield.DailyUserStat) error {
 	// 保存文件
 	filename := fmt.Sprintf("用户统计_%s.xlsx", time.Now().Format("20060102_150405"))
 	if err := f.SaveAs(filename); err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return filename, nil
 }
 
 // createLineChart 在Excel中创建折线图
