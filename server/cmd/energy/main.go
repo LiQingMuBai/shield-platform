@@ -99,20 +99,20 @@ func (a *App) startScheduler(interval time.Duration) {
 func (a *App) executeTask() {
 	a.logger.Println("开始能量兑换系统-执行定时任务...")
 	startTime := time.Now()
-	tronClient := pkg.NewTronClient(global.GVA_CONFIG.System.TRON_FULL_NODE)
-	sendAmount := utils.ConvertFloatToBigInt(global.GVA_CONFIG.System.DEPOSIT_TRX_AMOUNT, 6)
+	//tronClient := pkg.NewTronClient(global.GVA_CONFIG.System.TRON_FULL_NODE)
+	//sendAmount := utils.ConvertFloatToBigInt(global.GVA_CONFIG.System.DEPOSIT_TRX_AMOUNT, 6)
 
 	apiSecret := global.GVA_CONFIG.System.TRXFEE_APISECRET
 	apiKey := global.GVA_CONFIG.System.TRXFEE_APIKEY
 	baseUrl := global.GVA_CONFIG.System.TRXFEE_BASE_URL
 	trxfeeClient := pkg.NewTrxfeeClient(baseUrl, apiKey, apiSecret)
 
-	accountResp, err := trxfeeClient.Account()
-	trxFeeAccountAddress := accountResp.Data.RechargeAddr
-	if err != nil {
-		global.GVA_LOG.Error(fmt.Sprintf("获取trxfee账户失败: %v\n", err))
-		return
-	}
+	//accountResp, err := trxfeeClient.Account()
+	//trxFeeAccountAddress := accountResp.Data.RechargeAddr
+	//if err != nil {
+	//	global.GVA_LOG.Error(fmt.Sprintf("获取trxfee账户失败: %v\n", err))
+	//	return
+	//}
 	dictDetail, err := dictDetailService.GetDictionaryInfoByLabel("energy_cost")
 
 	if err != nil {
@@ -121,41 +121,41 @@ func (a *App) executeTask() {
 	}
 
 	amount, err := utils.StringToFloat64(dictDetail.Value)
-
+	//
 	if err != nil {
 		global.GVA_LOG.Error(fmt.Sprintf("没有设置energy_cost: %v\n", err))
 		return
 	}
-	trxFeeAccountBalance := accountResp.Data.Balance
-
-	if trxFeeAccountBalance <= global.GVA_CONFIG.System.MAX_TRX_AMOUNT {
-		//
-		global.GVA_LOG.Error(fmt.Sprintf("需要充值trxfee余额不够，余额：%f，最低余额%f\n", trxFeeAccountBalance, global.GVA_CONFIG.System.MAX_TRX_AMOUNT))
-
-		global.GVA_LOG.Info(fmt.Sprintf("需要充值trxfee地址：%s\n", trxFeeAccountAddress))
-
-		//telegram通知
-		go notifyInsufficientGas(global.GVA_CONFIG.System.ChatID, global.GVA_CONFIG.System.BotToken, accountResp.Data.RechargeAddr, trxFeeAccountBalance)
-		global.GVA_LOG.Info(fmt.Sprintf("telegram通知：%s\n", trxFeeAccountAddress))
-
-		//调用接口去充值
-
-		log.Println("=======================================")
-		log.Println("sendAmount:", sendAmount)
-		log.Println("tronClient:", global.GVA_CONFIG.System.TRON_FULL_NODE)
-		log.Println("pk:", global.GVA_CONFIG.System.MasterPK)
-		log.Println("address:", trxFeeAccountAddress)
-		log.Println("=======================================")
-		go func() {
-			_, err := tronClient.TransferNative(context.Background(), global.GVA_CONFIG.System.MasterPK, trxFeeAccountAddress, sendAmount)
-			if err != nil {
-
-			}
-		}()
-		global.GVA_LOG.Info(fmt.Sprintf("主地址進行地址充值：%s\n", trxFeeAccountAddress))
-
-		return
-	}
+	//trxFeeAccountBalance := accountResp.Data.Balance
+	//
+	//if trxFeeAccountBalance <= global.GVA_CONFIG.System.MAX_TRX_AMOUNT {
+	//	//
+	//	global.GVA_LOG.Error(fmt.Sprintf("需要充值trxfee余额不够，余额：%f，最低余额%f\n", trxFeeAccountBalance, global.GVA_CONFIG.System.MAX_TRX_AMOUNT))
+	//
+	//	global.GVA_LOG.Info(fmt.Sprintf("需要充值trxfee地址：%s\n", trxFeeAccountAddress))
+	//
+	//	//telegram通知
+	//	go notifyInsufficientGas(global.GVA_CONFIG.System.ChatID, global.GVA_CONFIG.System.BotToken, accountResp.Data.RechargeAddr, trxFeeAccountBalance)
+	//	global.GVA_LOG.Info(fmt.Sprintf("telegram通知：%s\n", trxFeeAccountAddress))
+	//
+	//	//调用接口去充值
+	//
+	//	log.Println("=======================================")
+	//	log.Println("sendAmount:", sendAmount)
+	//	log.Println("tronClient:", global.GVA_CONFIG.System.TRON_FULL_NODE)
+	//	log.Println("pk:", global.GVA_CONFIG.System.MasterPK)
+	//	log.Println("address:", trxFeeAccountAddress)
+	//	log.Println("=======================================")
+	//	go func() {
+	//		_, err := tronClient.TransferNative(context.Background(), global.GVA_CONFIG.System.MasterPK, trxFeeAccountAddress, sendAmount)
+	//		if err != nil {
+	//
+	//		}
+	//	}()
+	//	global.GVA_LOG.Info(fmt.Sprintf("主地址進行地址充值：%s\n", trxFeeAccountAddress))
+	//
+	//	return
+	//}
 
 	users, total, err := userService.GetUserInfoListAndAddressNotNull()
 	if err != nil {
@@ -210,19 +210,19 @@ func (a *App) executeTask() {
 
 					count := int(transaction.Amount / amount)
 
-					if count*int(amount) > int(trxFeeAccountBalance) {
-						global.GVA_LOG.Error(fmt.Sprintf("需要(%d)笔数，金额不够需要充值\n", count))
-						go notifyInsufficientGas(global.GVA_CONFIG.System.ChatID, global.GVA_CONFIG.System.BotToken, accountResp.Data.RechargeAddr, trxFeeAccountBalance)
-
-						go func() {
-							_, err := tronClient.TransferNative(context.Background(), global.GVA_CONFIG.System.MasterPK, trxFeeAccountAddress, sendAmount)
-							if err != nil {
-
-							}
-						}()
-
-						continue
-					}
+					//if count*int(amount) > int(trxFeeAccountBalance) {
+					//	global.GVA_LOG.Error(fmt.Sprintf("需要(%d)笔数，金额不够需要充值\n", count))
+					//	go notifyInsufficientGas(global.GVA_CONFIG.System.ChatID, global.GVA_CONFIG.System.BotToken, accountResp.Data.RechargeAddr, trxFeeAccountBalance)
+					//
+					//	go func() {
+					//		_, err := tronClient.TransferNative(context.Background(), global.GVA_CONFIG.System.MasterPK, trxFeeAccountAddress, sendAmount)
+					//		if err != nil {
+					//
+					//		}
+					//	}()
+					//
+					//	continue
+					//}
 					global.GVA_LOG.Info(fmt.Sprintf("发送（%d）笔能量给（%s），订单号 %s\n", count, sysOrder.FromAddress, orderNo))
 					trxfeeClient.Order(sysOrder.OrderNo, sysOrder.FromAddress, 65_000*count)
 				}

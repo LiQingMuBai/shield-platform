@@ -9,6 +9,29 @@ import (
 
 type TgUsersService struct{}
 
+// UserStat 用于存储每日用户统计结果
+type DailyUserStat struct {
+	Date  string
+	Count int
+}
+
+// 或者使用GORM的构建器方式（如果数据库支持DATE函数）
+func (tgUsersService *TgUsersService) QueryDailyNewUsersBuilder(ctx context.Context) ([]DailyUserStat, error) {
+	var stats []DailyUserStat
+
+	err := global.GVA_DB.Model(&ushield.TgUsers{}).
+		Select("DATE(created_at) as date, COUNT(*) as count").
+		Group("DATE(created_at)").
+		Order("date").
+		Scan(&stats).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return stats, nil
+}
+
 // CreateTgUsers 创建tgUsers表记录
 // Author [yourname](https://github.com/yourname)
 func (tgUsersService *TgUsersService) CreateTgUsers(ctx context.Context, tgUsers *ushield.TgUsers) (err error) {

@@ -290,7 +290,7 @@ func createLineChart(f *excelize.File, dataLength int) error {
 			{
 				Text: "统计今日冻结金额",
 			},
-		},                                                // 图表标题
+		}, // 图表标题
 		Legend: excelize.ChartLegend{Position: "bottom"}, // 图例位置
 		XAxis: excelize.ChartAxis{Title: []excelize.RichTextRun{
 			{
