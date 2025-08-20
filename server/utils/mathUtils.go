@@ -60,6 +60,9 @@ func AddMultipleStringNumbers(numbers ...string) (string, error) {
 	var total float64
 
 	for _, numStr := range numbers {
+		if numStr == "" {
+			numStr = "0.0"
+		}
 		num, err := strconv.ParseFloat(numStr, 64)
 		if err != nil {
 			return "", fmt.Errorf("'%s' 不是有效的数字: %v", numStr, err)

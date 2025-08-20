@@ -44,6 +44,12 @@ func (userUsdtDepositsService *UserUsdtDepositsService) GetUserUsdtDeposits(ctx 
 	return
 }
 
+func (userUsdtDepositsService *UserUsdtDepositsService) CountUserUsdtDepositsByTxHash(ctx context.Context, txHash string) (records int) {
+	var users []ushield.UserUsdtDeposits
+	_ = global.GVA_DB.Where("tx_hash = ?", txHash).Find(&users)
+	return len(users)
+}
+
 // GetUserUsdtDepositsInfoList 分页获取userUsdtDeposits表记录
 // Author [yourname](https://github.com/yourname)
 func (userUsdtDepositsService *UserUsdtDepositsService) GetUserUsdtDepositsInfoList(ctx context.Context, info ushieldReq.UserUsdtDepositsSearch) (list []ushield.UserUsdtDeposits, total int64, err error) {

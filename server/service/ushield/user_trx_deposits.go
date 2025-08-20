@@ -36,6 +36,11 @@ func (userTrxDepositsService *UserTrxDepositsService) UpdateUserTrxDeposits(ctx 
 	err = global.GVA_DB.Model(&ushield.UserTrxDeposits{}).Where("id = ?", userTrxDeposits.Id).Updates(&userTrxDeposits).Error
 	return err
 }
+func (userTrxDepositsService *UserTrxDepositsService) CountUserTRXDepositsByTxHash(ctx context.Context, txHash string) (records int) {
+	var users []ushield.UserTrxDeposits
+	_ = global.GVA_DB.Where("tx_hash = ?", txHash).Find(&users)
+	return len(users)
+}
 
 // GetUserTrxDeposits 根据id获取userTrxDeposits表记录
 // Author [yourname](https://github.com/yourname)

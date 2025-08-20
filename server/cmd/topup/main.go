@@ -177,14 +177,30 @@ func (a *App) executeTask() {
 
 					totalAmount, _ := utils.AddMultipleStringNumbers(trxModel.Amount, trxModel.Placeholder)
 					if totalAmount == trx_transaction.AmountStr {
+
+						records := userTrxDepositsService.CountUserTRXDepositsByTxHash(context.Background(), trx_transaction.TxID)
+
+						if records > 0 {
+							log.Printf("已经存在trx该交易hash: %d\n", records)
+
+							return
+						}
+
+						log.Println("匹配成功", trx_transaction.AmountStr)
+						log.Printf("trxModel: %d  amount: %s\n", trxModel.UserId, trxModel.Amount)
+
 						//命中请给对方添加金额
 						//修改状态
 						trxModel.Status = 1
+						trxModel.TxHash = trx_transaction.TxID
 						userTrxDepositsService.UpdateUserTrxDeposits(context.Background(), trxModel)
 						userTrxPlaceholdersService.UpdateUserTrxPlaceholdersByName(context.Background(), trxModel.Placeholder, 0)
 						//修改用户
 						tgUser, _ := tgUsersService.GetTgUsersByAssociates(context.Background(), trxModel.UserId)
-						tgUser.TronAmount, _ = utils.AddMultipleStringNumbers(tgUser.TronAmount, totalAmount)
+						tgUser.TronAmount, _ = utils.AddMultipleStringNumbers(tgUser.TronAmount, trxModel.Amount)
+						log.Println("trx入账tg_user name: ", tgUser.Username)
+						log.Println("trx入账tg_user amount: ", tgUser.Amount)
+
 						err := tgUsersService.UpdateTgUsers(context.Background(), tgUser)
 						if err != nil {
 							return
@@ -198,7 +214,7 @@ func (a *App) executeTask() {
 			log.Println("=======================USDT=================================")
 			_time := utils.GetTimeDaysAgo(1)
 
-			fmt.Printf("user deposit address: %s", user.DepositAddress)
+			fmt.Printf("user deposit address: %s\n", user.DepositAddress)
 			usdt_transactions, err := getIncomingTransactions(user.DepositAddress, global.GVA_CONFIG.System.TRON_FULL_NODE, 50, _time)
 			if err != nil {
 				global.GVA_LOG.Error(fmt.Sprintf("Error fetching bussiness's transactions: %v\n", err))
@@ -207,17 +223,32 @@ func (a *App) executeTask() {
 			for _, usdt_transaction := range usdt_transactions {
 				//fmt.Printf("usdt_transaction:%+v\n", usdt_transaction)
 				//fmt.Println("amount ", usdt_transaction.Amount)
-				fmt.Println("amountStr ", usdt_transaction.AmountStr)
+				fmt.Println("usdt amountStr ", usdt_transaction.AmountStr)
 				for _, usdtModel := range usdtDeposits {
 					totalAmount, _ := utils.AddMultipleStringNumbers(usdtModel.Amount, usdtModel.Placeholder)
 					if totalAmount == usdt_transaction.AmountStr {
+
+						records := userUsdtDepositsService.CountUserUsdtDepositsByTxHash(context.Background(), usdt_transaction.TxID)
+
+						if records > 0 {
+							log.Printf("已经存在usdt该交易hash: %d\n", records)
+
+							return
+						}
+
+						log.Println("匹配成功", usdt_transaction.AmountStr)
+						log.Printf("usdtModel: %d  amount: %s\n", usdtModel.UserId, usdtModel.Amount)
 						//命中请给对方添加金额
 						//修改状态
 						usdtModel.Status = 1
+						usdtModel.TxHash = usdt_transaction.TxID
 						userUsdtDepositsService.UpdateUserUsdtDeposits(context.Background(), usdtModel)
 						userUsdtPlaceholdersService.UpdateUserUsdtPlaceholdersByName(context.Background(), usdtModel.Placeholder, 0)
 						tgUser, _ := tgUsersService.GetTgUsersByAssociates(context.Background(), usdtModel.UserId)
-						tgUser.Amount, _ = utils.AddMultipleStringNumbers(tgUser.Amount, totalAmount)
+						tgUser.Amount, _ = utils.AddMultipleStringNumbers(tgUser.Amount, usdtModel.Amount)
+
+						log.Println("入账tg_user name: ", tgUser.Username)
+						log.Println("入账tg_user amount: ", tgUser.Amount)
 						err := tgUsersService.UpdateTgUsers(context.Background(), tgUser)
 						if err != nil {
 							return
