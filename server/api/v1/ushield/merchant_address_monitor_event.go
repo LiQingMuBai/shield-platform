@@ -324,7 +324,7 @@ func (merchantAddressMonitorEventApi *MerchantAddressMonitorEventApi) GetMerchan
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	list, total, err := merchantAddressMonitorEventService.GetMerchantAddressMonitorEventInfoList(ctx, pageInfo)
+	list, total, err := merchantAddressMonitorEventService.GetMerchantAddressMonitorEventInfoList(ctx, pageInfo, 1)
 	if err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败:"+err.Error(), c)

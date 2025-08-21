@@ -51,11 +51,11 @@ func (merchantAddressMonitorEventService *MerchantAddressMonitorEventService) Ge
 
 // GetMerchantAddressMonitorEventInfoList 分页获取merchantAddressMonitorEvent表记录
 // Author [yourname](https://github.com/yourname)
-func (merchantAddressMonitorEventService *MerchantAddressMonitorEventService) GetMerchantAddressMonitorEventInfoList(ctx context.Context, info ushieldReq.MerchantAddressMonitorEventSearch) (list []ushield.MerchantAddressMonitorEvent, total int64, err error) {
+func (merchantAddressMonitorEventService *MerchantAddressMonitorEventService) GetMerchantAddressMonitorEventInfoList(ctx context.Context, info ushieldReq.MerchantAddressMonitorEventSearch, _status int64) (list []ushield.MerchantAddressMonitorEvent, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&ushield.MerchantAddressMonitorEvent{})
+	db := global.GVA_DB.Model(&ushield.MerchantAddressMonitorEvent{}).Where("status = ?", _status)
 	var merchantAddressMonitorEvents []ushield.MerchantAddressMonitorEvent
 	// 如果有条件搜索 下方会自动创建搜索语句
 
