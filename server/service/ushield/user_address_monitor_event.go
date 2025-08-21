@@ -37,6 +37,11 @@ func (userAddressMonitorEventService *UserAddressMonitorEventService) UpdateUser
 	return err
 }
 
+func (userAddressMonitorEventService *UserAddressMonitorEventService) UpdateUserAddressMonitorEventStatus(ctx context.Context, userAddressMonitorEvent ushield.UserAddressMonitorEvent) (err error) {
+	err = global.GVA_DB.Model(&ushield.UserAddressMonitorEvent{}).Where("id = ?", userAddressMonitorEvent.Id).Updates(&userAddressMonitorEvent).Error
+	return err
+}
+
 // GetUserAddressMonitorEvent 根据id获取userAddressMonitorEvent表记录
 // Author [yourname](https://github.com/yourname)
 func (userAddressMonitorEventService *UserAddressMonitorEventService) GetUserAddressMonitorEvent(ctx context.Context, id string) (userAddressMonitorEvent ushield.UserAddressMonitorEvent, err error) {

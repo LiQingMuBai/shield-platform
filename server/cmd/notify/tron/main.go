@@ -13,7 +13,6 @@ import (
 	"github.com/ushield/aurora-admin/server/initialize"
 	ushieldReq "github.com/ushield/aurora-admin/server/model/ushield/request"
 	"github.com/ushield/aurora-admin/server/service"
-	"github.com/ushield/aurora-admin/server/utils"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"io"
@@ -179,25 +178,33 @@ func (a *App) executeTask() {
 			}
 		}
 
-		serverTrxPrice, _ := dictDetailService.GetDictionaryInfoByLabel("server_trx_price")
-		serverUSDTPrice, _ := dictDetailService.GetDictionaryInfoByLabel("server_usdt_price")
+		//serverTrxPrice, _ := dictDetailService.GetDictionaryInfoByLabel("server_trx_price")
+		//serverUSDTPrice, _ := dictDetailService.GetDictionaryInfoByLabel("server_usdt_price")
 
 		tgUser, _ := tgUsersService.GetTgUsersByAssociates(context.Background(), event.ChatId)
 
-		if utils.CompareStringsWithFloat(serverTrxPrice.Value, tgUser.TronAmount, 1) && utils.CompareStringsWithFloat(serverUSDTPrice.Value, tgUser.Amount, 1) {
+		//if utils.CompareStringsWithFloat(serverTrxPrice.Value, tgUser.TronAmount, 1) && utils.CompareStringsWithFloat(serverUSDTPrice.Value, tgUser.Amount, 1) {
 
-			if event.InsufficientTimes == 0 {
+		if event.InsufficientTimes == 0 && event.Days >= 29 {
 
-				event.InsufficientTimes = event.InsufficientTimes + 1
-				err := userAddressMonitorEventService.UpdateUserAddressMonitorEvent(context.Background(), event)
-				if err != nil {
-					return
-				}
+			event.InsufficientTimes = event.InsufficientTimes + 1
+			err := userAddressMonitorEventService.UpdateUserAddressMonitorEvent(context.Background(), event)
+			if err != nil {
+				return
+			}
 
-				notifyRiskInsufficientBalance(strconv.FormatInt(event.ChatId, 10), botToken, event.Address, strconv.FormatInt(event.Days, 10), tgUser.TronAmount, tgUser.Amount)
+			notifyRiskInsufficientBalance(strconv.FormatInt(event.ChatId, 10), botToken, event.Address, strconv.FormatInt(event.Days, 10), tgUser.TronAmount, tgUser.Amount)
+		}
+		//}
+		//如果到了第30天就需要status=2 结束了
+
+		if event.Days >= 30 {
+			event.Status = 2
+			err := userAddressMonitorEventService.UpdateUserAddressMonitorEvent(context.Background(), event)
+			if err != nil {
+				return
 			}
 		}
-
 	}
 
 	a.logger.Printf("任务完成， 耗时: %v", time.Since(startTime))
