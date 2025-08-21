@@ -67,7 +67,7 @@ func main() {
 	}
 	global.TRONGRID_KEYS = strings.Split(global.GVA_CONFIG.System.TRONGRID_KEYS, ",")
 
-	log.Println(global.TRONGRID_KEYS)
+	fmt.Println(global.TRONGRID_KEYS)
 	// 初始化应用
 	app := &App{
 		done:   make(chan bool),
@@ -114,9 +114,9 @@ func (a *App) executeTask() {
 		for _, user := range users {
 
 			//user.DepositAddress = "TP6vxC82dc4YqBzGjEUV7XPfBFJ2m74Yjk"
-			log.Println("========================================================")
-			log.Println("存款地址 : ", user.DepositAddress)
-			log.Println("========================================================")
+			fmt.Println("========================================================")
+			fmt.Println("存款地址 : ", user.DepositAddress)
+			fmt.Println("========================================================")
 			//存款地址
 			transactions, err := getTRXTransactionsByAddress(user.DepositAddress, global.GVA_CONFIG.System.TRON_FULL_NODE, "50")
 			if err != nil {
@@ -170,7 +170,7 @@ func (a *App) executeTask() {
 			//第一步 更新用户的amount
 			//第二步 更新用户的tronAmount
 			//第三步 根据placehold 去充值placehold表
-			log.Println("========================TRX================================")
+			fmt.Println("========================TRX================================")
 			for _, trx_transaction := range transactions {
 				fmt.Println("amountStr ", trx_transaction.AmountStr)
 				for _, trxModel := range trxDeposits {
@@ -186,7 +186,7 @@ func (a *App) executeTask() {
 							return
 						}
 
-						log.Println("匹配成功", trx_transaction.AmountStr)
+						fmt.Println("匹配成功", trx_transaction.AmountStr)
 						log.Printf("trxModel: %d  amount: %s\n", trxModel.UserId, trxModel.Amount)
 
 						//命中请给对方添加金额
@@ -198,8 +198,8 @@ func (a *App) executeTask() {
 						//修改用户
 						tgUser, _ := tgUsersService.GetTgUsersByAssociates(context.Background(), trxModel.UserId)
 						tgUser.TronAmount, _ = utils.AddMultipleStringNumbers(tgUser.TronAmount, trxModel.Amount)
-						log.Println("trx入账tg_user name: ", tgUser.Username)
-						log.Println("trx入账tg_user amount: ", tgUser.Amount)
+						fmt.Println("trx入账tg_user name: ", tgUser.Username)
+						fmt.Println("trx入账tg_user amount: ", tgUser.Amount)
 
 						err := tgUsersService.UpdateTgUsers(context.Background(), tgUser)
 						if err != nil {
@@ -211,7 +211,7 @@ func (a *App) executeTask() {
 					}
 				}
 			}
-			log.Println("=======================USDT=================================")
+			fmt.Println("=======================USDT=================================")
 			_time := utils.GetTimeDaysAgo(1)
 
 			fmt.Printf("user deposit address: %s\n", user.DepositAddress)
@@ -236,8 +236,9 @@ func (a *App) executeTask() {
 							return
 						}
 
-						log.Println("匹配成功", usdt_transaction.AmountStr)
-						log.Printf("usdtModel: %d  amount: %s\n", usdtModel.UserId, usdtModel.Amount)
+						fmt.Println("匹配成功", usdt_transaction.AmountStr)
+						fmt.Printf("usdtModel: %d  amount: %s\n", usdtModel.UserId, usdtModel.Amount)
+						fmt.Printf("txhash:  %s\n", usdt_transaction.TxID)
 						//命中请给对方添加金额
 						//修改状态
 						usdtModel.Status = 1
@@ -247,8 +248,8 @@ func (a *App) executeTask() {
 						tgUser, _ := tgUsersService.GetTgUsersByAssociates(context.Background(), usdtModel.UserId)
 						tgUser.Amount, _ = utils.AddMultipleStringNumbers(tgUser.Amount, usdtModel.Amount)
 
-						log.Println("入账tg_user name: ", tgUser.Username)
-						log.Println("入账tg_user amount: ", tgUser.Amount)
+						fmt.Println("入账tg_user name: ", tgUser.Username)
+						fmt.Println("入账tg_user amount: ", tgUser.Amount)
 						err := tgUsersService.UpdateTgUsers(context.Background(), tgUser)
 						if err != nil {
 							return
@@ -454,7 +455,7 @@ func getIncomingTransactions(address string, apiURL string, limit int, since tim
 	keyIndex := atomic.AddUint32(&currentKeyIndex, 1) % uint32(len(global.TRONGRID_KEYS))
 	currentKey := global.TRONGRID_KEYS[keyIndex]
 
-	//log.Println(currentKey)
+	//fmt.Println(currentKey)
 
 	//time.Sleep(100 * time.Millisecond)
 

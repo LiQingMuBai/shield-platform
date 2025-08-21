@@ -44,7 +44,7 @@ func main() {
 	global.GVA_VP = core.Viper() // 初始化Viper
 
 	buddha := `============================================
-                       代理一上线
+                       能量闪兑上线
    `
 	fmt.Println(buddha)
 	global.GVA_DB = initialize.Gorm() // gorm连接数据库
@@ -126,6 +126,8 @@ func (a *App) executeTask() {
 		global.GVA_LOG.Error(fmt.Sprintf("没有设置energy_cost: %v\n", err))
 		return
 	}
+
+	fmt.Println("设置energy_cost ", amount)
 	//trxFeeAccountBalance := accountResp.Data.Balance
 	//
 	//if trxFeeAccountBalance <= global.GVA_CONFIG.System.MAX_TRX_AMOUNT {
@@ -174,7 +176,7 @@ func (a *App) executeTask() {
 
 			for _, transaction := range transactions {
 
-				if transaction.Amount <= amount {
+				if transaction.Amount < amount {
 					global.GVA_LOG.Info(fmt.Sprintf("订单金额太小，交易: %s，金额: %f\n", transaction.TxID, transaction.Amount))
 					continue
 				}
@@ -294,7 +296,17 @@ func notifyInsufficientGas(_chatID string, _botToken string, _address string, _a
 // 获取指定地址的交易列表
 func getTRXTransactionsByAddress(address string, apiURL string, pageSize string) ([]TransactionTRXResp, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
-	url := fmt.Sprintf("%s/v1/accounts/%s/transactions?only_to=true&limit="+pageSize, apiURL, address)
+	// 获取当天时间范围
+	now := time.Now()
+	startOfDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+
+	//url := fmt.Sprintf("%s/v1/accounts/%s/transactions?only_to=true&limit="+pageSize, apiURL, address)
+
+	url := fmt.Sprintf("%s/v1/accounts/%s/transactions?only_to=true&min_timestamp=%d&max_timestamp=%d&limit="+pageSize, apiURL,
+		address,
+		startOfDay.UnixNano()/1e6, // 转换为毫秒
+		now.UnixNano()/1e6)
+
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %v", err)
