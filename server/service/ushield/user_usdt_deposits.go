@@ -2,9 +2,11 @@ package ushield
 
 import (
 	"context"
+	"fmt"
 	"github.com/ushield/aurora-admin/server/global"
 	"github.com/ushield/aurora-admin/server/model/ushield"
 	ushieldReq "github.com/ushield/aurora-admin/server/model/ushield/request"
+	"log"
 )
 
 type UserUsdtDepositsService struct{}
@@ -89,4 +91,31 @@ func (userUsdtDepositsService *UserUsdtDepositsService) GetUserTrxDepositsByStat
 func (userUsdtDepositsService *UserUsdtDepositsService) GetUserUsdtDepositsPublic(ctx context.Context) {
 	// 此方法为获取数据源定义的数据
 	// 请自行实现
+}
+
+// 按日期统计金额总和
+func (userUsdtDepositsService *UserUsdtDepositsService) GetDailyUSDTDeposits() (list []DailyDeposit, err error) {
+
+	var results []DailyDeposit
+
+	// 使用SQLite的date函数提取日期部分，并转换字符串金额为浮点数进行求和
+	result := global.GVA_DB.Model(&ushield.UserUsdtDeposits{}).
+		Select("date(created_at) as date, "+
+			"sum(cast(amount as real)) as total, "+
+			"count(*) as count").Where("status = ?", 1).
+		Group("date(created_at)").
+		Order("date").
+		Scan(&results)
+
+	if result.Error != nil {
+		log.Fatal("failed to query daily deposits: ", result.Error)
+	}
+
+	fmt.Println("\n每日存款统计:")
+	fmt.Println("日期\t\t总计\t\t笔数")
+	for _, r := range results {
+		fmt.Printf("%s\t%.2f\t\t%d\n", r.Date.Format("2006-01-02"), r.Total, r.Count)
+	}
+
+	return results, err
 }

@@ -14,6 +14,7 @@ import (
 	"go.uber.org/zap"
 	"log"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -74,10 +75,9 @@ func main() {
 }
 func sendTG(name string) {
 
-	TG_BOT_API := "7617902102:AAEIfTBDM08SbW3U6vZP0dG-JIEQ7M_eklM"
-
-	chat_ID := 1628434262
-
+	TG_BOT_API := global.GVA_CONFIG.System.BotToken
+	CHAT_ID := global.GVA_CONFIG.System.ChatID
+	chatID, _ := strconv.ParseInt(CHAT_ID, 10, 64)
 	// 1. 初始化 bot，使用你的 Telegram Bot Token
 	bot, err := tgbotapi.NewBotAPI(TG_BOT_API)
 	if err != nil {
@@ -99,10 +99,9 @@ func sendTG(name string) {
 
 	// 4. 创建文件上传配置
 	// 注意: 群组ID应该是负数，例如 -100123456789
-	chatID := chat_ID // 替换为你的群组ID (注意是负数)
 
 	// 5. 创建文件上传请求
-	fileConfig := tgbotapi.NewDocument(int64(chatID), tgbotapi.FileBytes{
+	fileConfig := tgbotapi.NewDocument(chatID, tgbotapi.FileBytes{
 		Name:  name, // 接收方看到的文件名
 		Bytes: fileBytes,
 	})

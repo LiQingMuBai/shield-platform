@@ -1,8 +1,9 @@
 package main
 
 import (
-	"context"
 	"fmt"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/robfig/cron/v3"
 	"github.com/ushield/aurora-admin/server/core"
 	"github.com/ushield/aurora-admin/server/global"
 	"github.com/ushield/aurora-admin/server/initialize"
@@ -11,11 +12,15 @@ import (
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 	"log"
+	"os"
+	"strconv"
 	"time"
 )
 
 var (
-	tgUsersService = service.ServiceGroupApp.UshieldServiceGroup.TgUsersService
+	tgUsersService          = service.ServiceGroupApp.UshieldServiceGroup.TgUsersService
+	userTrxDepositsService  = service.ServiceGroupApp.UshieldServiceGroup.UserTrxDepositsService
+	userUsdtDepositsService = service.ServiceGroupApp.UshieldServiceGroup.UserUsdtDepositsService
 )
 
 type App struct {
@@ -29,7 +34,7 @@ func main() {
 	global.GVA_VP = core.Viper() // 初始化Viper
 
 	buddha := `============================================
-                       统计新增用户数上线
+                       统计每日充值金额
    `
 	fmt.Println(buddha)
 	global.GVA_DB = initialize.Gorm() // gorm连接数据库
@@ -43,70 +48,82 @@ func main() {
 		db, _ := global.GVA_DB.DB()
 		defer db.Close()
 	}
+	c := cron.New()
+	// 每天 12 点执行任务
+	_, _ = c.AddFunc("10 12 * * *", func() {
+		log.Println("开始执行每日任务：发送每日充值金额")
+		results1, err := userTrxDepositsService.GetDailyTRXDeposits()
 
-	userStat, err := tgUsersService.QueryDailyNewUsersBuilder(context.Background())
+		if err != nil {
+			return
+		}
 
+		fileName1, err := generateExcelWithChart(results1, "TRX")
+
+		results2, err := userUsdtDepositsService.GetDailyUSDTDeposits()
+
+		sendTG(fileName1)
+
+		time.Sleep(10 * time.Second)
+		if err != nil {
+			return
+		}
+		fileName2, err := generateExcelWithChart(results2, "USDT")
+		sendTG(fileName2)
+	})
+	// 6. 启动定时任务
+	c.Start()
+	log.Println("定时任务已启动，每天 12 点执行")
+
+	// 7. 保持程序运行
+	select {}
+}
+
+func sendTG(name string) {
+
+	TG_BOT_API := global.GVA_CONFIG.System.BotToken
+	CHAT_ID := global.GVA_CONFIG.System.ChatID
+	chatID, _ := strconv.ParseInt(CHAT_ID, 10, 64)
+
+	// 1. 初始化 bot，使用你的 Telegram Bot Token
+	bot, err := tgbotapi.NewBotAPI(TG_BOT_API)
 	if err != nil {
-
-	}
-	for _, record := range userStat {
-
-		fmt.Printf("record : %v\n", record)
-
+		log.Panic(err)
 	}
 
-	generateExcelWithChart(userStat)
-	//c := cron.New()
-	//
-	//// 4. 每天 12 点执行任务
-	//_, err := c.AddFunc("0 12 * * *", func() {
-	//	log.Println("开始执行每日任务：更新 times=0 的 status=0")
-	//
-	//	// 5. 使用 GORM 更新符合条件的记录
-	//	error1 := tgUsersService.UpdateTgUsersTimes(context.Background())
-	//
-	//	if error1 != nil {
-	//		log.Printf("更新失败: %v", error1)
-	//		return
-	//	}
-	//
-	//	//log.Printf("更新成功，影响行数: %d", result.RowsAffected)
-	//})
-	//执行发送excel表格
-	//_, err = c.AddFunc("0 10 * * *", func() {
-	//	log.Println("任务2：开始更新 name=1 的记录")
-	//
-	//	result := db.Model(&TgUser{}).
-	//		Where("name = ?", "1").
-	//		Update("status", 0) // 假设你要更新 status，按需调整
-	//
-	//	if result.Error != nil {
-	//		log.Printf("任务2失败: %v", result.Error)
-	//		return
-	//	}
-	//
-	//	log.Printf("任务2成功，影响行数: %d", result.RowsAffected)
-	//})
-	//
-	//if err != nil {
-	//	log.Fatalf("定时任务设置失败: %v", err)
-	//}
+	bot.Debug = true // 开启调试模式
 
-	//if err != nil {
-	//	log.Fatalf("定时任务设置失败: %v", err)
-	//}
-	//
-	//// 6. 启动定时任务
-	//c.Start()
-	//log.Println("定时任务已启动，每天 0 点执行")
-	//
-	//// 7. 保持程序运行
-	//select {}
+	log.Printf("Authorized on account %s", bot.Self.UserName)
 
+	// 2. 准备要发送的 Excel 文件
+	filePath := "./" + name // 替换为你的 Excel 文件路径
+
+	// 3. 读取文件内容
+	fileBytes, err := os.ReadFile(filePath)
+	if err != nil {
+		log.Panicf("Error reading file: %v", err)
+	}
+
+	// 4. 创建文件上传配置
+	// 注意: 群组ID应该是负数，例如 -100123456789
+
+	// 5. 创建文件上传请求
+	fileConfig := tgbotapi.NewDocument(chatID, tgbotapi.FileBytes{
+		Name:  name, // 接收方看到的文件名
+		Bytes: fileBytes,
+	})
+	//fileConfig.Caption = "这是要发送的 Excel 文件" // 可选的文件描述
+
+	// 6. 发送文件
+	if _, err := bot.Send(fileConfig); err != nil {
+		log.Panic(err)
+	}
+
+	log.Println("Excel file sent successfully!")
 }
 
 // generateExcelWithChart 生成包含折线图的Excel文件
-func generateExcelWithChart(stats []ushield.DailyUserStat) error {
+func generateExcelWithChart(stats []ushield.DailyDeposit, token string) (string, error) {
 	f := excelize.NewFile()
 	defer func() {
 		if err := f.Close(); err != nil {
@@ -118,39 +135,42 @@ func generateExcelWithChart(stats []ushield.DailyUserStat) error {
 	sheetName := "用户统计"
 	index, err := f.NewSheet(sheetName)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// 设置表头
 	f.SetCellValue(sheetName, "A1", "日期")
-	f.SetCellValue(sheetName, "B1", "新增用户数")
+	f.SetCellValue(sheetName, "B1", "金额")
+	f.SetCellValue(sheetName, "C1", "人数")
 
 	// 填充数据
 	for i, stat := range stats {
 		row := i + 2 // 从第2行开始（第1行是表头）
 		f.SetCellValue(sheetName, fmt.Sprintf("A%d", row), stat.Date)
-		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), stat.Count)
+		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), stat.Total)
+		f.SetCellValue(sheetName, fmt.Sprintf("c%d", row), stat.Count)
 	}
 
 	// 设置列宽
 	f.SetColWidth(sheetName, "A", "A", 12) // 日期列宽
 	f.SetColWidth(sheetName, "B", "B", 15) // 数量列宽
+	f.SetColWidth(sheetName, "C", "C", 15) // 数量列宽
 
 	// 创建折线图
 	if err := createLineChart(f, sheetName, len(stats)); err != nil {
-		return err
+		return "", err
 	}
 
 	// 设置默认工作表
 	f.SetActiveSheet(index)
 
 	// 保存文件
-	filename := fmt.Sprintf("用户统计_%s.xlsx", time.Now().Format("20060102_150405"))
+	filename := fmt.Sprintf("用户"+token+"充值金额统计_%s.xlsx", time.Now().Format("20060102_150405"))
 	if err := f.SaveAs(filename); err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return filename, nil
 }
 
 // createLineChart 在Excel中创建折线图
@@ -175,7 +195,7 @@ func createLineChart(f *excelize.File, sheetName string, dataPoints int) error {
 		},
 		Title: []excelize.RichTextRun{
 			{
-				Text: "每日新增用户统计",
+				Text: "每日用户充值金额统计",
 			},
 		},
 		Legend: excelize.ChartLegend{
@@ -191,7 +211,7 @@ func createLineChart(f *excelize.File, sheetName string, dataPoints int) error {
 		YAxis: excelize.ChartAxis{
 			Title: []excelize.RichTextRun{
 				{
-					Text: "用户数量",
+					Text: "充值金额",
 				},
 			},
 		},
