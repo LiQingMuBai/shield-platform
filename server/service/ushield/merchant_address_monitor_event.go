@@ -45,7 +45,7 @@ func (merchantAddressMonitorEventService *MerchantAddressMonitorEventService) Ge
 }
 
 func (merchantAddressMonitorEventService *MerchantAddressMonitorEventService) GetMerchantAddressMonitorEventByAddressAndUser(ctx context.Context, _address string, _userID uint) (merchantAddressMonitorEvent ushield.MerchantAddressMonitorEvent, err error) {
-	err = global.GVA_DB.Where("address = ?", _address).Where("_userID = ?", _userID).First(&merchantAddressMonitorEvent).Error
+	err = global.GVA_DB.Where("address = ?", _address).Where("user_id = ? and status = ?", _userID, 1).First(&merchantAddressMonitorEvent).Error
 	return
 }
 

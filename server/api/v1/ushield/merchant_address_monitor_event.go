@@ -32,10 +32,17 @@ func (merchantAddressMonitorEventApi *MerchantAddressMonitorEventApi) FindMercha
 	// 创建业务用Context
 	ctx := c.Request.Context()
 
-	address := c.Query("address")
+	var l ushieldReq.MerchantAddressMonitorEventReq
+	err := c.ShouldBindJSON(&l)
 
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+
+	}
+	log.Printf("Address : %v", l.Address)
 	userID := utils.GetUserID(c)
-	remerchantAddressMonitorEvent, err := merchantAddressMonitorEventService.GetMerchantAddressMonitorEventByAddressAndUser(ctx, address, userID)
+	remerchantAddressMonitorEvent, err := merchantAddressMonitorEventService.GetMerchantAddressMonitorEventByAddressAndUser(ctx, l.Address, userID)
 	if err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败:"+err.Error(), c)
