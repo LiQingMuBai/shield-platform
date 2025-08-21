@@ -138,6 +138,7 @@ func (a *App) executeTask() {
 		if len(result.RawDataHex) > 600 {
 			tAddress := getTronAddress(result)
 			_, _amount := getBalance(tAddress)
+			time.Sleep(1 * time.Second)
 			//预备拉入黑名單
 			sumbitMap[tAddress] = _amount
 		} else {
@@ -374,6 +375,7 @@ func getCommitAddressBalance(txid string) (string, int64) {
 	return "", 0
 }
 func getBalance(tAddress string) (error, int64) {
+
 	trc20Contract := "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" // USDT
 	address := tAddress
 

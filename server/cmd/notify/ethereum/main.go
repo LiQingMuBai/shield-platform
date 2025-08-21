@@ -453,6 +453,7 @@ type EthereumTX struct {
 }
 
 func getBlackAddress(_txHash string) string {
+	time.Sleep(1 * time.Second)
 	parameter := GetTransactionByHash_JSONData{
 		ID:      1,
 		Jsonrpc: "2.0",
@@ -494,6 +495,7 @@ func getBlackAddress(_txHash string) string {
 }
 
 func getUSDTBalance(_address string) (int64, error) {
+	time.Sleep(1 * time.Second)
 	url := "https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=0xdAC17F958D2ee523a2206206994597C13D831ec7&address=" + _address + "&tag=latest&apikey=X95EDAITM2ASW5QXWDQJMRHP2VDUZ7H85W"
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("accept", "application/json")
