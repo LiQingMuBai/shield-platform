@@ -19,7 +19,9 @@ import (
 )
 
 var (
-	tgUsersService = service.ServiceGroupApp.UshieldServiceGroup.TgUsersService
+	tgUsersService          = service.ServiceGroupApp.UshieldServiceGroup.TgUsersService
+	userTrxDepositsService  = service.ServiceGroupApp.UshieldServiceGroup.UserTrxDepositsService
+	userUsdtDepositsService = service.ServiceGroupApp.UshieldServiceGroup.UserUsdtDepositsService
 )
 
 type App struct {
@@ -47,10 +49,10 @@ func main() {
 		db, _ := global.GVA_DB.DB()
 		defer db.Close()
 	}
-
+	//
 	c := cron.New()
 	// 每天 12 点执行任务
-	_, _ = c.AddFunc("0 12 * * *", func() {
+	_, _ = c.AddFunc("59 11 * * *", func() {
 		log.Println("开始执行每日任务：发送新增用户")
 		userStat, err := tgUsersService.QueryDailyNewUsersBuilder(context.Background())
 		if err != nil {
@@ -59,26 +61,17 @@ func main() {
 			fmt.Printf("record : %v\n", record)
 		}
 
-		var sum int
-		for _, dailyStat := range userStat {
-			sum += dailyStat.Count
-		}
+		results1, err := userTrxDepositsService.GetDailyTRXDeposits()
+		results2, err := userUsdtDepositsService.GetDailyUSDTDeposits()
 
-		var lastLine ushield.DailyUserStat
-
-		lastLine.Date = "总计"
-		lastLine.Count = sum
-
-		userStat = append(userStat, lastLine)
-
-		fileName, error1 := generateExcelWithChart(userStat)
+		error1 := generateTxtFile(results1, results2, userStat, "每日运营报表.txt")
 		if error1 != nil {
 			fmt.Printf("generateExcelWithChart error: %v\n", error1)
 			return
 		}
-		sendTG(fileName)
+		sendTG("每日运营报表.txt")
 	})
-	// 6. 启动定时任务
+	//6. 启动定时任务
 	c.Start()
 	log.Println("定时任务已启动，每天 12 点执行")
 
@@ -126,6 +119,180 @@ func sendTG(name string) {
 	}
 
 	log.Println("Excel file sent successfully!")
+}
+func extractDateSimple(isoString string) string {
+	// 简单截取前10个字符（年-月-日部分）
+	if len(isoString) >= 10 {
+		return isoString[:10]
+	}
+	return isoString
+}
+
+// 生成TXT文件
+func generateTxtFile(result1, result2 []ushield.DailyDeposit, stats []ushield.DailyUserStat, filename string) error {
+	// 创建文件
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// 写入文件头部
+	header := "日期\t\t\t每日人数\n"
+	file.WriteString(header)
+
+	// 写入分隔线
+	separator := "=============================================\n"
+	file.WriteString(separator)
+
+	// 写入每日统计数据
+	for _, stat := range stats {
+		line := fmt.Sprintf("%s\t\t%d人\n", extractDateSimple(stat.Date), stat.Count)
+		file.WriteString(line)
+	}
+
+	// 计算并写入总计
+	_, totalUsers := calculateTotals(stats)
+	totalLine := fmt.Sprintf("\n总计:\t\t%d人\n", totalUsers)
+	file.WriteString(separator)
+	file.WriteString(totalLine)
+
+	file.WriteString("\n")
+
+	file.WriteString("=================TRX充值统计====================\n")
+	file.WriteString("\n")
+	// 写入文件头部
+	header2 := "日期\t\ttrx充值\t\t每日人数\n"
+	file.WriteString(header2)
+
+	// 写入分隔线
+	separator2 := "=============================================\n"
+	file.WriteString(separator2)
+
+	// 写入每日统计数据
+	for _, stat := range result1 {
+		line := fmt.Sprintf("%s\t%f\t\t%d人\n", extractDateSimple(stat.Date.String()), stat.Total, stat.Count)
+		file.WriteString(line)
+	}
+
+	// 计算并写入总计
+	totalAmount2, totalUsers2 := calculateTotals2(result1)
+	totalLine2 := fmt.Sprintf("\n总计:\t%s\t\t%d人\n", totalAmount2, totalUsers2)
+	file.WriteString(separator2)
+	file.WriteString(totalLine2)
+	file.WriteString("\n")
+	file.WriteString("\n")
+	file.WriteString("=================USDT充值统计====================\n")
+	file.WriteString("\n")
+	// 写入文件头部
+
+	// 写入文件头部
+	header3 := "日期\t\tusdt充值\t\t每日人数\n"
+	file.WriteString(header3)
+
+	// 写入分隔线
+	separator3 := "=============================================\n"
+	file.WriteString(separator3)
+
+	// 写入每日统计数据
+	for _, stat := range result2 {
+		line := fmt.Sprintf("%s\t%f\t\t%d人\n", extractDateSimple(stat.Date.String()), stat.Total, stat.Count)
+		file.WriteString(line)
+	}
+
+	// 计算并写入总计
+	totalAmount3, totalUsers3 := calculateTotals2(result2)
+	totalLine3 := fmt.Sprintf("\n总计:\t%s\t\t%d人\n", totalAmount3, totalUsers3)
+	file.WriteString(separator3)
+	file.WriteString(totalLine3)
+
+	return nil
+}
+
+// 计算总计金额和总用户数
+func calculateTotals2(stats []ushield.DailyDeposit) (string, int) {
+	var totalAmount float64
+	var totalUsers int
+
+	for _, stat := range stats {
+		// 将字符串金额转换为浮点数进行计算
+		//amount, err := parseAmount2(stat.Total)
+		//if err != nil {
+		//	fmt.Printf("转换金额失败: %v, 跳过此项\n", err)
+		//	continue
+		//}
+		totalAmount += stat.Total
+		totalUsers += stat.Count
+	}
+
+	// 将总计金额格式化为字符串返回
+	return fmt.Sprintf("%.2f", totalAmount), totalUsers
+}
+
+// 解析金额字符串为浮点数
+func parseAmount2(amountStr string) (float64, error) {
+	// 这里可以根据您的实际数据格式进行调整
+	// 例如，如果金额字符串包含货币符号或逗号，需要先清理
+	// cleaned := cleanAmountString(amountStr)
+
+	// 直接转换为浮点数
+	amount, err := strconv.ParseFloat(amountStr, 64)
+	if err != nil {
+		return 0, fmt.Errorf("无法解析金额 '%s': %v", amountStr, err)
+	}
+
+	return amount, nil
+}
+
+// 计算总计金额和总用户数
+func calculateTotals(stats []ushield.DailyUserStat) (string, int) {
+	//var totalAmount float64
+	var totalUsers int
+
+	for _, stat := range stats {
+		// 将字符串金额转换为浮点数进行计算
+		//amount, err := parseAmount(stat.Amount)
+		//if err != nil {
+		//	fmt.Printf("转换金额失败: %v, 跳过此项\n", err)
+		//	continue
+		//}
+		//totalAmount += amount
+		totalUsers += stat.Count
+	}
+
+	// 将总计金额格式化为字符串返回
+	//return fmt.Sprintf("%.2f", totalAmount), totalUsers
+	return "", totalUsers
+}
+
+// 解析金额字符串为浮点数
+func parseAmount(amountStr string) (float64, error) {
+	// 这里可以根据您的实际数据格式进行调整
+	// 例如，如果金额字符串包含货币符号或逗号，需要先清理
+	// cleaned := cleanAmountString(amountStr)
+
+	// 直接转换为浮点数
+	amount, err := strconv.ParseFloat(amountStr, 64)
+	if err != nil {
+		return 0, fmt.Errorf("无法解析金额 '%s': %v", amountStr, err)
+	}
+
+	return amount, nil
+}
+
+// 清理金额字符串中的非数字字符
+func cleanAmountString(amountStr string) string {
+	// 移除所有非数字字符（除了小数点和负号）
+	// 例如：￥1,250.50 -> 1250.50
+	cleaned := make([]rune, 0, len(amountStr))
+
+	for _, r := range amountStr {
+		if (r >= '0' && r <= '9') || r == '.' || r == '-' {
+			cleaned = append(cleaned, r)
+		}
+	}
+
+	return string(cleaned)
 }
 
 // generateExcelWithChart 生成包含折线图的Excel文件

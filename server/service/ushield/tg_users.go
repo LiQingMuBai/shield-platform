@@ -22,7 +22,7 @@ func (tgUsersService *TgUsersService) QueryDailyNewUsersBuilder(ctx context.Cont
 	err := global.GVA_DB.Model(&ushield.TgUsers{}).
 		Select("DATE(created_at) as date, COUNT(*) as count").
 		Group("DATE(created_at)").
-		Order("date").
+		Order("date desc").
 		Scan(&stats).Error
 
 	if err != nil {

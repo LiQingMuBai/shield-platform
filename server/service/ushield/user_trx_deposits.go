@@ -108,7 +108,7 @@ func (userTrxDepositsService *UserTrxDepositsService) GetDailyTRXDeposits() (lis
 			"sum(cast(amount as real)) as total, "+
 			"count(*) as count").Where("status = ?", 1).
 		Group("date(created_at)").
-		Order("date").
+		Order("date desc").
 		Scan(&results)
 
 	if result.Error != nil {
