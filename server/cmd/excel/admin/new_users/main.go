@@ -58,6 +58,19 @@ func main() {
 		for _, record := range userStat {
 			fmt.Printf("record : %v\n", record)
 		}
+
+		var sum int
+		for _, dailyStat := range userStat {
+			sum += dailyStat.Count
+		}
+
+		var lastLine ushield.DailyUserStat
+
+		lastLine.Date = "总计"
+		lastLine.Count = sum
+
+		userStat = append(userStat, lastLine)
+
 		fileName, error1 := generateExcelWithChart(userStat)
 		if error1 != nil {
 			fmt.Printf("generateExcelWithChart error: %v\n", error1)
