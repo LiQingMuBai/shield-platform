@@ -1,6 +1,7 @@
 package system
 
 import (
+	"log"
 	"strconv"
 	"time"
 
@@ -16,6 +17,45 @@ import (
 	"github.com/ushield/aurora-admin/server/utils"
 	"go.uber.org/zap"
 )
+
+// Login
+// @Tags     Base
+// @Summary  用户登录
+// @Produce   application/json
+// @Param    data  body      systemReq.Login                                             true  "用户名, 密码, 验证码"
+// @Success  200   {object}  response.Response{data=systemRes.LoginResponse,msg=string}  "返回包括用户信息,token,过期时间"
+// @Router   /base/login [post]
+func (b *BaseApi) MerchantLogin(c *gin.Context) {
+	var l systemReq.Login
+	err := c.ShouldBindJSON(&l)
+
+	log.Printf("usernanme %s", l.Username)
+	log.Printf("password %s", l.Password)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	u := &system.SysUser{Username: l.Username, Password: l.Password}
+	user, err := userService.Login(u)
+	if err != nil {
+		global.GVA_LOG.Error("登陆失败! 用户名不存在或者密码错误!", zap.Error(err))
+		// 验证码次数+1
+
+		response.FailWithMessage("用户名不存在或者密码错误", c)
+		return
+	}
+	if user.Enable != 1 {
+		global.GVA_LOG.Error("登陆失败! 用户被禁止登录!")
+		// 验证码次数+1
+
+		response.FailWithMessage("用户被禁止登录", c)
+		return
+	}
+	b.TokenNext(c, *user)
+	return
+
+}
 
 // Login
 // @Tags     Base

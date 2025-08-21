@@ -12,7 +12,9 @@ import (
 	ushieldReq "github.com/ushield/aurora-admin/server/model/ushield/request"
 	"github.com/ushield/aurora-admin/server/utils"
 	"go.uber.org/zap"
+	"log"
 	"net/http"
+	"time"
 )
 
 type MerchantAddressMonitorEventApi struct{}
@@ -80,15 +82,48 @@ func (merchantAddressMonitorEventApi *MerchantAddressMonitorEventApi) CreateMerc
 	// 创建业务用Context
 	ctx := c.Request.Context()
 
-	var merchantAddressMonitorEvent ushield.MerchantAddressMonitorEvent
+	fmt.Println("进入厂商模式")
 
+	var merchantAddressMonitorEvent ushield.MerchantAddressMonitorEvent
 	merchantAddressMonitorEvent.UserId = utils.GetUserID(c)
 
-	err := c.ShouldBindJSON(&merchantAddressMonitorEvent)
+	log.Printf("userID : %v", merchantAddressMonitorEvent.UserId)
+	var l ushieldReq.MerchantAddressMonitorEventReq
+	err := c.ShouldBindJSON(&l)
+
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
+
 	}
+	log.Printf("Address : %v", l.Address)
+	log.Printf("Callback : %v", l.Callback)
+
+	//valid, message := utils.IsValidCryptoAddress(merchantAddressMonitorEvent.Address)
+
+	//if !valid {
+	//	//global.GVA_LOG.Error("非法地址!", zap.Error(message))
+	//	response.FailWithMessage("非法地址:"+message, c)
+	//	return
+	//}
+
+	//isUrl := utils.IsValidURL(merchantAddressMonitorEvent.Callback)
+	//if !isUrl {
+	//	//global.GVA_LOG.Error("非法地址!", zap.Error(message))
+	//	response.FailWithMessage("非法回调地址:"+merchantAddressMonitorEvent.Callback, c)
+	//	return
+	//}
+
+	//if merchantAddressMonitorEvent.Address
+
+	merchantAddressMonitorEvent.Address = l.Address
+	merchantAddressMonitorEvent.Callback = l.Callback
+	merchantAddressMonitorEvent.CreatedAt = time.Now()
+	merchantAddressMonitorEvent.UpdatedAt = time.Now()
+	merchantAddressMonitorEvent.Days = 0
+	merchantAddressMonitorEvent.Status = 1
+	//merchantAddressMonitorEvent.Network = message
+
 	err = merchantAddressMonitorEventService.CreateMerchantAddressMonitorEvent(ctx, &merchantAddressMonitorEvent)
 	if err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))

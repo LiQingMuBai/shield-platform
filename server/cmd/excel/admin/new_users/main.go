@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/robfig/cron/v3"
 	"github.com/ushield/aurora-admin/server/core"
 	"github.com/ushield/aurora-admin/server/global"
 	"github.com/ushield/aurora-admin/server/initialize"
@@ -50,33 +49,33 @@ func main() {
 		defer db.Close()
 	}
 	//
-	c := cron.New()
-	// 每天 12 点执行任务
-	_, _ = c.AddFunc("59 11 * * *", func() {
-		log.Println("开始执行每日任务：发送新增用户")
-		userStat, err := tgUsersService.QueryDailyNewUsersBuilder(context.Background())
-		if err != nil {
-		}
-		for _, record := range userStat {
-			fmt.Printf("record : %v\n", record)
-		}
+	//c := cron.New()
+	//// 每天 12 点执行任务
+	//_, _ = c.AddFunc("59 11 * * *", func() {
+	log.Println("开始执行每日任务：发送新增用户")
+	userStat, err := tgUsersService.QueryDailyNewUsersBuilder(context.Background())
+	if err != nil {
+	}
+	for _, record := range userStat {
+		fmt.Printf("record : %v\n", record)
+	}
 
-		results1, err := userTrxDepositsService.GetDailyTRXDeposits()
-		results2, err := userUsdtDepositsService.GetDailyUSDTDeposits()
+	results1, err := userTrxDepositsService.GetDailyTRXDeposits()
+	results2, err := userUsdtDepositsService.GetDailyUSDTDeposits()
 
-		error1 := generateTxtFile(results1, results2, userStat, "每日运营报表.txt")
-		if error1 != nil {
-			fmt.Printf("generateExcelWithChart error: %v\n", error1)
-			return
-		}
-		sendTG("每日运营报表.txt")
-	})
-	//6. 启动定时任务
-	c.Start()
-	log.Println("定时任务已启动，每天 12 点执行")
-
-	// 7. 保持程序运行
-	select {}
+	error1 := generateTxtFile(results1, results2, userStat, "每日运营报表.txt")
+	if error1 != nil {
+		fmt.Printf("generateExcelWithChart error: %v\n", error1)
+		return
+	}
+	//	sendTG("每日运营报表.txt")
+	//})
+	////6. 启动定时任务
+	//c.Start()
+	//log.Println("定时任务已启动，每天 12 点执行")
+	//
+	//// 7. 保持程序运行
+	//select {}
 
 }
 func sendTG(name string) {
