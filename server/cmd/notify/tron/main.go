@@ -166,7 +166,7 @@ func (a *App) executeTask() {
 	botToken := global.GVA_CONFIG.System.BotToken
 	for _, event := range monitorEvents {
 
-		if sumbitMap[event.Address] > 0 {
+		if sumbitMap[event.Address] >= 0 {
 			event.Times = event.Times + 1
 			if event.Times <= 10 {
 				err := userAddressMonitorEventService.UpdateUserAddressMonitorEvent(context.Background(), event)

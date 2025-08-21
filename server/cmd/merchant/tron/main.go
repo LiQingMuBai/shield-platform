@@ -166,7 +166,7 @@ func (a *App) executeTask() {
 
 	for _, event := range monitorEvents {
 
-		if sumbitMap[event.Address] > 0 {
+		if sumbitMap[event.Address] >= 0 {
 			event.Times = event.Times + 1
 			if event.Times <= 10 {
 				err := merchantAddressMonitorEventService.UpdateMerchantAddressMonitorEvent(context.Background(), event)
@@ -174,6 +174,7 @@ func (a *App) executeTask() {
 
 					return
 				}
+				log.Println("进行回调：", event.Callback)
 				callback(event.Callback, event.Address, 2)
 			}
 		}

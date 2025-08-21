@@ -186,7 +186,7 @@ func (a *App) executeTask() {
 
 	for _, event := range events {
 
-		if sumbitMap[event.Address] > 0 {
+		if sumbitMap[event.Address] >= 0 {
 			event.Times = event.Times + 1
 			if event.Times <= 10 {
 				err := merchantAddressMonitorEventService.UpdateMerchantAddressMonitorEvent(context.Background(), event)
