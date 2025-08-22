@@ -212,18 +212,19 @@ func (a *App) executeTask() {
 			if err != nil {
 				return
 			}
-			notifyRiskInsufficientBalance(strconv.FormatInt(event.ChatId, 10), botToken, event.Address, strconv.FormatInt(30-event.Days, 10), tgUser.TronAmount, tgUser.Amount)
+			notifyRiskInsufficientBalance(strconv.FormatInt(event.ChatId, 10), botToken, event.Address, strconv.FormatInt(31-event.Days, 10), tgUser.TronAmount, tgUser.Amount)
 			//	}
 		}
 
 		//如果到了第30天就需要status=2 结束了
 
-		if event.Days >= 29 {
+		if event.Days == 31 {
 			event.Status = 2
 			err := userAddressMonitorEventService.UpdateUserAddressMonitorEvent(context.Background(), event)
 			if err != nil {
 				return
 			}
+			notifyRiskInsufficientBalance(strconv.FormatInt(event.ChatId, 10), botToken, event.Address, strconv.FormatInt(31-event.Days, 10), tgUser.TronAmount, tgUser.Amount)
 		}
 
 	}
