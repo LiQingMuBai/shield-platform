@@ -60,7 +60,7 @@ func (tgUsersService *TgUsersService) UpdateTgUsers(ctx context.Context, tgUsers
 	return err
 }
 func (tgUsersService *TgUsersService) UpdateTgUsersTimes(ctx context.Context) (err error) {
-	err = global.GVA_DB.Model(&ushield.TgUsers{}).Update("status", 0).Error
+	err = global.GVA_DB.Model(&ushield.TgUsers{}).Where("times = ?", 1).Update("times", 0).Error
 	return err
 }
 

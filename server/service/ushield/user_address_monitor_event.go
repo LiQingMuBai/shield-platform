@@ -71,7 +71,13 @@ func (userAddressMonitorEventService *UserAddressMonitorEventService) GetUserAdd
 	err = db.Find(&userAddressMonitorEvents).Error
 	return userAddressMonitorEvents, total, err
 }
-func (userAddressMonitorEventService *UserAddressMonitorEventService) GetUserAddressMonitorEventPublic(ctx context.Context) {
+func (userAddressMonitorEventService *UserAddressMonitorEventService) GetUserAddressMonitorEventPublic(ctx context.Context) (list []ushield.UserAddressMonitorEvent, err error) {
 	// 此方法为获取数据源定义的数据
 	// 请自行实现
+	db := global.GVA_DB.Model(&ushield.UserAddressMonitorEvent{}).Where("status = ?", 1)
+	var userAddressMonitorEvents []ushield.UserAddressMonitorEvent
+
+	err = db.Find(&userAddressMonitorEvents).Error
+	return userAddressMonitorEvents, err
+
 }
