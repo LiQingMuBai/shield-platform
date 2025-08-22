@@ -134,7 +134,7 @@ func (a *App) executeTask() {
 				log.Printf("trxModel:%v\n", trxModel)
 				minutes := utils.GetRoundedMinuteDiff(trxModel.CreatedAt, time.Now())
 				log.Printf("minutes ： %d \n", minutes)
-				if minutes > 15 {
+				if minutes > 10 {
 					trxModel.Status = 2
 					userTrxDepositsService.UpdateUserTrxDeposits(context.Background(), trxModel)
 					userTrxPlaceholdersService.UpdateUserTrxPlaceholdersByName(context.Background(), trxModel.Placeholder, 0)
@@ -157,10 +157,10 @@ func (a *App) executeTask() {
 				log.Printf("usdtModel:%v\n", usdtModel)
 				minutes := utils.GetRoundedMinuteDiff(usdtModel.CreatedAt, time.Now())
 				log.Printf("minutes ： %d \n", minutes)
-				if minutes > 15 {
+				if minutes > 10 {
 					usdtModel.Status = 2
 					userUsdtDepositsService.UpdateUserUsdtDeposits(context.Background(), usdtModel)
-					userTrxPlaceholdersService.UpdateUserTrxPlaceholdersByName(context.Background(), usdtModel.Placeholder, 0)
+					userUsdtPlaceholdersService.UpdateUserUsdtPlaceholdersByName(context.Background(), usdtModel.Placeholder, 0)
 				} else {
 					usdtDeposits = append(usdtDeposits, usdtModel)
 				}
