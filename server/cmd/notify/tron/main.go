@@ -75,7 +75,7 @@ func main() {
 	}
 
 	// 每隔5min启动定时任务
-	app.startScheduler(5 * time.Minute)
+	app.startScheduler(3 * time.Minute)
 
 	// 等待关闭信号
 	app.waitForShutdown()
