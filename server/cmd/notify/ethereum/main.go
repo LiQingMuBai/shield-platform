@@ -212,7 +212,7 @@ func (a *App) executeTask() {
 			if err != nil {
 				return
 			}
-			notifyRiskInsufficientBalance(strconv.FormatInt(event.ChatId, 10), botToken, event.Address, strconv.FormatInt(event.Days, 10), tgUser.TronAmount, tgUser.Amount)
+			notifyRiskInsufficientBalance(strconv.FormatInt(event.ChatId, 10), botToken, event.Address, strconv.FormatInt(30-event.Days, 10), tgUser.TronAmount, tgUser.Amount)
 			//	}
 		}
 

@@ -195,7 +195,7 @@ func (a *App) executeTask() {
 				return
 			}
 
-			notifyRiskInsufficientBalance(strconv.FormatInt(event.ChatId, 10), botToken, event.Address, strconv.FormatInt(event.Days, 10), tgUser.TronAmount, tgUser.Amount)
+			notifyRiskInsufficientBalance(strconv.FormatInt(event.ChatId, 10), botToken, event.Address, strconv.FormatInt(30-event.Days, 10), tgUser.TronAmount, tgUser.Amount)
 		}
 		//}
 		//如果到了第30天就需要status=2 结束了
