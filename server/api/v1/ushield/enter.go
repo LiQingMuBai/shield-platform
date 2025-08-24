@@ -36,4 +36,5 @@ var (
 	userEnergyOrdersService            = service.ServiceGroupApp.UshieldServiceGroup.UserEnergyOrdersService
 	userBundleEnergyOrdersService      = service.ServiceGroupApp.UshieldServiceGroup.UserBundleEnergyOrdersService
 	merchantAddressMonitorEventService = service.ServiceGroupApp.UshieldServiceGroup.MerchantAddressMonitorEventService
+	userService                        = service.ServiceGroupApp.SystemServiceGroup.UserService
 )

@@ -19,6 +19,7 @@ func (s *MerchantAddressMonitorEventRouter) InitMerchantAddressMonitorEventRoute
 		merchantAddressMonitorEventRouter.POST("order", merchantAddressMonitorEventApi.CreateMerchantAddressMonitorEvent)
 		//厂商获取详情订单
 		merchantAddressMonitorEventRouter.POST("detail", merchantAddressMonitorEventApi.FindMerchantAddressMonitorEventByAddressAndUser)
+		merchantAddressMonitorEventRouter.POST("check", merchantAddressMonitorEventApi.DetectiveAddress)
 
 		//merchantAddressMonitorEventRouter.DELETE("deleteMerchantAddressMonitorEvent", merchantAddressMonitorEventApi.DeleteMerchantAddressMonitorEvent)           // 删除merchantAddressMonitorEvent表
 		merchantAddressMonitorEventRouter.DELETE("deleteMerchantAddressMonitorEvent", merchantAddressMonitorEventApi.InvokeMerchantAddressMonitorEvent)           // 删除merchantAddressMonitorEvent表

@@ -6,18 +6,83 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/ushield/aurora-admin/server/global"
 	"github.com/ushield/aurora-admin/server/model/common/response"
 	"github.com/ushield/aurora-admin/server/model/ushield"
 	ushieldReq "github.com/ushield/aurora-admin/server/model/ushield/request"
+	"github.com/ushield/aurora-admin/server/service/slowmist"
 	"github.com/ushield/aurora-admin/server/utils"
 	"go.uber.org/zap"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
 type MerchantAddressMonitorEventApi struct{}
+
+func (merchantAddressMonitorEventApi *MerchantAddressMonitorEventApi) DetectiveAddress(c *gin.Context) {
+	// 创建业务用Context
+	var l ushieldReq.MerchantAddressMonitorEventReq
+	err := c.ShouldBindJSON(&l)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+
+	}
+	log.Printf("Address : %v", l.Address)
+	userID := utils.GetUserID(c)
+	systemUser, err := userService.FindUserById(int(userID))
+	//扣用户的钱
+	if utils.CompareStringsWithFloat(systemUser.TrxAmount, "4", 1) || utils.CompareStringsWithFloat(systemUser.UsdtAmount, "1", 1) {
+		if utils.CompareStringsWithFloat(systemUser.TrxAmount, "4", 1) {
+			_trxAmount, _ := utils.SubtractStringNumbers(systemUser.TrxAmount, "4", 1)
+			systemUser.TrxAmount = _trxAmount
+			err := userService.UpdateUserTRXAmount(userID, _trxAmount)
+			if err == nil {
+				log.Println("扣用户4颗trx")
+			}
+
+		} else if utils.CompareStringsWithFloat(systemUser.UsdtAmount, "1", 1) {
+			usdtAmount, _ := utils.SubtractStringNumbers(systemUser.UsdtAmount, "1", 1)
+			systemUser.UsdtAmount = usdtAmount
+
+			err := userService.UpdateUserTRXAmount(userID, usdtAmount)
+			if err == nil {
+				log.Println("扣用户1颗usdt")
+			}
+		}
+
+		log.Println("UserID : ", userID)
+
+		// 加载 .env 文件
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
+
+		_cookie1 := os.Getenv("COOKIE1")
+		_cookie2 := os.Getenv("COOKIE2")
+		_cookie3 := os.Getenv("COOKIE3")
+		// 1. 创建字符串数组
+		cookies := []string{_cookie1, _cookie2, _cookie3}
+
+		_cookie := utils.RandomCookiesString(cookies)
+
+		fmt.Printf("_cookie: %s\n", _cookie)
+		feedback := slowmist.ExtractSlowMistRiskQuery(l.Address, _cookie)
+		code := 20000
+		response.Result(code, nil, feedback, c)
+
+	} else {
+		log.Println("UserID : ", userID)
+		feedback := "AI大数据分析诊断还未结束，请耐心等待几分钟..."
+		code := 20005
+		response.Result(code, nil, feedback, c)
+	}
+
+}
 
 // FindMerchantAddressMonitorEvent 用id查询merchantAddressMonitorEvent表
 // @Tags MerchantAddressMonitorEvent

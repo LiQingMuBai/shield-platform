@@ -24,6 +24,8 @@ type SysUser struct {
 	Password       string         `json:"-"  gorm:"comment:用户登录密码"`                                                                           // 用户登录密码
 	Address        string         `json:"address"  gorm:"comment:用户能量兑换地址"`                                                                   // 用户登录密码
 	DepositAddress string         `json:"depositAddress"  gorm:"column:deposit_address;comment:用户存款地址"`                                       // 用户登录密码
+	UsdtAmount     string         `json:"usdtAmount"  gorm:"column:usdt_amount;comment:usdt余额"`                                               // usdt余额
+	TrxAmount      string         `json:"trxAmount"  gorm:"column:trx_amount;comment:trx余额"`                                                  // trx余额
 	NickName       string         `json:"nickName" gorm:"default:系统用户;comment:用户昵称"`                                                          // 用户昵称
 	HeaderImg      string         `json:"headerImg" gorm:"default:https://qmplusimg.henrongyi.top/gva_header.jpg;comment:用户头像"`               // 用户头像
 	AuthorityId    uint           `json:"authorityId" gorm:"default:888;comment:用户角色ID"`                                                      // 用户角色ID

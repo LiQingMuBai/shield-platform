@@ -329,3 +329,12 @@ func (userService *UserService) ResetPassword(ID uint, password string) (err err
 	err = global.GVA_DB.Model(&system.SysUser{}).Where("id = ?", ID).Update("password", utils.BcryptHash(password)).Error
 	return err
 }
+
+func (userService *UserService) UpdateUserTRXAmount(ID uint, _amount string) (err error) {
+	err = global.GVA_DB.Model(&system.SysUser{}).Where("id = ?", ID).Update("trx_amount", _amount).Error
+	return err
+}
+func (userService *UserService) UpdateUserUSDTAmount(ID uint, _amount string) (err error) {
+	err = global.GVA_DB.Model(&system.SysUser{}).Where("id = ?", ID).Update("usdt_amount", _amount).Error
+	return err
+}
