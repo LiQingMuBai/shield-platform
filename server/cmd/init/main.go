@@ -47,12 +47,14 @@ func main() {
 	c := cron.New()
 
 	// 1. 每天 0 点执行任务
-	_, err := c.AddFunc("0 0 * * *", func() {
+	_, err := c.AddFunc("10 0 * * *", func() {
 		log.Println("开始执行每日任务：重置任务 time=0, days+1")
 
 		// 2. 使用 GORM 更新符合条件的记录
 		//重置用户访问检测地址次数=0
 		error1 := tgUsersService.UpdateTgUsersTimes(context.Background())
+
+		log.Println("重置用户的地址检测次数为0")
 
 		if error1 != nil {
 			log.Printf("更新失败: %v", error1)
